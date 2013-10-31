@@ -1,4 +1,4 @@
-package javabot.AIStarCraft;
+package javabot.RaynorsRaiders;
 
 import java.util.LinkedList;
 

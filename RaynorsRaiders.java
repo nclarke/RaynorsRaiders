@@ -1,4 +1,4 @@
-package javabot.AIStarCraft;
+package javabot.RaynorsRaiders;
 
 /**
  * Example of a Java AI Client that does nothing.

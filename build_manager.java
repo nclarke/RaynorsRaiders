@@ -1,4 +1,4 @@
-package javabot.AIStarCraft;
+package javabot.RaynorsRaiders;
 
 import java.awt.Point;
 import java.util.LinkedList;
@@ -12,7 +12,7 @@ import javabot.types.UnitType.UnitTypes;
 import javabot.types.UpgradeType;
 import javabot.types.UpgradeType.UpgradeTypes;
 import javabot.util.BWColor;
-import javabot.AIStarCraft.core_reactive.*;
+import javabot.RaynorsRaiders.core_reactive.*;
 
 // Cannot import core reactive, primary and secondary constructors will init the AI core communication
 
