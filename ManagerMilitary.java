@@ -13,7 +13,7 @@ import javabot.types.OrderType.OrderTypeTypes;
 import javabot.types.UnitType.UnitTypes;
 import javabot.util.BWColor;
 
-public class Military 
+public class ManagerMilitary 
 {
 	JNIBWAPI bwapi;
 	/* EnumMap for us to know what UnitTypes to train per Level - Level is determined by how well AI is doing in the game 
@@ -21,7 +21,7 @@ public class Military
 	EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLevel;
 	int homePositionX, homePositionY;
 	
-	public Military(JNIBWAPI rr_bwapi)
+	public ManagerMilitary(JNIBWAPI rr_bwapi)
 	{
 		this.bwapi = rr_bwapi;
 		unitTypesPerLevel = new EnumMap<Level, ArrayList<UnitTypes>>(Level.class);
