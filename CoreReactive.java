@@ -8,11 +8,11 @@ import javabot.types.UnitType.UnitTypes;
 import javabot.util.*;
 import javabot.model.*;
 
-public class core_reactive {
+public class CoreReactive {
 
 	//AIs
 	JNIBWAPI bwapi;
-	build_manager builder;
+	ManagerBuild builder;
 	
 	//Data structs
 	LinkedList<UnitTypes> core_econ_buildingStack;
@@ -32,7 +32,7 @@ public class core_reactive {
 	};
 	
 	/* Here is our constructor */
-	public core_reactive() {
+	public CoreReactive() {
 		core_econ_buildingStack = new LinkedList<UnitTypes>();
 		core_econ_unitsStack = new LinkedList<UnitTypes>();
 		
@@ -41,7 +41,7 @@ public class core_reactive {
 		core_econ_unitsMode = BuildMode.FIRST_POSSIBLE;
 	}
 	
-	public void AI_link_core_reactive(JNIBWAPI d_bwapi, build_manager d_builder) {
+	public void AILinkCoreReactive(JNIBWAPI d_bwapi, ManagerBuild d_builder) {
 		bwapi = d_bwapi;
 		builder = d_builder;
 	}

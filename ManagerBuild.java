@@ -12,27 +12,27 @@ import javabot.types.UnitType.UnitTypes;
 import javabot.types.UpgradeType;
 import javabot.types.UpgradeType.UpgradeTypes;
 import javabot.util.BWColor;
-import javabot.RaynorsRaiders.core_reactive.*;
+import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 
 // Cannot import core reactive, primary and secondary constructors will init the AI core communication
 
-public class build_manager {
+public class ManagerBuild {
 	
 	JNIBWAPI bwapi;
-	core_reactive core;
-	core_reactive.BuildMode mode;
+	CoreReactive core;
+	CoreReactive.BuildMode mode;
 	LinkedList<UnitTypes> orders;
 	
 	int homePositionX;
 	int homePositionY;
 	
-	public build_manager() {
+	public ManagerBuild() {
 		//SET UP ALL INTERNAL VARIABLES HERE
 	}
 	
-	public void AI_link_build_manager(JNIBWAPI d_bwapi, core_reactive d_core) {
+	public void AILinkManagerBuild(JNIBWAPI d_bwapi, CoreReactive d_core) {
 		//Here you get your pointers to the other AI cores (JINBWAPI, core, ect ect ect)
-		//The Raynons Raiders code should call this "constructor" after all the other AI parts have
+		//The Raynors Raiders code should call this "constructor" after all the other AI parts have
 		// been created.
 		bwapi = d_bwapi;
 		core = d_core;

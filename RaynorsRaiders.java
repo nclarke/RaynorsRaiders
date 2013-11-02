@@ -15,13 +15,14 @@ import javabot.util.BWColor;
 public class RaynorsRaiders implements BWAPIEventListener {
 
 	int homePositionX, homePositionY, mainMins;
+	boolean debgFlag = false;
 	
 	/* BroodWar API Harness*/
 	JNIBWAPI bwapi;
 	
 	/* Name AIs here */
-	core_reactive ai_core;
-	build_manager ai_builder;
+	CoreReactive ai_core;
+	ManagerBuild ai_builder;
 	
 	public static void main(String[] args) {
 		new RaynorsRaiders();
@@ -32,12 +33,12 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		bwapi.start();
 		
 		/* Construct builders */
-		ai_core = new core_reactive();
-		ai_builder = new build_manager();
+		ai_core = new CoreReactive();
+		ai_builder = new ManagerBuild();
 		
 		/* Send AI Pointers to all the AIs (this is the "second" constructor */
-		ai_builder.AI_link_build_manager(bwapi, ai_core);
-		ai_core.AI_link_core_reactive(bwapi, ai_builder);
+		ai_builder.AILinkManagerBuild(bwapi, ai_core);
+		ai_core.AILinkCoreReactive(bwapi, ai_builder);
 	} 
 	
 	
@@ -66,19 +67,42 @@ public class RaynorsRaiders implements BWAPIEventListener {
 			ai_builder.captureBaseLocation();
 		}
 		
+		/*
 		for(Unit u : bwapi.getAllUnits())
 		{
 			bwapi.drawCircle(u.getX(), u.getY(), 5, BWColor.RED, true, false);
-		}
+		}*/
 		
 		// Call actions every 30 frames
-		if (bwapi.getFrameCount() % 30 == 0) {
+		if (bwapi.getFrameCount() % 30 == 0) 
+		{
 			ai_core.checkUp();
 			ai_builder.construct();
 		}
+		// Draw debug information on screen
+		if (debgFlag)
+			drawDebugInfo();	
 	}
+	
+	public void drawDebugInfo() {
+		for (Unit u : bwapi.getMyUnits())  
+		{
+			if (u.isUnderAttack()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.RED, false, false);
+			else if (u.isGatheringMinerals()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.BLUE, false, false);
+			else if (u.isGatheringGas()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.GREEN, false, false);
+			else if (u.isAttacking()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.ORANGE, false, false);
+			
+			
+			bwapi.drawLine(u.getX(), u.getY(), u.getTargetX(), u.getTargetY(), BWColor.WHITE, false);
+		}
+	}
+	
 	public void gameEnded() { }
-	public void keyPressed(int keyCode) {}
+	public void keyPressed(int keyCode) 
+	{
+		if (keyCode == 66 ) //if equals b toggle debgFlag
+			debgFlag = !debgFlag;
+	}
 	public void matchEnded(boolean winner) { }
 	public void nukeDetect(int x, int y) { }
 	public void nukeDetect() { }

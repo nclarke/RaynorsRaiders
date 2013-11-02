@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 
 import javabot.JNIBWAPI;
-import javabot.Level;
+import javabot.RaynorsRaiders.Level;
 import javabot.model.*;
 import javabot.types.*;
 import javabot.types.OrderType.OrderTypeTypes;
