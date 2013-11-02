@@ -46,6 +46,7 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	}
 	
 	public void gameStarted() {
+		System.out.println("In RaynorsRaiders");
 		System.out.println("Game Started");
 
 		// allow me to manually control units during the game
