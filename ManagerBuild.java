@@ -22,13 +22,26 @@ public class ManagerBuild {
 	CoreReactive core;
 	CoreReactive.BuildMode mode;
 	LinkedList<UnitTypes> orders;
+	LinkedList<UnitTypes> builtBuildings;
+	LinkedList<UnitTypes> buildingBuildings;
+	//LinkedList<UnitTypes> Buildings;
+	UnitTypes tempType;
+	Unit tempUnit;
 	
 	int homePositionX;
 	int homePositionY;
 	
 	public ManagerBuild() {
 		//SET UP ALL INTERNAL VARIABLES HERE
+		builtBuildings = new LinkedList<UnitTypes>();
+		builtBuildings.push(UnitTypes.Terran_Command_Center);
 	}
+	
+	/*
+	 * 	if ((unit.getTypeID() == buildingTypeID) && (!unit.isCompleted())) return true;
+	 * 
+	 * 
+	 */
 	
 	public void AILinkManagerBuild(JNIBWAPI d_bwapi, CoreReactive d_core) {
 		//Here you get your pointers to the other AI cores (JINBWAPI, core, ect ect ect)
@@ -145,6 +158,7 @@ public class ManagerBuild {
 				    // order our worker to build it
 				    if ((buildTile.x != -1) && (!weAreBuilding(bldg.getID()))) {
 				    	bwapi.build(worker, buildTile.x, buildTile.y, bldg.getID());
+				    	//buildingBuildings.push(bldg);
 				    }
 				}
 				else {
