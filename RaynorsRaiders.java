@@ -21,8 +21,9 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	JNIBWAPI bwapi;
 	
 	/* Name AIs here */
-	CoreReactive ai_core;
-	ManagerBuild ai_builder;
+	CoreReactive ai_core;     //Active
+	ManagerBuild ai_builder;  //Active
+	ManagerWorkers ai_worker; //Passive
 	
 	public static void main(String[] args) {
 		new RaynorsRaiders();
@@ -35,9 +36,11 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		/* Construct builders */
 		ai_core = new CoreReactive();
 		ai_builder = new ManagerBuild();
+		ai_worker = new ManagerWorkers();
 		
 		/* Send AI Pointers to all the AIs (this is the "second" constructor */
 		ai_builder.AILinkManagerBuild(bwapi, ai_core);
+		ai_core.AILinkCoreReactive(bwapi, ai_builder);
 		ai_core.AILinkCoreReactive(bwapi, ai_builder);
 	} 
 	
