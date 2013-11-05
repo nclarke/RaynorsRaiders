@@ -26,10 +26,10 @@ public class ManagerMilitary
 		this.bwapi = rr_bwapi;
 		unitTypesPerLevel = new EnumMap<Level, ArrayList<UnitTypes>>(Level.class);
 		initMap(unitTypesPerLevel);
-		setHomePosition(homePositionX, homePositionY);
+		setHomePosition();
 	}
 	
-	void setHomePosition(int homePositionX, int homePositionY)
+	void setHomePosition()
 	{
 		if (bwapi.getFrameCount() == 1) 
 		{
@@ -288,7 +288,6 @@ public class ManagerMilitary
 			ArrayList<BaseLocation> enemyBases = getEnemyBases();
 
 			rallyUnits(unitFormed, homePositionX, homePositionY);
-			
 			attackEnemyLocation(unitFormed, enemyBases.get(0).getX(), enemyBases.get(0).getY(), homePositionX, homePositionY);
 		}
 		System.out.println("Attacked");
