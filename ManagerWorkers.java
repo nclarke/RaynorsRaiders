@@ -16,12 +16,20 @@ import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 
 // Cannot import core reactive, primary and secondary constructors will init the AI core communication
 
-public class ManagerWorkers {
-	
+/*
+ * Need to get the home base locations from the builder
+ * Need to get number of minerals at each base location
+ * 
+ */
+
+public class ManagerWorkers 
+{
+	private static final double SCVS_PER_MIN_PATCH = 2.5;
 	JNIBWAPI bwapi;
 	CoreReactive core;
 	CoreReactive.BuildMode mode;
 	LinkedList<UnitTypes> orders;
+	LinkedList<Worker> workers;
 	// Want to store an array of workers at each current base location
 	//LinkedList<UnitTypes> Buildings;
 	UnitTypes tempType;
@@ -32,6 +40,114 @@ public class ManagerWorkers {
 	public ManagerWorkers() 
 	{
 		//SET UP ALL INTERNAL VARIABLES HERE
+		workers = new LinkedList<Worker>();
+	}
+	
+	private class Worker 
+	{
+		private int unitID;
+		private String curOrder; //mine, attack, defend etc... thinking of doing an enum
+		private int asgnedBase; //what base it should be mining from 0 = Main, 1 = Natural...
+		private int asgnedBaseX, asgnedBaseY; // X and Y coords of the current base location
+		
+		private Worker() {
+			unitID = asgnedBase = 0;
+			curOrder = "mine";
+		}
+		
+	}
+	
+	public int getNumWorkers()
+	{
+		return workers.size();
+	}
+	
+	/*
+	 * Pass in a location and it will return the number of minerals at that base
+	 * Right now gets all minerals in a 10 by 10 tile area
+	 */
+	
+	public int getNumMinerals(int xLoc, int yLoc)
+	{
+		int numMins = 0;
+		for (Unit neu : bwapi.getNeutralUnits()) 
+		{
+			if (neu.getTypeID() == UnitTypes.Resource_Mineral_Field.ordinal())
+			{
+				double distance = Math.sqrt(Math.pow(neu.getX() - xLoc, 2) + Math.pow(neu.getY() - yLoc, 2));
+				if (distance < (20 * 32))
+				{
+					numMins++;
+
+				}
+			}	
+		}
+
+		return numMins;
+	}
+	
+	public void addWorker(int unitID)
+	{
+		System.out.println("In new worker");
+		Worker newWorker = new Worker();
+		newWorker.unitID = unitID;
+		newWorker.curOrder = "mine";  //by default have it set to mine
+		newWorker.asgnedBase = 0;
+		workers.push(newWorker);
+	}
+	
+	public void removeWorker(int unitID)
+	{
+		System.out.println("In lost worker");
+		int ndx = 0;
+		Worker toRemove = new Worker();
+		toRemove.unitID = unitID;
+		
+		for (ndx = 0; ndx < workers.size(); ndx++)
+		{
+			if (workers.get(ndx).unitID == unitID)
+			{
+				System.out.println("Found remove");
+				workers.remove(ndx);
+			}
+		}
+		
+	}
+	
+	public void handleIdle()
+	{
+		Worker curWorker = null;
+		int workersHomeX, workersHomeY;
+		for (Unit unit : bwapi.getMyUnits()) {
+			// if this unit is Terran_SCV (worker),
+			// and if it is idle (not doing anything),
+			if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal() & unit.isIdle()) {
+				// then find the closest mineral patch (if we see any)
+				curWorker = getWorkerByID(unit.getID());
+				int closestId = -1;
+				double closestDist = 99999999;
+				for (Unit neu : bwapi.getNeutralUnits()) {
+					if (neu.getTypeID() == UnitTypes.Resource_Mineral_Field.ordinal()) {
+						double distance = Math.sqrt(Math.pow(neu.getX() - unit.getX(), 2) + Math.pow(neu.getY() - unit.getY(), 2));
+						if ((closestId == -1) || (distance < closestDist)) {
+							closestDist = distance;
+							//bwapi.printText("Closet dist is" + String.valueOf(closestDist));
+							closestId = neu.getID();
+						}
+					}
+				}
+				// and (if we found it) send this worker to gather it.
+				if (closestId != -1) bwapi.rightClick(unit.getID(), closestId);
+			}
+		}
+	}
+	
+	public Worker getWorkerByID(int unitID)
+	{
+		for (Worker w : workers)
+			if (w.unitID == unitID)
+				return w;
+		return null;
 	}
 	
 	/*
@@ -40,7 +156,7 @@ public class ManagerWorkers {
 	 * 
 	 */
 	
-	public void AILinkManagerBuild(JNIBWAPI d_bwapi, CoreReactive d_core) {
+	public void AILinkManagerWorkers(JNIBWAPI d_bwapi, CoreReactive d_core) {
 		//Here you get your pointers to the other AI cores (JINBWAPI, core, ect ect ect)
 		//The Raynors Raiders code should call this "constructor" after all the other AI parts have
 		// been created.
@@ -48,6 +164,7 @@ public class ManagerWorkers {
 		core = d_core;
 		mode = core.econ_getBuildingMode();
 		orders = core.econ_getBuildingStack();
+
 	}
 	
 
@@ -74,12 +191,25 @@ public class ManagerWorkers {
 	//(builderID should be our worker)
 
 	//Returns true if we are currently constructing the building of a given type.
-	public boolean weAreBuilding(int buildingTypeID) {
+	public boolean weAreBuilding(int buildingTypeID)
+	{
 		for (Unit unit : bwapi.getMyUnits()) {
 			if ((unit.getTypeID() == buildingTypeID) && (!unit.isCompleted())) return true;
 			if (bwapi.getUnitType(unit.getTypeID()).isWorker() && unit.getConstructingTypeID() == buildingTypeID) return true;
 		}
 		return false;
+	}
+	
+	public int workerDebg()
+	{
+		//System.out.println("In worker debg");
+		bwapi.drawText(0, 10, "Workers are", true);
+		int ndx;
+		for (ndx = 0; ndx < workers.size(); ndx++)
+		{
+			bwapi.drawText(0, 10 + (10 * (ndx + 1)), ndx + " " + workers.get(ndx).unitID, true);	
+		}
+		return 0;
 	}
 
 }

@@ -57,8 +57,6 @@ public class ManagerBuild {
 		// Remember our homeTilePosition at the first frame
 		if (bwapi.getFrameCount() == 1) {
 			int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
-			if (cc == -1) cc = getNearestUnit(UnitTypes.Zerg_Hatchery.ordinal(), 0, 0);
-			if (cc == -1) cc = getNearestUnit(UnitTypes.Protoss_Nexus.ordinal(), 0, 0);
 			homePositionX = bwapi.getUnit(cc).getX();
 			homePositionY = bwapi.getUnit(cc).getY();
 		}

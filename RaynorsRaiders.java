@@ -4,6 +4,7 @@ package javabot.RaynorsRaiders;
  * Example of a Java AI Client that does nothing.
  */
 import java.awt.Point;
+import java.util.LinkedList;
 
 import javabot.model.*;
 import javabot.types.*;
@@ -14,15 +15,20 @@ import javabot.util.BWColor;
 
 public class RaynorsRaiders implements BWAPIEventListener {
 
-	int homePositionX, homePositionY, mainMins;
 	boolean debgFlag = false;
+	boolean healthFlag = false;
+	
+	/* Master unit list */
+	LinkedList<Unit> masterUnitList = new LinkedList<Unit>();;
+	
 	
 	/* BroodWar API Harness*/
 	JNIBWAPI bwapi;
 	
 	/* Name AIs here */
-	CoreReactive ai_core;
-	ManagerBuild ai_builder;
+	CoreReactive 		coreReactive;
+	ManagerBuild 		managerBuild;
+	ManagerWorkers		managerWorkers;
 	
 	public static void main(String[] args) {
 		new RaynorsRaiders();
@@ -30,15 +36,19 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	
 	public RaynorsRaiders() {
 		bwapi = new JNIBWAPI(this);
-		bwapi.start();
+		
 		
 		/* Construct builders */
-		ai_core = new CoreReactive();
-		ai_builder = new ManagerBuild();
+		coreReactive = new CoreReactive();
+		managerBuild = new ManagerBuild();
+		managerWorkers = new ManagerWorkers();
 		
 		/* Send AI Pointers to all the AIs (this is the "second" constructor */
-		ai_builder.AILinkManagerBuild(bwapi, ai_core);
-		ai_core.AILinkCoreReactive(bwapi, ai_builder);
+		coreReactive.AILinkCoreReactive(bwapi, managerBuild);
+		managerBuild.AILinkManagerBuild(bwapi, coreReactive);
+		managerWorkers.AILinkManagerWorkers(bwapi, coreReactive);
+		
+		bwapi.start();
 	} 
 	
 	
@@ -49,6 +59,7 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	public void gameStarted() {
 		System.out.println("In RaynorsRaiders");
 		System.out.println("Game Started");
+		
 
 		// allow me to manually control units during the game
 		bwapi.enableUserInput();
@@ -58,33 +69,49 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		bwapi.setGameSpeed(30);
 		
 		// analyze the map
+		System.out.println("Analyzing map... Please wait");
 		bwapi.loadMapData(true);
+		System.out.println("Map Analyzed");
+		
+		// Setup master unit list
+		masterUnitList.clear();
+		for (Unit u : bwapi.getMyUnits())
+		{
+			masterUnitList.add(u);
+		}
+		System.out.println("Game setup complete");
+		System.out.println("Size of master list is " + masterUnitList.size());
 	}
 	public void gameUpdate() 
 	{
+		 //Draw debug information on screen
+		if (debgFlag)
+			drawDebugInfo();
 		// This sets up the base location
 		if (bwapi.getFrameCount() == 1) {
-			ai_builder.captureBaseLocation();
+			managerBuild.captureBaseLocation();
+			for (Unit unit : bwapi.getMyUnits()) 
+			{
+				if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal()) 
+				{
+					managerWorkers.addWorker(unit.getID());
+				}
+			}
 		}
-		
-		/*
-		for(Unit u : bwapi.getAllUnits())
-		{
-			bwapi.drawCircle(u.getX(), u.getY(), 5, BWColor.RED, true, false);
-		}*/
 		
 		// Call actions every 30 frames
 		if (bwapi.getFrameCount() % 30 == 0) 
 		{
-			ai_core.checkUp();
-			ai_builder.construct();
+			coreReactive.checkUp();
+			managerBuild.construct();
 		}
-		// Draw debug information on screen
-		if (debgFlag)
-			drawDebugInfo();	
+
+		
 	}
 	
 	public void drawDebugInfo() {
+		bwapi.drawText(0, 0, "Home base location is ( " + managerBuild.homePositionX + ", "
+				+ managerBuild.homePositionY + ")", true);
 		for (Unit u : bwapi.getMyUnits())  
 		{
 			if (u.isUnderAttack()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.RED, false, false);
@@ -95,20 +122,51 @@ public class RaynorsRaiders implements BWAPIEventListener {
 			
 			bwapi.drawLine(u.getX(), u.getY(), u.getTargetX(), u.getTargetY(), BWColor.WHITE, false);
 		}
+		int tempMins = managerWorkers.getNumMinerals(managerBuild.homePositionX, managerBuild.homePositionY);
+		bwapi.drawText(500, 500, "On the map?", false);
+		bwapi.drawText(managerBuild.homePositionX-32, managerBuild.homePositionY-(32*2), "Num mins is " + tempMins, false);
+		bwapi.drawHealth(healthFlag);
+		managerWorkers.workerDebg();
+	//	System.out.print("debing");
 	}
+	
 	
 	public void gameEnded() { }
 	public void keyPressed(int keyCode) 
 	{
 		if (keyCode == 66 ) //if equals b toggle debgFlag
 			debgFlag = !debgFlag;
+		else if (keyCode == 72) // press h to toggle health
+			healthFlag = !healthFlag;
 	}
 	public void matchEnded(boolean winner) { }
 	public void nukeDetect(int x, int y) { }
 	public void nukeDetect() { }
 	public void playerLeft(int id) { }
-	public void unitCreate(int unitID) { }
-	public void unitDestroy(int unitID) { }
+	public void unitCreate(int unitID) 
+	{
+		bwapi.printText("Unit Created " + String.valueOf(unitID));
+		masterUnitList.add(bwapi.getUnit(unitID));
+		System.out.println("creating type id is " + bwapi.getUnit(unitID).getTypeID());
+		if (bwapi.getUnit(unitID).getTypeID() == UnitTypes.Terran_SCV.ordinal()) 
+			managerWorkers.addWorker(unitID);
+	}
+	public void unitDestroy(int unitID)
+	{
+		System.out.println("In unit destroyed");
+		bwapi.printText("Unit Destroyed " + String.valueOf(unitID));
+		
+		for (Unit u : masterUnitList)
+		{
+			if (u.getID() == unitID)
+			{
+				if (u.getTypeID() == UnitTypes.Terran_SCV.ordinal())
+					managerWorkers.removeWorker(unitID);
+				masterUnitList.remove(u);
+				System.out.println("Remove succesfull");
+			}
+		}
+	}
 	public void unitDiscover(int unitID) { }
 	public void unitEvade(int unitID) { }
 	public void unitHide(int unitID) { }
