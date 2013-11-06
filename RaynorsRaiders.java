@@ -21,9 +21,11 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	JNIBWAPI bwapi;
 	
 	/* Name AIs here */
-	CoreReactive ai_core;     //Active
-	ManagerBuild ai_builder;  //Active
-	ManagerWorkers ai_worker; //Passive
+	CoreBaby         ai_baby;     //Active
+	CoreReactive     ai_react;     //Active
+	ManagerBuild     ai_builder;  //Active
+	ManagerMilitary  ai_military; //Active
+	ManagerWorkers   ai_worker;   //Passive
 	
 	public static void main(String[] args) {
 		new RaynorsRaiders();
@@ -34,14 +36,17 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		bwapi.start();
 		
 		/* Construct builders */
-		ai_core = new CoreReactive();
+		ai_react = new CoreReactive();
+		ai_baby = new CoreBaby();
 		ai_builder = new ManagerBuild();
+		ai_military = new ManagerMilitary(null); //FIXME NEEDS TO NOT HAVE PASSED VALUES
 		ai_worker = new ManagerWorkers();
 		
 		/* Send AI Pointers to all the AIs (this is the "second" constructor */
-		ai_builder.AILinkManagerBuild(bwapi, ai_core);
-		ai_core.AILinkCoreReactive(bwapi, ai_builder);
-		ai_core.AILinkCoreReactive(bwapi, ai_builder);
+		ai_react.AILink(bwapi, ai_react, ai_baby, ai_builder, ai_military, ai_worker);
+		ai_baby.AILink(bwapi, ai_react, ai_baby, ai_builder, ai_military, ai_worker);
+		ai_builder.AILinkManagerBuild(bwapi, ai_react);
+		
 	} 
 	
 	
@@ -62,6 +67,9 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		
 		// analyze the map
 		bwapi.loadMapData(true);
+		
+		ai_baby.startUp();
+		ai_react.startUp();
 	}
 	public void gameUpdate() 
 	{
@@ -79,7 +87,9 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		// Call actions every 30 frames
 		if (bwapi.getFrameCount() % 30 == 0) 
 		{
-			ai_core.checkUp();
+			ai_react.checkUp();
+			ai_baby.checkUp();
+			
 			ai_builder.construct();
 		}
 		// Draw debug information on screen

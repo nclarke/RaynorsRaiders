@@ -8,12 +8,7 @@ import javabot.types.UnitType.UnitTypes;
 import javabot.util.*;
 import javabot.model.*;
 
-public class CoreReactive {
-
-	//AIs
-	JNIBWAPI bwapi;
-	ManagerBuild builder;
-	
+public class CoreReactive extends RRAITemplate {
 	//Data structs
 	LinkedList<UnitTypes> core_econ_buildingStack;
 	LinkedList<UnitTypes> core_econ_unitsStack;
@@ -41,30 +36,10 @@ public class CoreReactive {
 		core_econ_unitsMode = BuildMode.FIRST_POSSIBLE;
 	}
 	
-	public void AILinkCoreReactive(JNIBWAPI d_bwapi, ManagerBuild d_builder) {
-		bwapi = d_bwapi;
-		builder = d_builder;
-	}
-	
 	/* This is to be run during startup, currently its a basic loadout of units to create */
 	public void startUpSequence() {
 		// Now populate the buildingStack
-		core_econ_buildingStack.push(UnitTypes.Terran_Supply_Depot);
-		core_econ_buildingStack.push(UnitTypes.Terran_Supply_Depot);
-		core_econ_buildingStack.push(UnitTypes.Terran_Barracks);
-		core_econ_buildingStack.push(UnitTypes.Terran_Refinery);
-		core_econ_buildingStack.push(UnitTypes.Terran_Supply_Depot);
-		core_econ_buildingStack.push(UnitTypes.Terran_Bunker);
-		core_econ_buildingStack.push(UnitTypes.Terran_Bunker);
-		
-		core_econ_unitsStack.push(UnitTypes.Terran_SCV);
-		core_econ_unitsStack.push(UnitTypes.Terran_SCV);
-		core_econ_unitsStack.push(UnitTypes.Terran_SCV);
-		core_econ_unitsStack.push(UnitTypes.Terran_SCV);
-		core_econ_unitsStack.push(UnitTypes.Terran_Marine);
-		core_econ_unitsStack.push(UnitTypes.Terran_Marine);
-		core_econ_unitsStack.push(UnitTypes.Terran_Marine);
-		core_econ_unitsStack.push(UnitTypes.Terran_Marine);
+
 	}
 	
 	
