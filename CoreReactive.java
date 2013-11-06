@@ -70,9 +70,11 @@ public class CoreReactive {
 	
 	/* This is to be run frequently, and is the quick-decider for things such as resources */
 	public void checkUp() {
-		BuildAlert currentAlert;
 		
-		/* Check on build alert */
+		//Commented out to keep checkUp silent
+		/*
+		 BuildAlert currentAlert;
+		
 		if ((currentAlert = core_econ_buildAlerts.pop()) != null) {
 			if (currentAlert == BuildAlert.NO_ROOM) {
 				//Save previous modes...
@@ -84,6 +86,8 @@ public class CoreReactive {
 				//Add on make a vespene geyeser facility
 			}
 		}
+		*/
+		
 		
 	}
 	
