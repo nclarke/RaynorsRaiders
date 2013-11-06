@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.LinkedList;
 
 import javabot.JNIBWAPI;
+import javabot.model.BaseLocation;
 import javabot.model.Unit;
 import javabot.types.TechType;
 import javabot.types.TechType.TechTypes;
@@ -25,6 +26,8 @@ public class ManagerBuild {
 	LinkedList<UnitTypes> builtBuildings;
 	LinkedList<UnitTypes> buildingBuildings;
 	//LinkedList<UnitTypes> Buildings;
+	LinkedList<BaseLocation> ourBases;
+	
 	UnitTypes tempType;
 	Unit tempUnit;
 	
@@ -35,6 +38,68 @@ public class ManagerBuild {
 		//SET UP ALL INTERNAL VARIABLES HERE
 		builtBuildings = new LinkedList<UnitTypes>();
 		builtBuildings.push(UnitTypes.Terran_Command_Center);
+		ourBases = new LinkedList<BaseLocation>();
+	}
+	
+	public enum baseStatus 
+	{
+		UNOCCUPIED, BUILT, BUILDING, 
+		DESTROYED, ENEMIES, ENEMIES_DESTROYED
+	}
+	
+	private class BaseRR
+	{
+		private BaseLocation baseLoc;
+		private int baseNumber;
+		private baseStatus status;
+		
+		private BaseRR() 
+		{	
+		}
+		
+		private BaseRR(BaseLocation bl, int number, baseStatus status)
+		{
+			this.baseLoc = bl;
+			this.baseNumber = number;
+			this.status = status;
+		}
+	
+	}
+	
+	/*
+	 * Assumes that this function will be called on the first frame before
+	 * we have other bases
+	 */
+	
+	public int baseSetup()
+	{
+		int unitPostX = 0, unitPostY = 0;
+		int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
+		unitPostX = bwapi.getUnit(cc).getX();
+		unitPostY = bwapi.getUnit(cc).getY();
+		for (BaseLocation b : bwapi.getMap().getBaseLocations())
+		{
+			if (b.getX() == unitPostX && b.getY() == unitPostY)
+			{
+				ourBases.add(b);
+				System.out.println("ManagerBuild: Found our home base! Size is " + ourBases.size());
+			}
+		}
+		return ourBases.size();
+	}
+	
+	/*
+	 * Returns the location of our very first base
+	 */
+	
+	public BaseLocation getStartLocation() 
+	{
+		return ourBases.get(0);
+	}
+	
+	public void getOurBases() 
+	{
+		
 	}
 	
 	/*

@@ -26,17 +26,17 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	JNIBWAPI bwapi;
 	
 	/* Name AIs here */
-<<<<<<< HEAD
+//<<<<<<< HEAD
 	CoreReactive 		coreReactive;
 	ManagerBuild 		managerBuild;
 	ManagerWorkers		managerWorkers;
-=======
+//=======
 	CoreBaby         ai_baby;     //Active
 	CoreReactive     ai_react;     //Active
 	ManagerBuild     ai_builder;  //Active
 	ManagerMilitary  ai_military; //Active
 	ManagerWorkers   ai_worker;   //Passive
->>>>>>> a88d9c7ed35e8ffcd4f6aadc350ec3ef27dad21e
+//>>>>>>> a88d9c7ed35e8ffcd4f6aadc350ec3ef27dad21e
 	
 	public static void main(String[] args) {
 		new RaynorsRaiders();
@@ -47,18 +47,18 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		
 		
 		/* Construct builders */
-<<<<<<< HEAD
+//<<<<<<< HEAD
 		coreReactive = new CoreReactive();
 		managerBuild = new ManagerBuild();
 		managerWorkers = new ManagerWorkers();
 		
 		/* Send AI Pointers to all the AIs (this is the "second" constructor */
-		coreReactive.AILinkCoreReactive(bwapi, managerBuild);
+		//coreReactive.AILinkCoreReactive(bwapi, managerBuild);
 		managerBuild.AILinkManagerBuild(bwapi, coreReactive);
 		managerWorkers.AILinkManagerWorkers(bwapi, coreReactive);
 		
 		bwapi.start();
-=======
+//=======
 		ai_react = new CoreReactive();
 		ai_baby = new CoreBaby();
 		ai_builder = new ManagerBuild();
@@ -70,7 +70,7 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		ai_baby.AILink(bwapi, ai_react, ai_baby, ai_builder, ai_military, ai_worker);
 		ai_builder.AILinkManagerBuild(bwapi, ai_react);
 		
->>>>>>> a88d9c7ed35e8ffcd4f6aadc350ec3ef27dad21e
+//>>>>>>> a88d9c7ed35e8ffcd4f6aadc350ec3ef27dad21e
 	} 
 	
 	
@@ -93,7 +93,6 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		// analyze the map
 		System.out.println("Analyzing map... Please wait");
 		bwapi.loadMapData(true);
-<<<<<<< HEAD
 		System.out.println("Map Analyzed");
 		
 		// Setup master unit list
@@ -104,11 +103,9 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		}
 		System.out.println("Game setup complete");
 		System.out.println("Size of master list is " + masterUnitList.size());
-=======
 		
 		ai_baby.startUp();
 		ai_react.startUp();
->>>>>>> a88d9c7ed35e8ffcd4f6aadc350ec3ef27dad21e
 	}
 	public void gameUpdate() 
 	{
@@ -118,6 +115,11 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		// This sets up the base location
 		if (bwapi.getFrameCount() == 1) {
 			managerBuild.captureBaseLocation();
+			if( managerBuild.baseSetup() != 1)
+			{
+				//Throw error here
+				System.out.println("ERROR: BaseSetup does not equal 1");
+			}
 			for (Unit unit : bwapi.getMyUnits()) 
 			{
 				if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal()) 
@@ -130,15 +132,13 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		// Call actions every 30 frames
 		if (bwapi.getFrameCount() % 30 == 0) 
 		{
-<<<<<<< HEAD
+			managerWorkers.handleIdle();
 			coreReactive.checkUp();
 			managerBuild.construct();
-=======
 			ai_react.checkUp();
 			ai_baby.checkUp();
 			
 			ai_builder.construct();
->>>>>>> a88d9c7ed35e8ffcd4f6aadc350ec3ef27dad21e
 		}
 
 		
@@ -147,6 +147,9 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	public void drawDebugInfo() {
 		bwapi.drawText(0, 0, "Home base location is ( " + managerBuild.homePositionX + ", "
 				+ managerBuild.homePositionY + ")", true);
+		bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
+				+ managerBuild.getStartLocation().getY() + ")", true);
+		
 		for (Unit u : bwapi.getMyUnits())  
 		{
 			if (u.isUnderAttack()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.RED, false, false);

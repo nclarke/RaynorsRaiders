@@ -46,13 +46,23 @@ public class ManagerWorkers
 	private class Worker 
 	{
 		private int unitID;
-		private String curOrder; //mine, attack, defend etc... thinking of doing an enum
 		private int asgnedBase; //what base it should be mining from 0 = Main, 1 = Natural...
-		private int asgnedBaseX, asgnedBaseY; // X and Y coords of the current base location
+		private workerOrders curOrder; //mine, attack, defend etc... thinking of doing an enum
+		private double asgnedBaseX, asgnedBaseY; // X and Y coords of the current base location
 		
-		private Worker() {
+		private Worker() 
+		{
 			unitID = asgnedBase = 0;
-			curOrder = "mine";
+			curOrder = workerOrders.MINE;
+		}
+		
+		private Worker(int unitID, int asgnedBase, workerOrders workOrd)
+		{
+			this.unitID = unitID;
+			this.asgnedBase = asgnedBase;
+			this.curOrder = workOrd;
+			//this.asgnedBaseX = 
+			
 		}
 		
 	}
@@ -64,7 +74,8 @@ public class ManagerWorkers
 	
 	/*
 	 * Pass in a location and it will return the number of minerals at that base
-	 * Right now gets all minerals in a 10 by 10 tile area
+	 * Right now gets all minerals within a 20 tile area
+	 * Possible move this function to info manager?
 	 */
 	
 	public int getNumMinerals(int xLoc, int yLoc)
@@ -91,8 +102,8 @@ public class ManagerWorkers
 		System.out.println("In new worker");
 		Worker newWorker = new Worker();
 		newWorker.unitID = unitID;
-		newWorker.curOrder = "mine";  //by default have it set to mine
-		newWorker.asgnedBase = 0;
+		newWorker.curOrder = workerOrders.MINE;  //by default have it set to mine
+		newWorker.asgnedBase = 0; //default is base zero which is main base
 		workers.push(newWorker);
 	}
 	
@@ -111,33 +122,51 @@ public class ManagerWorkers
 				workers.remove(ndx);
 			}
 		}
-		
+	}
+	
+	public enum workerOrders
+	{
+		MINE, GAS, ATTACK, DEFEND, BUILD
 	}
 	
 	public void handleIdle()
 	{
 		Worker curWorker = null;
 		int workersHomeX, workersHomeY;
+		int closestId = -1;
 		for (Unit unit : bwapi.getMyUnits()) {
 			// if this unit is Terran_SCV (worker),
 			// and if it is idle (not doing anything),
 			if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal() & unit.isIdle()) {
-				// then find the closest mineral patch (if we see any)
 				curWorker = getWorkerByID(unit.getID());
-				int closestId = -1;
-				double closestDist = 99999999;
-				for (Unit neu : bwapi.getNeutralUnits()) {
-					if (neu.getTypeID() == UnitTypes.Resource_Mineral_Field.ordinal()) {
-						double distance = Math.sqrt(Math.pow(neu.getX() - unit.getX(), 2) + Math.pow(neu.getY() - unit.getY(), 2));
-						if ((closestId == -1) || (distance < closestDist)) {
-							closestDist = distance;
-							//bwapi.printText("Closet dist is" + String.valueOf(closestDist));
-							closestId = neu.getID();
+				switch (curWorker.curOrder)
+				{
+				case MINE :
+					double closestDist = 99999999;
+					for (Unit neu : bwapi.getNeutralUnits()) 
+					{
+						if (neu.getTypeID() == UnitTypes.Resource_Mineral_Field.ordinal()) 
+						{
+							double distance = Math.sqrt(Math.pow(neu.getX() - curWorker.asgnedBaseX, 2)
+							+ Math.pow(neu.getY() - curWorker.asgnedBaseY, 2));
+							if ((closestId == -1) || (distance < closestDist)) 
+							{
+								closestDist = distance;
+								//bwapi.printText("Closet dist is" + String.valueOf(closestDist));
+								closestId = neu.getID();
+							}
 						}
-					}
+					} 
+					// and (if we found it) send this worker to gather it.
+					if (closestId != -1) bwapi.rightClick(unit.getID(), closestId);
+					break;
+				case GAS :
+					break;
+				case ATTACK :
+					break;
+				default :
+					break;
 				}
-				// and (if we found it) send this worker to gather it.
-				if (closestId != -1) bwapi.rightClick(unit.getID(), closestId);
 			}
 		}
 	}
