@@ -130,9 +130,9 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		if(unitFormation != null)
 		{
-			for(int index = 0; index < unitFormation.size(); index++)
+			for(Unit unit: unitFormation)
 			{
-				bwapi.move(unitFormation.get(index).getID(), pixelPositionX, pixelPositionY);
+				bwapi.move(unit.getID(), pixelPositionX, pixelPositionY);
 			}
 			System.out.println("RALLY TEST");
 		}
@@ -144,9 +144,9 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(unitFormation != null)
 		{
-			for(int index = 0; index < unitFormation.size(); index++)
+			for(Unit unit: unitFormation)
 			{
-				if((unitFormation.get(index).getX() == pixelPositionX) && (unitFormation.get(index).getY() == pixelPositionY))
+				if((unit.getX() == pixelPositionX) && (unit.getY() == pixelPositionY))
 				{
 					checkFlag = true;
 				}
@@ -167,9 +167,9 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		if(unitFormation != null)
 		{
-			for(int index = 0; index < unitFormation.size(); index++)
+			for(Unit unit: unitFormation)
 			{
-				bwapi.attack(unitFormation.get(index).getID(), pixelPositionX, pixelPositionY);
+				bwapi.attack(unit.getID(), pixelPositionX, pixelPositionY);
 			}
 			System.out.println("ATTACK TEST");
 		}
@@ -253,13 +253,13 @@ public class ManagerMilitary extends RRAITemplate
 	 */
 	private void scoutEnemyBases(Unit scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs)
 	{		
-		for (int index = 0; index < enemyBaseLocs.size(); index++) 
+		for (BaseLocation baseLoc: enemyBaseLocs) 
 		{
-			bwapi.move(scoutUnitID.getID(), enemyBaseLocs.get(index).getX(), enemyBaseLocs.get(index).getY());
+			bwapi.move(scoutUnitID.getID(), baseLoc.getX(), baseLoc.getY());
 			
 			 /* tried to get the scout to not do anything once it reaches the enemy base - not working atm for some reason */
-			 if( ((scoutUnitID.getX() == enemyBaseLocs.get(index).getX()) 
-					&& (scoutUnitID.getY() == enemyBaseLocs.get(index).getY())) 
+			 if( ((scoutUnitID.getX() == baseLoc.getX()) 
+					&& (scoutUnitID.getY() == baseLoc.getY())) 
 					|| scoutUnitID.isAttacking() || scoutUnitID.isGatheringGas() 
 					|| scoutUnitID.isGatheringMinerals() )
 			{
