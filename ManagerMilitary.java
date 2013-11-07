@@ -13,7 +13,7 @@ import javabot.util.*;
 
 public class ManagerMilitary extends RRAITemplate
 {
-	JNIBWAPI bwapi;
+
 	/* EnumMap for us to know what UnitTypes to train per Level - Level is determined by how well AI is doing in the game 
 	 * (AI is very rich in the beginning, gets its level changed from ZERO to TWO) */
 	EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLevel;
@@ -292,14 +292,6 @@ public class ManagerMilitary extends RRAITemplate
 		scoutEnemyBases(scout.getID(), getEnemyBases());
 	}
 	
-	// This is so AIs can link data if they need to
-	// they only need to rewrite this function in
-	// their code
-	public void AILinkData() {
-		//Remember by this time all AI pointers are pointing to their respective AIs
-		//So you can use react.whatever, baby.something, ect
-		this.bwapi = super.bwapi;
-	}
 	
 	/*
 	 * Give this function a base location to have a group of units (marines atm) to attack
