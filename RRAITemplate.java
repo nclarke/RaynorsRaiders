@@ -52,6 +52,7 @@ public class RRAITemplate {
 	public void checkUp() {
 	}
 	
+	
 	public void debug() {
 		
 	}
