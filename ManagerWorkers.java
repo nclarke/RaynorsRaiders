@@ -22,7 +22,7 @@ import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
  * 
  */
 
-public class ManagerWorkers 
+public class ManagerWorkers extends RRAITemplate 
 {
 	private static final double SCVS_PER_MIN_PATCH = 2.5;
 	JNIBWAPI bwapi;
@@ -43,7 +43,7 @@ public class ManagerWorkers
 		workers = new LinkedList<Worker>();
 	}
 	
-	private class Worker 
+	private class Worker
 	{
 		private int unitID;
 		private int asgnedBase; //what base it should be mining from 0 = Main, 1 = Natural...

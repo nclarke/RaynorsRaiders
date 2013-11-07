@@ -24,19 +24,12 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	
 	/* BroodWar API Harness*/
 	JNIBWAPI bwapi;
-	
-	/* Name AIs here */
-//<<<<<<< HEAD
+
 	CoreReactive 		coreReactive;
+	CoreBaby			coreBaby;
 	ManagerBuild 		managerBuild;
 	ManagerWorkers		managerWorkers;
-//=======
-	CoreBaby         ai_baby;     //Active
-	CoreReactive     ai_react;     //Active
-	ManagerBuild     ai_builder;  //Active
-	ManagerMilitary  ai_military; //Active
-	ManagerWorkers   ai_worker;   //Passive
-//>>>>>>> a88d9c7ed35e8ffcd4f6aadc350ec3ef27dad21e
+	ManagerMilitary     managerMilitary;
 	
 	public static void main(String[] args) {
 		new RaynorsRaiders();
@@ -47,30 +40,19 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		
 		
 		/* Construct builders */
-//<<<<<<< HEAD
 		coreReactive = new CoreReactive();
 		managerBuild = new ManagerBuild();
 		managerWorkers = new ManagerWorkers();
+		managerMilitary = new ManagerMilitary();
+		coreBaby = new CoreBaby();
 		
 		/* Send AI Pointers to all the AIs (this is the "second" constructor */
-		//coreReactive.AILinkCoreReactive(bwapi, managerBuild);
-		managerBuild.AILinkManagerBuild(bwapi, coreReactive);
-		managerWorkers.AILinkManagerWorkers(bwapi, coreReactive);
+		coreReactive.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
+		coreBaby.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
+		managerBuild.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
+		managerWorkers.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
 		
 		bwapi.start();
-//=======
-		ai_react = new CoreReactive();
-		ai_baby = new CoreBaby();
-		ai_builder = new ManagerBuild();
-		ai_military = new ManagerMilitary(null); //FIXME NEEDS TO NOT HAVE PASSED VALUES
-		ai_worker = new ManagerWorkers();
-		
-		/* Send AI Pointers to all the AIs (this is the "second" constructor */
-		ai_react.AILink(bwapi, ai_react, ai_baby, ai_builder, ai_military, ai_worker);
-		ai_baby.AILink(bwapi, ai_react, ai_baby, ai_builder, ai_military, ai_worker);
-		ai_builder.AILinkManagerBuild(bwapi, ai_react);
-		
-//>>>>>>> a88d9c7ed35e8ffcd4f6aadc350ec3ef27dad21e
 	} 
 	
 	
@@ -104,8 +86,8 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		System.out.println("Game setup complete");
 		System.out.println("Size of master list is " + masterUnitList.size());
 		
-		ai_baby.startUp();
-		ai_react.startUp();
+		coreBaby.startUp();
+		coreReactive.startUp();
 	}
 	public void gameUpdate() 
 	{
@@ -135,10 +117,7 @@ public class RaynorsRaiders implements BWAPIEventListener {
 			managerWorkers.handleIdle();
 			coreReactive.checkUp();
 			managerBuild.construct();
-			ai_react.checkUp();
-			ai_baby.checkUp();
-			
-			ai_builder.construct();
+			coreBaby.checkUp();
 		}
 
 		

@@ -17,7 +17,7 @@ import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 
 // Cannot import core reactive, primary and secondary constructors will init the AI core communication
 
-public class ManagerBuild {
+public class ManagerBuild extends RRAITemplate{
 	
 	JNIBWAPI bwapi;
 	CoreReactive core;

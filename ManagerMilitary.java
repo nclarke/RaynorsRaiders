@@ -13,7 +13,7 @@ import javabot.types.OrderType.OrderTypeTypes;
 import javabot.types.UnitType.UnitTypes;
 import javabot.util.BWColor;
 
-public class ManagerMilitary 
+public class ManagerMilitary extends RRAITemplate
 {
 	JNIBWAPI bwapi;
 	/* EnumMap for us to know what UnitTypes to train per Level - Level is determined by how well AI is doing in the game 
@@ -21,12 +21,11 @@ public class ManagerMilitary
 	EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLevel;
 	int homePositionX, homePositionY;
 	
-	public ManagerMilitary(JNIBWAPI rr_bwapi)
+	public ManagerMilitary()
 	{
-		this.bwapi = rr_bwapi;
 		unitTypesPerLevel = new EnumMap<Level, ArrayList<UnitTypes>>(Level.class);
 		initMap(unitTypesPerLevel);
-		setHomePosition();
+		//setHomePosition(); - FIXME Check the spec on linking AIs
 	}
 	
 	void setHomePosition()
