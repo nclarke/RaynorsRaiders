@@ -19,7 +19,7 @@ import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 
 public class ManagerBuild extends RRAITemplate{
 	
-	JNIBWAPI bwapi;
+	private JNIBWAPI bwapi;
 	CoreReactive core;
 	CoreReactive.BuildMode mode;
 	LinkedList<UnitTypes> orders;
@@ -36,6 +36,7 @@ public class ManagerBuild extends RRAITemplate{
 	
 	public ManagerBuild() {
 		//SET UP ALL INTERNAL VARIABLES HERE
+		super();
 		builtBuildings = new LinkedList<UnitTypes>();
 		builtBuildings.push(UnitTypes.Terran_Command_Center);
 		ourBases = new LinkedList<BaseLocation>();
@@ -120,11 +121,11 @@ public class ManagerBuild extends RRAITemplate{
 	
 	public void captureBaseLocation() {
 		// Remember our homeTilePosition at the first frame
-		if (bwapi.getFrameCount() == 1) {
+//		if (bwapi.getFrameCount() == 1) {
 			int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
 			homePositionX = bwapi.getUnit(cc).getX();
 			homePositionY = bwapi.getUnit(cc).getY();
-		}
+//		}
 	}
 	
 	
@@ -332,6 +333,17 @@ public class ManagerBuild extends RRAITemplate{
  		}
  		return nearestID;
 	}	
+	
+	// This is so AIs can link data if they need to
+	// they only need to rewrite this function in
+	// their code
+	public void AILinkData() {
+		//Remember by this time all AI pointers are pointing to their respective AIs
+		//So you can use react.whatever, baby.something, ect
+		AILinkManagerBuild(super.bwapi, super.react);
+	}
+	
+	
 
 	//Returns the Point object representing the suitable build tile position
 	//for a given building type near specified pixel position (or Point(-1,-1) if not found)

@@ -276,7 +276,15 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		Unit scout = getScoutUnit();
 		scoutEnemyBases(scout, getEnemyBases());
-		System.out.println("Scouted");
+	}
+	
+	// This is so AIs can link data if they need to
+	// they only need to rewrite this function in
+	// their code
+	public void AILinkData() {
+		//Remember by this time all AI pointers are pointing to their respective AIs
+		//So you can use react.whatever, baby.something, ect
+		this.bwapi = super.bwapi;
 	}
 	
 	public void attackOperation()
