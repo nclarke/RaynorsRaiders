@@ -71,7 +71,7 @@ public class ManagerBuild extends RRAITemplate
 		orders = react.econ_getBuildingStack();
 	}
 	
-	public void startUp() {
+	public void setup() {
 		System.out.println("ManagerBuild Online");
 	}
 	

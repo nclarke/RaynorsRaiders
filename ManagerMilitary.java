@@ -31,7 +31,7 @@ public class ManagerMilitary extends RRAITemplate
 		//None here
 	}
 	
-	public void startUp() {
+	public void setup() {
 		System.out.println("ManageMilitary online");
 	}
 	

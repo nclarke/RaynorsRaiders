@@ -94,11 +94,11 @@ public class RaynorsRaiders implements BWAPIEventListener
 		System.out.println("Game setup complete");
 		System.out.println("Size of master list is " + masterUnitList.size());
 		
-		coreBaby.startUp();
-		coreReactive.startUp();
-		managerMilitary.startUp();
-		managerBuild.startUp();
-		managerWorkers.startUp();
+		coreBaby.setup();
+		coreReactive.setup();
+		managerMilitary.setup();
+		managerBuild.setup();
+		managerWorkers.setup();
 		
 	}
 	

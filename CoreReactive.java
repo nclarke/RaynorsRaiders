@@ -40,8 +40,8 @@ public class CoreReactive extends RRAITemplate
 		core_econ_unitsMode = BuildMode.FIRST_POSSIBLE;
 	}
 	
-	/* This is to be run during startup, currently its a basic loadout of units to create */
-	public void startUp() 
+	/* This is to be run during setup, currently its a basic loadout of units to create */
+	public void setup() 
 	{
 		System.out.println("CoreReactive Online");
 	}

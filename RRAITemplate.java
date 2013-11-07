@@ -42,6 +42,12 @@ public class RRAITemplate
 		//Remember by this time all AI pointers are pointing to their respective AIs
 		//So you can use react.whatever, baby.something, ect
 	}
+
+	
+	public void setup() 
+	{
+		System.out.println("Default setup");
+	}
 	
 	public void startUp()
 	{

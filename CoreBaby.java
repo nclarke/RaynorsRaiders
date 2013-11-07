@@ -12,7 +12,7 @@ public class CoreBaby extends RRAITemplate
 		//Nothing to init yet
 	}
 	
-	public void startUp() 
+	public void setup() 
 	{
 		System.out.println("CoreBaby Online");
 		// Now populate the buildingStack
