@@ -39,9 +39,15 @@ public class RRAITemplate {
 		//So you can use react.whatever, baby.something, ect
 	}
 	
-	public void startUp() {
+	// This will be called in the beginning of the every game for each AI
+	
+	public void setup() 
+	{
+		
 	}
 	
+	public void startUp() {
+	}
 	
 	public void checkUp() {
 	}

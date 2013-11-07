@@ -31,13 +31,21 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	ManagerWorkers		managerWorkers;
 	ManagerMilitary     managerMilitary;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 		new RaynorsRaiders();
 	}
 	
-	public RaynorsRaiders() {
+	/*
+	 * This only happens once
+	 * If we want to have new variables when we start each map we need to
+	 * reset each data struct
+	 */
+	
+	public RaynorsRaiders() 
+	{
+		System.out.println("TOP of RR");
 		bwapi = new JNIBWAPI(this);
-		
 		
 		/* Construct builders */
 		coreReactive = new CoreReactive();
@@ -78,6 +86,12 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		bwapi.loadMapData(true);
 		System.out.println("Map Analyzed");
 		
+		// Setup ais and make sure we start with new data for each match
+		// Needs this for restarts
+		// can be setup or startup right now 11/7
+		
+		managerWorkers.setup();
+		
 		// Setup master unit list
 		masterUnitList.clear();
 		for (Unit u : bwapi.getMyUnits())
@@ -103,8 +117,7 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		}
 		// This sets up the base location
 		if (bwapi.getFrameCount() == 1)
-		{
-			
+		{	
 			managerBuild.captureBaseLocation();
 			managerMilitary.scoutOperation();
 			if( managerBuild.baseSetup() != 1)
@@ -133,7 +146,9 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		
 	}
 	
-	public void drawDebugInfo() {
+	public void drawDebugInfo() 
+	{
+		System.out.println("Start debug");
 		bwapi.drawText(0, 0, "Home base location is ( " + managerBuild.homePositionX + ", "
 				+ managerBuild.homePositionY + ")", true);
 		bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
@@ -149,16 +164,19 @@ public class RaynorsRaiders implements BWAPIEventListener {
 			
 			bwapi.drawLine(u.getX(), u.getY(), u.getTargetX(), u.getTargetY(), BWColor.WHITE, false);
 		}
-		int tempMins = managerWorkers.getNumMinerals(managerBuild.homePositionX, managerBuild.homePositionY);
-		bwapi.drawText(500, 500, "On the map?", false);
-		bwapi.drawText(managerBuild.homePositionX-32, managerBuild.homePositionY-(32*2), "Num mins is " + tempMins, false);
+		System.out.println("Here");
+		managerWorkers.debug();
+		
 		bwapi.drawHealth(healthFlag);
-		managerWorkers.workerDebg();
-	//	System.out.print("debing");
+		//managerWorkers.workerDebg();
+		System.out.println("End debug");
 	}
 	
 	
-	public void gameEnded() { }
+	public void gameEnded() 
+	{
+		System.out.println("RaynorsRaiders: Game Ended");
+	}
 	public void keyPressed(int keyCode) 
 	{
 		if (keyCode == 66 ) //if equals b toggle debgFlag
@@ -166,7 +184,11 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		else if (keyCode == 72) // press h to toggle health
 			healthFlag = !healthFlag;
 	}
-	public void matchEnded(boolean winner) { }
+	public void matchEnded(boolean winner) 
+	{
+		System.out.println("RaynorsRaiders: Match Ended");
+		System.out.println("RaynorsRaiders: Did we win? " + winner);
+	}
 	public void nukeDetect(int x, int y) { }
 	public void nukeDetect() { }
 	public void playerLeft(int id) { }

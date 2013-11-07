@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.LinkedList;
 
 import javabot.JNIBWAPI;
+import javabot.model.BaseLocation;
 import javabot.model.Unit;
 import javabot.types.TechType;
 import javabot.types.TechType.TechTypes;
@@ -14,7 +15,6 @@ import javabot.types.UpgradeType.UpgradeTypes;
 import javabot.util.BWColor;
 import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 
-// Cannot import core reactive, primary and secondary constructors will init the AI core communication
 
 /*
  * Need to get the home base locations from the builder
@@ -25,14 +25,12 @@ import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 public class ManagerWorkers extends RRAITemplate 
 {
 	private static final double SCVS_PER_MIN_PATCH = 2.5;
-	JNIBWAPI bwapi;
+	//JNIBWAPI bwapi;
 	CoreReactive core;
 	CoreReactive.BuildMode mode;
 	LinkedList<UnitTypes> orders;
 	LinkedList<Worker> allWorkers;
 	LinkedList<LinkedList<Worker>> baseWorkers;
-	// Want to store an array of workers at each current base location
-	//LinkedList<UnitTypes> Buildings;
 	UnitTypes tempType;
 	Unit tempUnit;
 	
@@ -42,6 +40,7 @@ public class ManagerWorkers extends RRAITemplate
 	{
 		//SET UP ALL INTERNAL VARIABLES HERE
 		allWorkers = new LinkedList<Worker>();
+		allWorkers.clear();
 		baseWorkers = new LinkedList<LinkedList<Worker>>();
 		baseWorkers.add(new LinkedList<Worker>());
 	}
@@ -89,9 +88,20 @@ public class ManagerWorkers extends RRAITemplate
 		curBaseWorkers.add(toAdd);
 	}
 	
-	public int getNumWorkers()
+	public void removeWorkerFromBase(Worker toRem, int baseNdx)
+	{
+		LinkedList<Worker> curBaseWorkers = baseWorkers.get(baseNdx);
+		curBaseWorkers.remove(toRem);
+	}
+	
+	public int getTotalNumWorkers()
 	{
 		return allWorkers.size();
+	}
+	
+	public int getBaseWorkers(int baseNum)
+	{
+		return baseWorkers.get(0).size();
 	}
 	
 	/*
@@ -126,6 +136,7 @@ public class ManagerWorkers extends RRAITemplate
 		newWorker.unitID = unitID;
 		newWorker.curOrder = workerOrders.MINE;  //by default have it set to mine
 		newWorker.asgnedBase = 0; //default is base zero which is main base
+		addWorkerToBase(newWorker, 0);
 		allWorkers.push(newWorker);
 	}
 	
@@ -136,11 +147,13 @@ public class ManagerWorkers extends RRAITemplate
 		Worker toRemove = new Worker();
 		toRemove.unitID = unitID;
 		
+		
 		for (ndx = 0; ndx < allWorkers.size(); ndx++)
 		{
 			if (allWorkers.get(ndx).unitID == unitID)
 			{
 				System.out.println("Found remove");
+				removeWorkerFromBase(allWorkers.get(ndx), allWorkers.get(ndx).asgnedBase);
 				allWorkers.remove(ndx);
 			}
 		}
@@ -263,17 +276,24 @@ public class ManagerWorkers extends RRAITemplate
 		}
 		return false;
 	}
-	
-	public int workerDebg()
+	@Override
+	public void debug() 
 	{
-		//System.out.println("In worker debg");
+		for (BaseLocation b : builder.ourBases) 
+		{
+			int tempMins = getNumMinerals(b.getX(), b.getY());
+			int tempWorkers = getBaseWorkers(0);
+			bwapi.drawText(b.getX()-64, b.getY()-(32*2)-10, "Num mins is " + tempMins, false);
+			bwapi.drawText(b.getX()-64, b.getY()-(32*2), "Num workers is " + tempWorkers, false);
+		}
+		
+		
 		bwapi.drawText(0, 10, "Workers are", true);
 		int ndx;
 		for (ndx = 0; ndx < allWorkers.size(); ndx++)
 		{
 			bwapi.drawText(0, 10 + (10 * (ndx + 1)), ndx + " " + allWorkers.get(ndx).unitID, true);	
 		}
-		return 0;
 	}
 
 }
