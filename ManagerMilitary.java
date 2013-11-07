@@ -66,7 +66,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * 
 	 * Returns an ArrayList of Units (max = 12) of the UnitTypes wanted in levelEnum
 	 */
-	public ArrayList<Unit> unitFormationHelper(Level levelEnum, EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLvl)
+	private ArrayList<Unit> unitFormationHelper(Level levelEnum, EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLvl)
 	{
 		final int maxUnits = 12;
 		ArrayList<Unit> unitRally = new ArrayList<Unit>();
@@ -98,7 +98,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * 
 	 * Returns the ArrayList of Units passed in from unitFormationHelper
 	 */
-	public ArrayList<Unit> unitFormation(Level levelEnum, EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLvl)
+	private ArrayList<Unit> unitFormation(Level levelEnum, EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLvl)
 	{	
 		if(levelEnum.equals(Level.ZERO))
 		{
@@ -126,27 +126,27 @@ public class ManagerMilitary extends RRAITemplate
 	 * pixelPositionY:  Rally position's Y
 	 * 
 	 */
-	public void rallyUnits(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY )
+	private void rallyUnits(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY )
 	{
 		if(unitFormation != null)
 		{
-			for(int index = 0; index < unitFormation.size(); index++)
+			for(Unit unit: unitFormation)
 			{
-				bwapi.move(unitFormation.get(index).getID(), pixelPositionX, pixelPositionY);
+				bwapi.move(unit.getID(), pixelPositionX, pixelPositionY);
 			}
 			System.out.println("RALLY TEST");
 		}
 	}
 	
-	public boolean rallyReadyCheck(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY)
+	private boolean rallyReadyCheck(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY)
 	{
 		boolean checkFlag = false;
 		
 		if(unitFormation != null)
 		{
-			for(int index = 0; index < unitFormation.size(); index++)
+			for(Unit unit: unitFormation)
 			{
-				if((unitFormation.get(index).getX() == pixelPositionX) && (unitFormation.get(index).getY() == pixelPositionY))
+				if((unit.getX() == pixelPositionX) && (unit.getY() == pixelPositionY))
 				{
 					checkFlag = true;
 				}
@@ -163,13 +163,13 @@ public class ManagerMilitary extends RRAITemplate
 	 * pixelPositionY:  Attack position's Y
 	 * 
 	 */
-	public void attackEnemyLocation(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY, int homePosX, int homePosY)
+	private void attackEnemyLocation(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY)
 	{
 		if(unitFormation != null)
 		{
-			for(int index = 0; index < unitFormation.size(); index++)
+			for(Unit unit: unitFormation)
 			{
-				bwapi.attack(unitFormation.get(index).getID(), pixelPositionX, pixelPositionY);
+				bwapi.attack(unit.getID(), pixelPositionX, pixelPositionY);
 			}
 			System.out.println("ATTACK TEST");
 		}
@@ -251,15 +251,15 @@ public class ManagerMilitary extends RRAITemplate
 	 * enemyBaseLocs:  ArrayList of enemy's base locations
 	 * 
 	 */
-	public void scoutEnemyBases(Unit scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs)
+	private void scoutEnemyBases(Unit scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs)
 	{		
-		for (int index = 0; index < enemyBaseLocs.size(); index++) 
+		for (BaseLocation baseLoc: enemyBaseLocs) 
 		{
-			bwapi.move(scoutUnitID.getID(), enemyBaseLocs.get(index).getX(), enemyBaseLocs.get(index).getY());
+			bwapi.move(scoutUnitID.getID(), baseLoc.getX(), baseLoc.getY());
 			
 			 /* tried to get the scout to not do anything once it reaches the enemy base - not working atm for some reason */
-			 if( ((scoutUnitID.getX() == enemyBaseLocs.get(index).getX()) 
-					&& (scoutUnitID.getY() == enemyBaseLocs.get(index).getY())) 
+			 if( ((scoutUnitID.getX() == baseLoc.getX()) 
+					&& (scoutUnitID.getY() == baseLoc.getY())) 
 					|| scoutUnitID.isAttacking() || scoutUnitID.isGatheringGas() 
 					|| scoutUnitID.isGatheringMinerals() )
 			{
@@ -276,18 +276,28 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		Unit scout = getScoutUnit();
 		scoutEnemyBases(scout, getEnemyBases());
-		System.out.println("Scouted");
 	}
 	
-	public void attackOperation()
+	// This is so AIs can link data if they need to
+	// they only need to rewrite this function in
+	// their code
+	public void AILinkData() {
+		//Remember by this time all AI pointers are pointing to their respective AIs
+		//So you can use react.whatever, baby.something, ect
+		this.bwapi = super.bwapi;
+	}
+	
+	/*
+	 * Give this function a base location to have a group of units (marines atm) to attack
+	 */
+	public void attackOperation(int pixelPositionX, int pixelPositionY)
 	{
 		if(((getCurrentUnitCount() % 12) == 0))
 		{
 			ArrayList<Unit> unitFormed = unitFormation(Level.ZERO, unitTypesPerLevel);
-			ArrayList<BaseLocation> enemyBases = getEnemyBases();
 
 			rallyUnits(unitFormed, homePositionX, homePositionY);
-			attackEnemyLocation(unitFormed, enemyBases.get(0).getX(), enemyBases.get(0).getY(), homePositionX, homePositionY);
+			attackEnemyLocation(unitFormed, pixelPositionX, pixelPositionY);
 		}
 		System.out.println("Attacked");
 	}

@@ -31,6 +31,10 @@ public class CoreReactive extends RRAITemplate {
 		core_econ_buildingStack = new LinkedList<UnitTypes>();
 		core_econ_unitsStack = new LinkedList<UnitTypes>();
 		
+		core_econ_buildingStack.add(UnitTypes.Terran_Supply_Depot);
+        core_econ_buildingStack.add(UnitTypes.Terran_Refinery);
+        core_econ_buildingStack.add(UnitTypes.Terran_Barracks);
+		
 		// Set default build mode to process everything in the stack in-order and normally
 		core_econ_buildingMode = BuildMode.BLOCKING_STACK;
 		core_econ_unitsMode = BuildMode.FIRST_POSSIBLE;

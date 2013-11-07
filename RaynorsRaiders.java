@@ -50,6 +50,7 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		coreReactive.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
 		coreBaby.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
 		managerBuild.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
+		managerMilitary.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
 		managerWorkers.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
 		
 		bwapi.start();
@@ -91,12 +92,21 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	}
 	public void gameUpdate() 
 	{
+//		System.out.print("frame:: "+bwapi.getFrameCount());
+//		System.out.print(" (and its 1?  "+(bwapi.getFrameCount()==1));
+//		System.out.print(" or 30ish?  "+(bwapi.getFrameCount()/30));
+//		System.out.println("");
 		 //Draw debug information on screen
 		if (debgFlag)
+		{
 			drawDebugInfo();
+		}
 		// This sets up the base location
-		if (bwapi.getFrameCount() == 1) {
+		if (bwapi.getFrameCount() == 1)
+		{
+			
 			managerBuild.captureBaseLocation();
+			managerMilitary.scoutOperation();
 			if( managerBuild.baseSetup() != 1)
 			{
 				//Throw error here

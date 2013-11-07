@@ -21,6 +21,14 @@ public class CoreBaby extends RRAITemplate {
 	}
 	
 	
+
+	public void startUp() {
+		this.builder.AILinkData();
+		this.military.AILinkData();
+	}
+	
+	
+	
 	public void buildBasicBase() {
 		
 		builder.orders.push(UnitTypes.Terran_Supply_Depot);

@@ -19,7 +19,7 @@ import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 
 public class ManagerBuild extends RRAITemplate{
 	
-	JNIBWAPI bwapi;
+	private JNIBWAPI bwapi;
 	CoreReactive core;
 	CoreReactive.BuildMode mode;
 	LinkedList<UnitTypes> orders;
@@ -36,6 +36,7 @@ public class ManagerBuild extends RRAITemplate{
 	
 	public ManagerBuild() {
 		//SET UP ALL INTERNAL VARIABLES HERE
+		super();
 		builtBuildings = new LinkedList<UnitTypes>();
 		builtBuildings.push(UnitTypes.Terran_Command_Center);
 		ourBases = new LinkedList<BaseLocation>();
@@ -120,17 +121,47 @@ public class ManagerBuild extends RRAITemplate{
 	
 	public void captureBaseLocation() {
 		// Remember our homeTilePosition at the first frame
-		if (bwapi.getFrameCount() == 1) {
+//		if (bwapi.getFrameCount() == 1) {
 			int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
 			homePositionX = bwapi.getUnit(cc).getX();
 			homePositionY = bwapi.getUnit(cc).getY();
+//		}
+	}
+	
+	
+	public int underConstructionM() {
+		int cost = 0;
+		
+		for(Unit unit : bwapi.getMyUnits()) {
+			if(unit.isConstructing()) {
+				UnitType bldg = bwapi.getUnitType(unit.getBuildTypeID());
+				
+				cost += bldg.getMineralPrice();
+			}
 		}
+		
+		return cost;
+	}
+	
+	public int underConstructionG() {
+		int cost = 0;
+		
+		for(Unit unit : bwapi.getMyUnits()) {
+			if(unit.isConstructing()) {
+				UnitType bldg = bwapi.getUnitType(unit.getBuildTypeID());
+				
+				cost += bldg.getGasPrice();
+			}
+		}
+		
+		return cost;
 	}
 	
 	// looks for a building to construct according to the build mode
 	// calls build() method if it finds something to construct
 	public void construct() {
-
+//System.out.println("orders: " + orders.toString());
+//System.out.println("built: " +builtBuildings.toString());
 		switch(mode) {
 			case FIRST_POSSIBLE:
 				int i = 0;
@@ -154,9 +185,10 @@ public class ManagerBuild extends RRAITemplate{
 				if(canBuild){
 				   build(b);
 				   orders.remove(i);
+				   builtBuildings.add(b);
 				}
 				else {
-					// could not build anything in stack
+					System.out.println("could not build anything in stack");
 				}
 					
 				break;
@@ -164,14 +196,15 @@ public class ManagerBuild extends RRAITemplate{
 				b = orders.peek();
 				bldg = bwapi.getUnitType(b.ordinal());
 				
-				if(bwapi.getSelf().getMinerals() >= bldg.getMineralPrice() && bwapi.getSelf().getGas() >= bldg.getGasPrice()) {
+				if(bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) {
 					build(b);
 					orders.pop();
+					builtBuildings.add(b);
 				}
 
 				break;
 			case HOLD_ALL:
-				// does nothing
+				System.out.println("halting construction...");
 				break;
 			default:
 				break;
@@ -310,6 +343,17 @@ public class ManagerBuild extends RRAITemplate{
  		}
  		return nearestID;
 	}	
+	
+	// This is so AIs can link data if they need to
+	// they only need to rewrite this function in
+	// their code
+	public void AILinkData() {
+		//Remember by this time all AI pointers are pointing to their respective AIs
+		//So you can use react.whatever, baby.something, ect
+		AILinkManagerBuild(super.bwapi, super.react);
+	}
+	
+	
 
 	//Returns the Point object representing the suitable build tile position
 	//for a given building type near specified pixel position (or Point(-1,-1) if not found)
