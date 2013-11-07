@@ -23,8 +23,8 @@ public class CoreBaby extends RRAITemplate {
 	
 
 	public void startUp() {
-		this.builder.AILinkData();
-		this.military.AILinkData();
+		//README You should NOT be calling AILinkData().  This is already called in RRAITemplate within
+		// link.  NO AI should be dependent on any other AI to initalize.
 	}
 	
 	
