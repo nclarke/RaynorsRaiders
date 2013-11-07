@@ -127,10 +127,40 @@ public class ManagerBuild extends RRAITemplate{
 		}
 	}
 	
+	
+	public int underConstructionM() {
+		int cost = 0;
+		
+		for(Unit unit : bwapi.getMyUnits()) {
+			if(unit.isConstructing()) {
+				UnitType bldg = bwapi.getUnitType(unit.getBuildTypeID());
+				
+				cost += bldg.getMineralPrice();
+			}
+		}
+		
+		return cost;
+	}
+	
+	public int underConstructionG() {
+		int cost = 0;
+		
+		for(Unit unit : bwapi.getMyUnits()) {
+			if(unit.isConstructing()) {
+				UnitType bldg = bwapi.getUnitType(unit.getBuildTypeID());
+				
+				cost += bldg.getGasPrice();
+			}
+		}
+		
+		return cost;
+	}
+	
 	// looks for a building to construct according to the build mode
 	// calls build() method if it finds something to construct
 	public void construct() {
-
+//System.out.println("orders: " + orders.toString());
+//System.out.println("built: " +builtBuildings.toString());
 		switch(mode) {
 			case FIRST_POSSIBLE:
 				int i = 0;
@@ -154,9 +184,10 @@ public class ManagerBuild extends RRAITemplate{
 				if(canBuild){
 				   build(b);
 				   orders.remove(i);
+				   builtBuildings.add(b);
 				}
 				else {
-					// could not build anything in stack
+					System.out.println("could not build anything in stack");
 				}
 					
 				break;
@@ -164,14 +195,15 @@ public class ManagerBuild extends RRAITemplate{
 				b = orders.peek();
 				bldg = bwapi.getUnitType(b.ordinal());
 				
-				if(bwapi.getSelf().getMinerals() >= bldg.getMineralPrice() && bwapi.getSelf().getGas() >= bldg.getGasPrice()) {
+				if(bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) {
 					build(b);
 					orders.pop();
+					builtBuildings.add(b);
 				}
 
 				break;
 			case HOLD_ALL:
-				// does nothing
+				System.out.println("halting construction...");
 				break;
 			default:
 				break;
