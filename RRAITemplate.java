@@ -43,19 +43,6 @@ public class RRAITemplate
 		//So you can use react.whatever, baby.something, ect
 	}
 	
-<<<<<<< HEAD
-	// This will be called in the beginning of the every game for each AI
-	
-	public void setup() 
-	{
-		
-	}
-	
-	public void startUp() {
-	}
-	
-	public void checkUp() {
-=======
 	public void startUp()
 	{
 		System.out.println("Default Start Up");
@@ -64,9 +51,7 @@ public class RRAITemplate
 	public void checkUp() 
 	{
 		System.out.println("Default Check Up");
->>>>>>> Building works now
 	}
-	
 	
 	public void debug() 
 	{

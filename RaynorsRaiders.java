@@ -31,30 +31,15 @@ public class RaynorsRaiders implements BWAPIEventListener
 	ManagerBuild 		managerBuild;
 	ManagerWorkers		managerWorkers;
 	ManagerMilitary     managerMilitary;
-	
-<<<<<<< HEAD
+
 	public static void main(String[] args) 
-=======
-	public static void main(String[] args)
->>>>>>> Building works now
 	{
 		new RaynorsRaiders();
 	}
 	
-<<<<<<< HEAD
-	/*
-	 * This only happens once
-	 * If we want to have new variables when we start each map we need to
-	 * reset each data struct
-	 */
-	
 	public RaynorsRaiders() 
 	{
 		System.out.println("TOP of RR");
-=======
-	public RaynorsRaiders()
-	{
->>>>>>> Building works now
 		bwapi = new JNIBWAPI(this);
 		
 		/* Construct builders */
@@ -98,11 +83,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		bwapi.loadMapData(true);
 		System.out.println("Map Analyzed");
 		
-		// Setup ais and make sure we start with new data for each match
-		// Needs this for restarts
-		// can be setup or startup right now 11/7
 		
-		managerWorkers.setup();
 		
 		// Setup master unit list
 		masterUnitList.clear();
@@ -117,6 +98,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		coreReactive.startUp();
 		managerMilitary.startUp();
 		managerBuild.startUp();
+		managerWorkers.startUp();
 		
 	}
 	
@@ -132,13 +114,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 		
 		// This sets up the base location
-<<<<<<< HEAD
-		if (bwapi.getFrameCount() == 1)
-		{	
-=======
+
 		if (frameCount == 1)
 		{		
->>>>>>> Building works now
 			managerBuild.captureBaseLocation();
 			managerMilitary.scoutOperation();
 			if( managerBuild.baseSetup() != 1)
