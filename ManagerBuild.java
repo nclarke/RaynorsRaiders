@@ -185,8 +185,13 @@ public class ManagerBuild extends RRAITemplate{
 	public void build(UnitTypes structure) {
 		UnitType bldg;
 		
-		if (structure == null) {
+		if (structure == null)
+		{
 			return;
+		}
+		if (structure.ordinal() == UnitTypes.Terran_Command_Center.ordinal())
+		{
+			buildExpand();
 		}
 		
 		bldg = bwapi.getUnitType(structure.ordinal());
@@ -236,6 +241,11 @@ public class ManagerBuild extends RRAITemplate{
 		else {
 			core.core_econ_buildAlerts.push(BuildAlert.NO_MINERALS);
 		}
+	}
+	
+	public void buildExpand()
+	{
+		
 	}
 
     // input: upgrade(UpgradeTypes.xxxx)

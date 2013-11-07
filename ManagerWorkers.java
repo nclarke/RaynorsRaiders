@@ -29,7 +29,8 @@ public class ManagerWorkers extends RRAITemplate
 	CoreReactive core;
 	CoreReactive.BuildMode mode;
 	LinkedList<UnitTypes> orders;
-	LinkedList<Worker> workers;
+	LinkedList<Worker> allWorkers;
+	LinkedList<LinkedList<Worker>> baseWorkers;
 	// Want to store an array of workers at each current base location
 	//LinkedList<UnitTypes> Buildings;
 	UnitTypes tempType;
@@ -40,7 +41,9 @@ public class ManagerWorkers extends RRAITemplate
 	public ManagerWorkers() 
 	{
 		//SET UP ALL INTERNAL VARIABLES HERE
-		workers = new LinkedList<Worker>();
+		allWorkers = new LinkedList<Worker>();
+		baseWorkers = new LinkedList<LinkedList<Worker>>();
+		baseWorkers.add(new LinkedList<Worker>());
 	}
 	
 	private class Worker
@@ -67,9 +70,28 @@ public class ManagerWorkers extends RRAITemplate
 		
 	}
 	
+	/*
+	 * Adds a new LinkedList for a new base
+	 * allows new workers to be assigned to a linked list 
+	 * corresponding to that base.
+	 * Returns the LinkedList that was just created
+	 */
+	
+	public int addBaseToBaseWorkers() 
+	{
+		baseWorkers.add(new LinkedList<Worker>());
+		return baseWorkers.size();
+	}
+	
+	public void addWorkerToBase(Worker toAdd, int baseNdx)
+	{
+		LinkedList<Worker> curBaseWorkers = baseWorkers.get(baseNdx);
+		curBaseWorkers.add(toAdd);
+	}
+	
 	public int getNumWorkers()
 	{
-		return workers.size();
+		return allWorkers.size();
 	}
 	
 	/*
@@ -104,7 +126,7 @@ public class ManagerWorkers extends RRAITemplate
 		newWorker.unitID = unitID;
 		newWorker.curOrder = workerOrders.MINE;  //by default have it set to mine
 		newWorker.asgnedBase = 0; //default is base zero which is main base
-		workers.push(newWorker);
+		allWorkers.push(newWorker);
 	}
 	
 	public void removeWorker(int unitID)
@@ -114,12 +136,12 @@ public class ManagerWorkers extends RRAITemplate
 		Worker toRemove = new Worker();
 		toRemove.unitID = unitID;
 		
-		for (ndx = 0; ndx < workers.size(); ndx++)
+		for (ndx = 0; ndx < allWorkers.size(); ndx++)
 		{
-			if (workers.get(ndx).unitID == unitID)
+			if (allWorkers.get(ndx).unitID == unitID)
 			{
 				System.out.println("Found remove");
-				workers.remove(ndx);
+				allWorkers.remove(ndx);
 			}
 		}
 	}
@@ -132,8 +154,8 @@ public class ManagerWorkers extends RRAITemplate
 	public void handleIdle()
 	{
 		Worker curWorker = null;
-		int workersHomeX, workersHomeY;
 		int closestId = -1;
+		double closestDist = 99999999;
 		for (Unit unit : bwapi.getMyUnits()) {
 			// if this unit is Terran_SCV (worker),
 			// and if it is idle (not doing anything),
@@ -142,7 +164,6 @@ public class ManagerWorkers extends RRAITemplate
 				switch (curWorker.curOrder)
 				{
 				case MINE :
-					double closestDist = 99999999;
 					for (Unit neu : bwapi.getNeutralUnits()) 
 					{
 						if (neu.getTypeID() == UnitTypes.Resource_Mineral_Field.ordinal()) 
@@ -161,6 +182,20 @@ public class ManagerWorkers extends RRAITemplate
 					if (closestId != -1) bwapi.rightClick(unit.getID(), closestId);
 					break;
 				case GAS :
+					for (Unit neu : bwapi.getNeutralUnits()) 
+					{
+						if (neu.getTypeID() == UnitTypes.Resource_Vespene_Geyser.ordinal()) 
+						{
+							double distance = Math.sqrt(Math.pow(neu.getX() - curWorker.asgnedBaseX, 2)
+							+ Math.pow(neu.getY() - curWorker.asgnedBaseY, 2));
+							if ((closestId == -1) || (distance < closestDist)) 
+							{
+								closestDist = distance;
+								//bwapi.printText("Closet dist is" + String.valueOf(closestDist));
+								closestId = neu.getID();
+							}
+						}
+					} 
 					break;
 				case ATTACK :
 					break;
@@ -173,7 +208,7 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public Worker getWorkerByID(int unitID)
 	{
-		for (Worker w : workers)
+		for (Worker w : allWorkers)
 			if (w.unitID == unitID)
 				return w;
 		return null;
@@ -234,9 +269,9 @@ public class ManagerWorkers extends RRAITemplate
 		//System.out.println("In worker debg");
 		bwapi.drawText(0, 10, "Workers are", true);
 		int ndx;
-		for (ndx = 0; ndx < workers.size(); ndx++)
+		for (ndx = 0; ndx < allWorkers.size(); ndx++)
 		{
-			bwapi.drawText(0, 10 + (10 * (ndx + 1)), ndx + " " + workers.get(ndx).unitID, true);	
+			bwapi.drawText(0, 10 + (10 * (ndx + 1)), ndx + " " + allWorkers.get(ndx).unitID, true);	
 		}
 		return 0;
 	}
