@@ -8,10 +8,8 @@ import java.util.EnumMap;
 import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.Level;
 import javabot.model.*;
-import javabot.types.*;
-import javabot.types.OrderType.OrderTypeTypes;
 import javabot.types.UnitType.UnitTypes;
-import javabot.util.BWColor;
+import javabot.util.*;
 
 public class ManagerMilitary extends RRAITemplate
 {
@@ -20,6 +18,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * (AI is very rich in the beginning, gets its level changed from ZERO to TWO) */
 	EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLevel;
 	int homePositionX, homePositionY;
+	Unit scout;
 	
 	public ManagerMilitary()
 	{
@@ -251,22 +250,37 @@ public class ManagerMilitary extends RRAITemplate
 	 * enemyBaseLocs:  ArrayList of enemy's base locations
 	 * 
 	 */
-	private void scoutEnemyBases(Unit scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs)
+	private void scoutEnemyBases(int scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs)
 	{		
+		/* Need to store this list of bases and then send the scout to each base once it reaches a certain location
+		 * currently, it receives all orders at the same time and can only respond to the last one
+		 * this is why it is not returning to the base afetr it has finsihed scouting. 
+		 * 
+		 * Also, I want to make this more generic sot hat we can scout enemy bases later in the game
+		 * like include something about leaving if you see "bad" stuff
+		 */
+		int baseNumber = 0;
+		System.out.println("MM: number of bases: "+enemyBaseLocs.size());
 		for (BaseLocation baseLoc: enemyBaseLocs) 
 		{
-			bwapi.move(scoutUnitID.getID(), baseLoc.getX(), baseLoc.getY());
+			System.out.println("MM: base #"+baseNumber+" which is: "+baseLoc);
+			baseNumber++;
+			bwapi.move(scoutUnitID, baseLoc.getX(), baseLoc.getY());
 			
-			 /* tried to get the scout to not do anything once it reaches the enemy base - not working atm for some reason */
-			 if( ((scoutUnitID.getX() == baseLoc.getX()) 
-					&& (scoutUnitID.getY() == baseLoc.getY())) 
-					|| scoutUnitID.isAttacking() || scoutUnitID.isGatheringGas() 
-					|| scoutUnitID.isGatheringMinerals() )
+			 /* tried to get the scout to not do anything once it reaches the enemy base - not working atm for some reason 
+			 if( ((scout.getX() == baseLoc.getX()) 
+					&& (scout.getY() == baseLoc.getY())) 
+					|| scout.isAttacking() || scout.isGatheringGas() 
+					|| scout.isGatheringMinerals() )
 			{
-				/* if it did do something, tell it to go back to home base */
-				bwapi.move(scoutUnitID.getID(), homePositionX, homePositionY);
+				// if it did do something, tell it to go back to home base
+				bwapi.move(scoutUnitID, homePositionX, homePositionY);
 			} 
+			  */
 		}
+		//return to home bas
+		System.out.println("MM: return to home base now Mr. scout");
+		bwapi.move(scoutUnitID, homePositionX, homePositionY);
 	}
 	
 	/*
@@ -274,8 +288,8 @@ public class ManagerMilitary extends RRAITemplate
 	 */
 	public void scoutOperation()
 	{
-		Unit scout = getScoutUnit();
-		scoutEnemyBases(scout, getEnemyBases());
+		this.scout = getScoutUnit();
+		scoutEnemyBases(scout.getID(), getEnemyBases());
 	}
 	
 	// This is so AIs can link data if they need to

@@ -19,7 +19,7 @@ import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 
 public class ManagerBuild extends RRAITemplate{
 	
-	private JNIBWAPI bwapi;
+//	private JNIBWAPI bwapi;
 	CoreReactive core;
 	CoreReactive.BuildMode mode;
 	LinkedList<UnitTypes> orders;
