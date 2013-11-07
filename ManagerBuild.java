@@ -17,10 +17,9 @@ import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 
 // Cannot import core reactive, primary and secondary constructors will init the AI core communication
 
-public class ManagerBuild extends RRAITemplate{
+public class ManagerBuild extends RRAITemplate
+{
 	
-//	private JNIBWAPI bwapi;
-	CoreReactive core;
 	CoreReactive.BuildMode mode;
 	LinkedList<UnitTypes> orders;
 	LinkedList<UnitTypes> builtBuildings;
@@ -66,6 +65,86 @@ public class ManagerBuild extends RRAITemplate{
 		}
 	
 	}
+
+	public void AILinkData() {
+		mode = react.econ_getBuildingMode();
+		orders = react.econ_getBuildingStack();
+	}
+	
+	public void startUp() {
+		System.out.println("ManagerBuild Online");
+	}
+	
+	// looks for a building to construct according to the build mode
+	// calls build() method if it finds something to construct
+	public void checkUp() 
+	{
+		System.out.println("ManagerBuild Running");
+		switch(mode) 
+		{
+			case FIRST_POSSIBLE:
+				int i = 0;
+				boolean canBuild = false;
+				UnitTypes b = null;
+				UnitType bldg = null;
+				
+				// go through list until we find a buildable structure
+				while(!canBuild && i < orders.size())
+				{
+					b = orders.get(i);
+					bldg = bwapi.getUnitType(b.ordinal());
+					
+					if(bwapi.getSelf().getMinerals() < bldg.getMineralPrice() && bwapi.getSelf().getGas() < bldg.getGasPrice())
+					{
+						i++;
+					}
+					else
+					{
+						canBuild = true;
+					}
+				}
+				
+				if(canBuild)
+				{
+				   build(b);
+				   orders.remove(i);
+				   builtBuildings.add(b);
+				}
+				else 
+				{
+					System.out.println("could not build anything in stack");
+				}
+					
+				break;
+			case BLOCKING_STACK:
+				b = orders.peek();
+				bldg = bwapi.getUnitType(b.ordinal());
+				
+				if(bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice())
+				{
+					build(b);
+					orders.pop();
+					builtBuildings.add(b);
+				}
+
+				break;
+			case HOLD_ALL:
+				System.out.println("halting construction...");
+				break;
+			default:
+				break;
+		}
+	}
+	
+	public void captureBaseLocation() {
+		// Remember our homeTilePosition at the first frame
+//		if (bwapi.getFrameCount() == 1) {
+			int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
+			homePositionX = bwapi.getUnit(cc).getX();
+			homePositionY = bwapi.getUnit(cc).getY();
+//		}
+	}
+	
 	
 	/*
 	 * Assumes that this function will be called on the first frame before
@@ -109,25 +188,6 @@ public class ManagerBuild extends RRAITemplate{
 	 * 
 	 */
 	
-	public void AILinkManagerBuild(JNIBWAPI d_bwapi, CoreReactive d_core) {
-		//Here you get your pointers to the other AI cores (JINBWAPI, core, ect ect ect)
-		//The Raynors Raiders code should call this "constructor" after all the other AI parts have
-		// been created.
-		bwapi = d_bwapi;
-		core = d_core;
-		mode = core.econ_getBuildingMode();
-		orders = core.econ_getBuildingStack();
-	}
-	
-	public void captureBaseLocation() {
-		// Remember our homeTilePosition at the first frame
-//		if (bwapi.getFrameCount() == 1) {
-			int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
-			homePositionX = bwapi.getUnit(cc).getX();
-			homePositionY = bwapi.getUnit(cc).getY();
-//		}
-	}
-	
 	
 	public int underConstructionM() {
 		int cost = 0;
@@ -156,61 +216,6 @@ public class ManagerBuild extends RRAITemplate{
 		
 		return cost;
 	}
-	
-	// looks for a building to construct according to the build mode
-	// calls build() method if it finds something to construct
-	public void construct() {
-//System.out.println("orders: " + orders.toString());
-//System.out.println("built: " +builtBuildings.toString());
-		switch(mode) {
-			case FIRST_POSSIBLE:
-				int i = 0;
-				boolean canBuild = false;
-				UnitTypes b = null;
-				UnitType bldg = null;
-				
-				// go through list until we find a buildable structure
-				while(!canBuild && i < orders.size()){
-					b = orders.get(i);
-					bldg = bwapi.getUnitType(b.ordinal());
-					
-					if(bwapi.getSelf().getMinerals() < bldg.getMineralPrice() && bwapi.getSelf().getGas() < bldg.getGasPrice()) {
-						i++;
-					}
-					else {
-						canBuild = true;
-					}
-				}
-				
-				if(canBuild){
-				   build(b);
-				   orders.remove(i);
-				   builtBuildings.add(b);
-				}
-				else {
-					System.out.println("could not build anything in stack");
-				}
-					
-				break;
-			case BLOCKING_STACK:
-				b = orders.peek();
-				bldg = bwapi.getUnitType(b.ordinal());
-				
-				if(bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) {
-					build(b);
-					orders.pop();
-					builtBuildings.add(b);
-				}
-
-				break;
-			case HOLD_ALL:
-				System.out.println("halting construction...");
-				break;
-			default:
-				break;
-		}
-	}
-	
 	
         // input: build(UnitTypes.xxxx) 
         // will build near similar building types
@@ -263,16 +268,16 @@ public class ManagerBuild extends RRAITemplate{
 				    }
 				}
 				else {
-					core.core_econ_buildAlerts.push(BuildAlert.NO_WORKERS);
+					react.core_econ_buildAlerts.push(BuildAlert.NO_WORKERS);
 				}
 			}
 		  }
 		  else {
-			  core.core_econ_buildAlerts.push(BuildAlert.NO_GAS);
+			  react.core_econ_buildAlerts.push(BuildAlert.NO_GAS);
 		  }
 		}
 		else {
-			core.core_econ_buildAlerts.push(BuildAlert.NO_MINERALS);
+			react.core_econ_buildAlerts.push(BuildAlert.NO_MINERALS);
 		}
 	}
 	
@@ -296,11 +301,11 @@ public class ManagerBuild extends RRAITemplate{
 			}
 		}
 		else {
-			core.core_econ_buildAlerts.push(BuildAlert.NO_GAS);
+			react.core_econ_buildAlerts.push(BuildAlert.NO_GAS);
 		}
 	 }
 	 else {
-		 core.core_econ_buildAlerts.push(BuildAlert.NO_MINERALS);
+		 react.core_econ_buildAlerts.push(BuildAlert.NO_MINERALS);
 	 }
 	}
 
@@ -319,11 +324,11 @@ public class ManagerBuild extends RRAITemplate{
 			}
 		  }
 		  else {
-				core.core_econ_buildAlerts.push(BuildAlert.NO_GAS);
+				react.core_econ_buildAlerts.push(BuildAlert.NO_GAS);
 		  }
 	    }
 		else {
-			 core.core_econ_buildAlerts.push(BuildAlert.NO_MINERALS);
+			 react.core_econ_buildAlerts.push(BuildAlert.NO_MINERALS);
 		}
 	}
 
@@ -343,15 +348,6 @@ public class ManagerBuild extends RRAITemplate{
  		}
  		return nearestID;
 	}	
-	
-	// This is so AIs can link data if they need to
-	// they only need to rewrite this function in
-	// their code
-	public void AILinkData() {
-		//Remember by this time all AI pointers are pointing to their respective AIs
-		//So you can use react.whatever, baby.something, ect
-		AILinkManagerBuild(super.bwapi, super.react);
-	}
 	
 	
 

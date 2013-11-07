@@ -27,6 +27,37 @@ public class ManagerMilitary extends RRAITemplate
 		//setHomePosition(); - FIXME Check the spec on linking AIs
 	}
 	
+	public void AILinkData() {
+		//None here
+	}
+	
+	public void startUp() {
+		System.out.println("ManageMilitary online");
+	}
+	
+	public void checkUp() {
+		//Check up - FIXME - code needs to go here.
+	}
+	
+    public void debug()
+    {
+    	int spacing = 10;
+		
+		// Draw our home position.
+		bwapi.drawText(new Point(5,0), "Our home position: "+String.valueOf(homePositionX)+","+String.valueOf(homePositionY), true);
+		for (BaseLocation b : bwapi.getMap().getBaseLocations()) {
+			if (b.isStartLocation()) {
+				int index  = spacing/10;
+				bwapi.drawText(new Point(5,spacing), "Base position " + index + ": " +String.valueOf(b.getX())+","+String.valueOf(b.getY()), true);
+			}
+			spacing= spacing + 10;
+		}
+		
+		bwapi.drawText(new Point(5,110), "Total SCVs trained: " + String.valueOf(getWorkersCount()), true);
+		bwapi.drawText(new Point(5,120), "Total Marines trained: " + String.valueOf(getCurrentUnitCount()), true);
+    }
+    
+    
 	void setHomePosition()
 	{
 		if (bwapi.getFrameCount() == 1) 
@@ -327,21 +358,5 @@ public class ManagerMilitary extends RRAITemplate
 	    return nearestID;
     }
     
-    public void drawMilitaryDebugInfo()
-    {
-    	int spacing = 10;
-		
-		// Draw our home position.
-		bwapi.drawText(new Point(5,0), "Our home position: "+String.valueOf(homePositionX)+","+String.valueOf(homePositionY), true);
-		for (BaseLocation b : bwapi.getMap().getBaseLocations()) {
-			if (b.isStartLocation()) {
-				int index  = spacing/10;
-				bwapi.drawText(new Point(5,spacing), "Base position " + index + ": " +String.valueOf(b.getX())+","+String.valueOf(b.getY()), true);
-			}
-			spacing= spacing + 10;
-		}
-		
-		bwapi.drawText(new Point(5,110), "Total SCVs trained: " + String.valueOf(getWorkersCount()), true);
-		bwapi.drawText(new Point(5,120), "Total Marines trained: " + String.valueOf(getCurrentUnitCount()), true);
-    }
+
 }

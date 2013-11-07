@@ -4,32 +4,35 @@ import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.*;
 import javabot.types.UnitType.UnitTypes;
 
-public class CoreBaby extends RRAITemplate {
+public class CoreBaby extends RRAITemplate 
+{
 	
-	public CoreBaby() {
+	public CoreBaby() 
+	{
 		//Nothing to init yet
 	}
 	
-	public void startUpSequence() {
+	public void startUp() 
+	{
+		System.out.println("CoreBaby Online");
 		// Now populate the buildingStack
 		buildBasicBase();
 	}
 	
 	
-	public void checkUp() {
+	public void checkUp() 
+	{
 		//Baby is doing nothing during runtime
 	}
 	
-	
-
-	public void startUp() {
-		//README You should NOT be calling AILinkData().  This is already called in RRAITemplate within
-		// link.  NO AI should be dependent on any other AI to initalize.
+	public void debug() 
+	{
+		//Put debug info here for the Baby
 	}
 	
 	
-	
-	public void buildBasicBase() {
+	public void buildBasicBase() 
+	{
 		
 		builder.orders.push(UnitTypes.Terran_Supply_Depot);
 		builder.orders.push(UnitTypes.Terran_Supply_Depot);
@@ -39,14 +42,14 @@ public class CoreBaby extends RRAITemplate {
 		builder.orders.push(UnitTypes.Terran_Bunker);
 		builder.orders.push(UnitTypes.Terran_Bunker);
 		
-		builder.orders.push(UnitTypes.Terran_SCV);
+		/*builder.orders.push(UnitTypes.Terran_SCV);
 		builder.orders.push(UnitTypes.Terran_SCV);
 		builder.orders.push(UnitTypes.Terran_SCV);
 		builder.orders.push(UnitTypes.Terran_SCV);
 		builder.orders.push(UnitTypes.Terran_Marine);
 		builder.orders.push(UnitTypes.Terran_Marine);
 		builder.orders.push(UnitTypes.Terran_Marine);
-		builder.orders.push(UnitTypes.Terran_Marine);
+		builder.orders.push(UnitTypes.Terran_Marine);*/
 	}
 	
 }

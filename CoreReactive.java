@@ -8,7 +8,8 @@ import javabot.types.UnitType.UnitTypes;
 import javabot.util.*;
 import javabot.model.*;
 
-public class CoreReactive extends RRAITemplate {
+public class CoreReactive extends RRAITemplate 
+{
 	//Data structs
 	LinkedList<UnitTypes> core_econ_buildingStack;
 	LinkedList<UnitTypes> core_econ_unitsStack;
@@ -18,22 +19,21 @@ public class CoreReactive extends RRAITemplate {
 	BuildMode core_econ_unitsMode;
 	
 	
-	public enum BuildMode {
+	public enum BuildMode 
+	{
 		FIRST_POSSIBLE, BLOCKING_STACK, HOLD_ALL, RESET_BLOCKING_STACK
 	};
 	
-	public enum BuildAlert {
+	public enum BuildAlert 
+	{
 		NO_MINERALS, NO_GAS, NO_ROOM, NO_WORKERS
 	};
 	
 	/* Here is our constructor */
-	public CoreReactive() {
+	public CoreReactive() 
+	{
 		core_econ_buildingStack = new LinkedList<UnitTypes>();
 		core_econ_unitsStack = new LinkedList<UnitTypes>();
-		
-		core_econ_buildingStack.add(UnitTypes.Terran_Supply_Depot);
-        core_econ_buildingStack.add(UnitTypes.Terran_Refinery);
-        core_econ_buildingStack.add(UnitTypes.Terran_Barracks);
 		
 		// Set default build mode to process everything in the stack in-order and normally
 		core_econ_buildingMode = BuildMode.BLOCKING_STACK;
@@ -41,15 +41,16 @@ public class CoreReactive extends RRAITemplate {
 	}
 	
 	/* This is to be run during startup, currently its a basic loadout of units to create */
-	public void startUpSequence() {
-		// Now populate the buildingStack
-
+	public void startUp() 
+	{
+		System.out.println("CoreReactive Online");
 	}
 	
 	
 	/* This is to be run frequently, and is the quick-decider for things such as resources */
-	public void checkUp() {
-		
+	public void checkUp() 
+	{
+		System.out.println("CoreReactive checkup phase");
 		//Commented out to keep checkUp silent
 		/*
 		 BuildAlert currentAlert;
@@ -70,23 +71,33 @@ public class CoreReactive extends RRAITemplate {
 		
 	}
 	
-	public void econ_sendBuildAlert(BuildAlert alert) {
+	public void debug() 
+	{
+		// Need to put core Reactive debug here
+	}
+	
+	public void econ_sendBuildAlert(BuildAlert alert) 
+	{
 		core_econ_buildAlerts.add(alert);
 	}
 	
-	public LinkedList<UnitTypes> econ_getBuildingStack(){
+	public LinkedList<UnitTypes> econ_getBuildingStack()
+	{
 		return this.core_econ_buildingStack;
 	}
 	
-	public LinkedList<UnitTypes> econ_getUnitsStack() {
+	public LinkedList<UnitTypes> econ_getUnitsStack()
+	{
 		return this.core_econ_unitsStack;
 	}
 	
-	public BuildMode econ_getBuildingMode() {
+	public BuildMode econ_getBuildingMode()
+	{
 		return this.core_econ_buildingMode;
 	}
 	
-	public LinkedList<Unit> gen_findUnits(UnitTypes input) {
+	public LinkedList<Unit> gen_findUnits(UnitTypes input) 
+	{
 	LinkedList<Unit> listToBuild = new LinkedList<Unit>();
 	UnitType searchFor = bwapi.getUnitType(input.ordinal());
 		for(Unit unit : bwapi.getMyUnits()) {

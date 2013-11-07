@@ -13,13 +13,14 @@ import javabot.types.OrderType.OrderTypeTypes;
 import javabot.types.UnitType.UnitTypes;
 import javabot.util.BWColor;
 
-public class RaynorsRaiders implements BWAPIEventListener {
+public class RaynorsRaiders implements BWAPIEventListener 
+{
 
 	boolean debgFlag = false;
 	boolean healthFlag = false;
 	
 	/* Master unit list */
-	LinkedList<Unit> masterUnitList = new LinkedList<Unit>();;
+	LinkedList<Unit> masterUnitList = new LinkedList<Unit>();
 	
 	
 	/* BroodWar API Harness*/
@@ -31,11 +32,16 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	ManagerWorkers		managerWorkers;
 	ManagerMilitary     managerMilitary;
 	
+<<<<<<< HEAD
 	public static void main(String[] args) 
+=======
+	public static void main(String[] args)
+>>>>>>> Building works now
 	{
 		new RaynorsRaiders();
 	}
 	
+<<<<<<< HEAD
 	/*
 	 * This only happens once
 	 * If we want to have new variables when we start each map we need to
@@ -45,6 +51,10 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	public RaynorsRaiders() 
 	{
 		System.out.println("TOP of RR");
+=======
+	public RaynorsRaiders()
+	{
+>>>>>>> Building works now
 		bwapi = new JNIBWAPI(this);
 		
 		/* Construct builders */
@@ -65,11 +75,13 @@ public class RaynorsRaiders implements BWAPIEventListener {
 	} 
 	
 	
-	public void connected() {
+	public void connected()
+	{
 		bwapi.loadTypeData();
 	}
 	
-	public void gameStarted() {
+	public void gameStarted()
+	{
 		System.out.println("In RaynorsRaiders");
 		System.out.println("Game Started");
 		
@@ -103,21 +115,30 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		
 		coreBaby.startUp();
 		coreReactive.startUp();
+		managerMilitary.startUp();
+		managerBuild.startUp();
+		
 	}
+	
+	
 	public void gameUpdate() 
 	{
-//		System.out.print("frame:: "+bwapi.getFrameCount());
-//		System.out.print(" (and its 1?  "+(bwapi.getFrameCount()==1));
-//		System.out.print(" or 30ish?  "+(bwapi.getFrameCount()/30));
-//		System.out.println("");
+		Integer frameCount = bwapi.getFrameCount();
+		
 		 //Draw debug information on screen
 		if (debgFlag)
 		{
 			drawDebugInfo();
 		}
+		
 		// This sets up the base location
+<<<<<<< HEAD
 		if (bwapi.getFrameCount() == 1)
 		{	
+=======
+		if (frameCount == 1)
+		{		
+>>>>>>> Building works now
 			managerBuild.captureBaseLocation();
 			managerMilitary.scoutOperation();
 			if( managerBuild.baseSetup() != 1)
@@ -135,15 +156,13 @@ public class RaynorsRaiders implements BWAPIEventListener {
 		}
 		
 		// Call actions every 30 frames
-		if (bwapi.getFrameCount() % 30 == 0) 
+		if (frameCount % 30 == 0) 
 		{
-			managerWorkers.handleIdle();
-			coreReactive.checkUp();
-			managerBuild.construct();
+			//this.managerWorkers.handleIdle();	FIXME - was crashing, thus killing the method that called it.	
 			coreBaby.checkUp();
-		}
-
-		
+			coreReactive.checkUp();
+			managerBuild.checkUp();
+		}	
 	}
 	
 	public void drawDebugInfo() 
