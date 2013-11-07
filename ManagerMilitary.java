@@ -66,7 +66,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * 
 	 * Returns an ArrayList of Units (max = 12) of the UnitTypes wanted in levelEnum
 	 */
-	public ArrayList<Unit> unitFormationHelper(Level levelEnum, EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLvl)
+	private ArrayList<Unit> unitFormationHelper(Level levelEnum, EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLvl)
 	{
 		final int maxUnits = 12;
 		ArrayList<Unit> unitRally = new ArrayList<Unit>();
@@ -98,7 +98,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * 
 	 * Returns the ArrayList of Units passed in from unitFormationHelper
 	 */
-	public ArrayList<Unit> unitFormation(Level levelEnum, EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLvl)
+	private ArrayList<Unit> unitFormation(Level levelEnum, EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLvl)
 	{	
 		if(levelEnum.equals(Level.ZERO))
 		{
@@ -126,7 +126,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * pixelPositionY:  Rally position's Y
 	 * 
 	 */
-	public void rallyUnits(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY )
+	private void rallyUnits(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY )
 	{
 		if(unitFormation != null)
 		{
@@ -138,7 +138,7 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
-	public boolean rallyReadyCheck(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY)
+	private boolean rallyReadyCheck(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY)
 	{
 		boolean checkFlag = false;
 		
@@ -163,7 +163,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * pixelPositionY:  Attack position's Y
 	 * 
 	 */
-	public void attackEnemyLocation(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY, int homePosX, int homePosY)
+	private void attackEnemyLocation(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY)
 	{
 		if(unitFormation != null)
 		{
@@ -251,7 +251,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * enemyBaseLocs:  ArrayList of enemy's base locations
 	 * 
 	 */
-	public void scoutEnemyBases(Unit scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs)
+	private void scoutEnemyBases(Unit scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs)
 	{		
 		for (int index = 0; index < enemyBaseLocs.size(); index++) 
 		{
@@ -287,15 +287,17 @@ public class ManagerMilitary extends RRAITemplate
 		this.bwapi = super.bwapi;
 	}
 	
-	public void attackOperation()
+	/*
+	 * Give this function a base location to have a group of units (marines atm) to attack
+	 */
+	public void attackOperation(int pixelPositionX, int pixelPositionY)
 	{
 		if(((getCurrentUnitCount() % 12) == 0))
 		{
 			ArrayList<Unit> unitFormed = unitFormation(Level.ZERO, unitTypesPerLevel);
-			ArrayList<BaseLocation> enemyBases = getEnemyBases();
 
 			rallyUnits(unitFormed, homePositionX, homePositionY);
-			attackEnemyLocation(unitFormed, enemyBases.get(0).getX(), enemyBases.get(0).getY(), homePositionX, homePositionY);
+			attackEnemyLocation(unitFormed, pixelPositionX, pixelPositionY);
 		}
 		System.out.println("Attacked");
 	}
