@@ -32,7 +32,12 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public void setup() {
 		System.out.println("ManageMilitary online");
+	}
+	
+	public void startUp()
+	{
 		setHomePosition();
+		scoutOperation();
 	}
 	
 	public void checkUp() {
