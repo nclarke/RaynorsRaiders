@@ -42,14 +42,14 @@ public class CoreBaby extends RRAITemplate
 		builder.orders.push(UnitTypes.Terran_Bunker);
 		builder.orders.push(UnitTypes.Terran_Bunker);
 		
-		/*builder.orders.push(UnitTypes.Terran_SCV);
-		builder.orders.push(UnitTypes.Terran_SCV);
-		builder.orders.push(UnitTypes.Terran_SCV);
-		builder.orders.push(UnitTypes.Terran_SCV);
-		builder.orders.push(UnitTypes.Terran_Marine);
-		builder.orders.push(UnitTypes.Terran_Marine);
-		builder.orders.push(UnitTypes.Terran_Marine);
-		builder.orders.push(UnitTypes.Terran_Marine);*/
+		builder.roster.push(UnitTypes.Terran_SCV);
+		builder.roster.push(UnitTypes.Terran_SCV);
+		builder.roster.push(UnitTypes.Terran_SCV);
+		builder.roster.push(UnitTypes.Terran_SCV);
+		builder.roster.push(UnitTypes.Terran_Marine);
+		builder.roster.push(UnitTypes.Terran_Marine);
+		builder.roster.push(UnitTypes.Terran_Marine);
+		builder.roster.push(UnitTypes.Terran_Marine);
 	}
 	
 }

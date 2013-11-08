@@ -96,6 +96,11 @@ public class CoreReactive extends RRAITemplate
 		return this.core_econ_buildingMode;
 	}
 	
+	public BuildMode econ_getUnitsMode()
+	{
+		return this.core_econ_unitsMode;
+	}
+	
 	public LinkedList<Unit> gen_findUnits(UnitTypes input) 
 	{
 	LinkedList<Unit> listToBuild = new LinkedList<Unit>();
