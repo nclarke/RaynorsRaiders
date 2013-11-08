@@ -329,8 +329,8 @@ public class ManagerMilitary extends RRAITemplate
 		scoutEnemyBases(scout, getEnemyBases(), 0);
 		
 		//return to home base
-		System.out.println("MM: return to home base now Mr. scout");
-		bwapi.move(scout.getID(), homePositionX, homePositionY);
+		//System.out.println("MM: return to home base now Mr. scout");
+		//bwapi.move(scout.getID(), homePositionX, homePositionY);
 	}
 	
 	
