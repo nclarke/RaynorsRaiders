@@ -144,7 +144,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 	
 	public void drawDebugInfo() 
 	{
-		System.out.println("Start debug");
+		//System.out.println("Start debug");
 		bwapi.drawText(0, 0, "Home base location is ( " + managerBuild.homePositionX + ", "
 				+ managerBuild.homePositionY + ")", true);
 		bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
@@ -161,7 +161,6 @@ public class RaynorsRaiders implements BWAPIEventListener
 			
 			bwapi.drawLine(u.getX(), u.getY(), u.getTargetX(), u.getTargetY(), BWColor.WHITE, false);
 		}
-		System.out.println("Here");
 		managerWorkers.debug();
 		
 		if(militaryDebugFlag)
@@ -169,7 +168,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			//managerMilitary.debug();
 		}
 		
-		System.out.println("End debug");
+		//System.out.println("End debug");
 	}
 	
 	
@@ -177,6 +176,10 @@ public class RaynorsRaiders implements BWAPIEventListener
 	{
 		System.out.println("RaynorsRaiders: Game Ended");
 	}
+	/*
+	 *	Letters are in ascii so just look up ascii code for the letter you want 
+	 *	UpperCase ascii
+	 */
 	public void keyPressed(int keyCode) 
 	{
 		if (keyCode == 66 ) //if equals b toggle debgFlag
@@ -185,6 +188,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 			healthFlag = !healthFlag;
 		else if (keyCode == 77) // press m to toggle military debugs
 			militaryDebugFlag = !militaryDebugFlag;
+		//else if (keyCode == 73) // press g to send workers to mine (DEBUG)
+			//managerWorkers.assignWorkersToGas(0, 2);
 	}
 	public void matchEnded(boolean winner) 
 	{

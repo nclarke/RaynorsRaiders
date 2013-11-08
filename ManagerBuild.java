@@ -84,7 +84,7 @@ public class ManagerBuild extends RRAITemplate
 	// calls build() method if it finds something to construct
 	public void checkUp() 
 	{
-		System.out.println("ManagerBuild Running");
+		//System.out.println("ManagerBuild Running");
 //System.out.println("orders: " + orders.toString());
 //System.out.println("built: " +builtBuildings.toString());
 				switch(bldgMode) {

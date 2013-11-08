@@ -50,7 +50,7 @@ public class CoreReactive extends RRAITemplate
 	/* This is to be run frequently, and is the quick-decider for things such as resources */
 	public void checkUp() 
 	{
-		System.out.println("CoreReactive checkup phase");
+		//System.out.println("CoreReactive checkup phase");
 		//Commented out to keep checkUp silent
 		/*
 		 BuildAlert currentAlert;

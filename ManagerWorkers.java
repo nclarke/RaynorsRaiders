@@ -25,9 +25,6 @@ import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 public class ManagerWorkers extends RRAITemplate 
 {
 	private static final double SCVS_PER_MIN_PATCH = 2.5;
-	//JNIBWAPI bwapi;
-	CoreReactive core;
-	CoreReactive.BuildMode mode;
 	LinkedList<UnitTypes> orders;
 	LinkedList<Worker> allWorkers;
 	LinkedList<LinkedList<Worker>> baseWorkers;
@@ -43,6 +40,17 @@ public class ManagerWorkers extends RRAITemplate
 		allWorkers.clear();
 		baseWorkers = new LinkedList<LinkedList<Worker>>();
 		baseWorkers.add(new LinkedList<Worker>());
+	}
+	
+	@Override
+	public void setup() 
+	{
+		
+	}
+	
+	public enum workerOrders
+	{
+		MINE, GAS, ATTACK, DEFEND, BUILD, SCOUT
 	}
 	
 	private class Worker
@@ -68,6 +76,77 @@ public class ManagerWorkers extends RRAITemplate
 			
 		}
 		
+	}
+	
+	public void addWorker(int unitID)
+	{
+		int baseNdx = getBaseToAddWorkers();
+		System.out.println("In new worker, baseNdx is " + baseNdx);
+		//default is base zero which is main base
+		//by default have it set to mine
+		Worker newWorker = new Worker(unitID, baseNdx, workerOrders.MINE);
+		addWorkerToBase(newWorker, baseNdx);
+		allWorkers.push(newWorker);
+	}
+	
+	private int getBaseToAddWorkers()
+	{
+		int rtnNdx = -1, ndx = 0;
+		int baseWorkers, baseMins, gasWorkers;
+		BaseLocation curBase;
+		for (ndx = 0; ndx < builder.ourBases.size(); ndx++) 
+		{
+			curBase = builder.ourBases.get(ndx);
+			baseWorkers = getBaseWorkers(ndx);
+			baseMins = getNumMinerals(curBase.getX(), curBase.getY());
+			if (!curBase.isMineralOnly())
+				gasWorkers = 3;
+			else
+				gasWorkers = 0;
+			if (baseWorkers < ( (SCVS_PER_MIN_PATCH * baseMins) + gasWorkers) )
+				return ndx;
+		}
+		System.out.println("MANAGERWORKER: All bases are full, can't assign new workers");
+		return rtnNdx;
+	}
+	
+	public void removeWorker(int unitID)
+	{
+		System.out.println("In lost worker");
+		int ndx = 0;
+		Worker toRemove = new Worker();
+		toRemove.unitID = unitID;
+		
+		
+		for (ndx = 0; ndx < allWorkers.size(); ndx++)
+		{
+			if (allWorkers.get(ndx).unitID == unitID)
+			{
+				System.out.println("Found remove");
+				removeWorkerFromBase(allWorkers.get(ndx), allWorkers.get(ndx).asgnedBase);
+				allWorkers.remove(ndx);
+			}
+		}
+	}
+	
+	public void assignWorkersToGas(int baseNdx, int howMany)
+	{
+		int ndx = 0, workerNdx = 0, curCC;
+		BaseLocation curBase = builder.ourBases.get(baseNdx);
+		curCC = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), curBase.getX(), curBase.getY());
+		Worker tempWorker;
+		for (ndx = 0; ndx < howMany; workerNdx++)
+		{
+			tempWorker = baseWorkers.get(0).get(workerNdx);
+			if (tempWorker.curOrder != workerOrders.GAS)
+			{
+				tempWorker.curOrder = workerOrders.GAS;
+				bwapi.rightClick(tempWorker.unitID, curCC);
+				ndx++;
+			}	
+		}
+		
+			
 	}
 	
 	/*
@@ -102,7 +181,7 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public int getBaseWorkers(int baseNum)
 	{
-		return baseWorkers.get(0).size();
+		return baseWorkers.get(baseNum).size();
 	}
 	
 	/*
@@ -130,60 +209,27 @@ public class ManagerWorkers extends RRAITemplate
 		return numMins;
 	}
 	
-	public void addWorker(int unitID)
-	{
-		System.out.println("In new worker");
-		//default is base zero which is main base
-		//by default have it set to mine
-		Worker newWorker = new Worker(unitID, 0, workerOrders.MINE);
-		addWorkerToBase(newWorker, 0);
-		allWorkers.push(newWorker);
-	}
-	
-	public void removeWorker(int unitID)
-	{
-		System.out.println("In lost worker");
-		int ndx = 0;
-		Worker toRemove = new Worker();
-		toRemove.unitID = unitID;
-		
-		
-		for (ndx = 0; ndx < allWorkers.size(); ndx++)
-		{
-			if (allWorkers.get(ndx).unitID == unitID)
-			{
-				System.out.println("Found remove");
-				removeWorkerFromBase(allWorkers.get(ndx), allWorkers.get(ndx).asgnedBase);
-				allWorkers.remove(ndx);
-			}
-		}
-	}
-	
-	public enum workerOrders
-	{
-		MINE, GAS, ATTACK, DEFEND, BUILD
-	}
-	
 	public void handleIdle()
 	{
 		Worker curWorker = null;
 		int closestId = -1;
 		double closestDist = 99999999;
-		for (Unit unit : bwapi.getMyUnits()) {
-			// if this unit is Terran_SCV (worker),
-			// and if it is idle (not doing anything),
-			if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal() & unit.isIdle()) {
+		for (Unit unit : bwapi.getMyUnits())
+		{
+			if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal() & unit.isIdle()) // if this unit is Terran_SCV (worker) and if it is idle (not doing anything),
+			{
 				curWorker = getWorkerByID(unit.getID());
 				switch (curWorker.curOrder)
 				{
 				case MINE :
-					// return idle worker to mine
 					closestId = getNearestMin(curWorker.asgnedBaseX, curWorker.asgnedBaseY); 
 					if (closestId != -1) 
 						bwapi.rightClick(unit.getID(), closestId);
 					break;
 				case GAS :
-					closestId = getNearestGas(curWorker.asgnedBaseX, curWorker.asgnedBaseY); 
+					closestId = getNearestUnit(UnitTypes.Terran_Refinery.ordinal(), (int)curWorker.asgnedBaseX, (int)curWorker.asgnedBaseY); 
+					//closestId = getNearestGas(curWorker.asgnedBaseX, curWorker.asgnedBaseY);
+					System.out.println("---------------------Idle Gas, Closest id is " + closestId);
 					if (closestId != -1) 
 						bwapi.rightClick(unit.getID(), closestId);
 					break;
@@ -237,20 +283,19 @@ public class ManagerWorkers extends RRAITemplate
 		}
 		return rtnID;
 	}
-	public Worker getWorkerByID(int unitID)
+	
+	private Worker getWorkerByID(int unitID)
 	{
 		for (Worker w : allWorkers)
 			if (w.unitID == unitID)
 				return w;
 		return null;
 	}
-	
-	/*
-	 * 	if ((unit.getTypeID() == buildingTypeID) && (!unit.isCompleted())) return true;
-	 */	
 
 	//Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
 	//don't have a unit of this type
+	
+	//Want to remove this and put this in another file? I am using this in this file
 	public int getNearestUnit(int unitTypeID, int x, int y)
 	{
 		int nearestID = -1;
@@ -266,11 +311,8 @@ public class ManagerWorkers extends RRAITemplate
  		return nearestID;
 	}	
 
-	//Returns the Point object representing the suitable build tile position
-	//for a given building type near specified pixel position (or Point(-1,-1) if not found)
-	//(builderID should be our worker)
 
-
+	
 	@Override
 	public void debug() 
 	{
