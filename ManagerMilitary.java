@@ -57,7 +57,10 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		this.scoutingPositions = new LinkedList<Tile>();
 		setHomePosition();
-		scoutOperation();
+		addEnemyBases();
+		this.scout = getNewScoutUnit();
+		System.out.println("scout is: "+scout);
+		scout();
 	}
 	
 	public void checkUp() {
@@ -281,7 +284,7 @@ public class ManagerMilitary extends RRAITemplate
 	{		
 		for (Unit unit : bwapi.getMyUnits())
 		{
-			if (unit.isIdle() && unit.getTypeID() == unitID)
+			if (unit.getTypeID() == unitID && (unit.isIdle() || bwapi.getFrameCount() == 1))//not sure about checking frame count
 			{
 				return new Unit(unit.getID());
 			}
@@ -290,26 +293,12 @@ public class ManagerMilitary extends RRAITemplate
 		return new Unit(-1);
 	}
 	
-	/*
-	 * Gets all the possible the base locations on the map
-	 * 
-	 * Returns an ArrayList of those base locations other than our home base location
-	 */
-	public void addEnemyBases()
-	{		
-		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
-		{
-			
-			if (b.isStartLocation() && (b.getX() != homePositionX) && (b.getY() != homePositionY)) 
-			{
-				this.scoutingPositions.add(new Tile(b.getX(),b.getY()));
-			}
-		}
-	}
+
+
 	
 	
 	/*makes scouting more generic
-	 * so it can be called anytime in game
+	 * so it can be called any time in game
 	 */
 	private void scout(){
 		if(this.scout != null && scoutHasArrived() && !this.scoutingPositions.isEmpty()){
@@ -327,9 +316,15 @@ public class ManagerMilitary extends RRAITemplate
 		Tile next;
 		if(!this.scoutingPositions.isEmpty()){
 			next=this.scoutingPositions.peek();
-								
-			if((scout.getX() == next.getX()) && (scout.getX() == next.getY()))
+
+			if (scout.isIdle() || bwapi.getFrameCount()==1)
 			{
+				//scout is not doing anything, so he can go scout some more (or at start)
+				return true;
+			}
+			if(((scout.getX() == next.getX()) && (scout.getX() == next.getY())))
+			{
+				//scout has reached the Tile, so he can go scout some more
 				this.scoutingPositions.pop();
 				return true;
 			}	
@@ -390,17 +385,7 @@ public class ManagerMilitary extends RRAITemplate
 	/*
 	 * The high-level function called to do the scouting
 	 */
-	public void scoutOperation()
-	{
-		this.scout = getNewScoutUnit();
-		addEnemyBases();
-		this.scoutingPositions.add(new Tile(this.homePositionX, this.homePositionY));
-		scout();
-		
-		//return to home base
-		//System.out.println("MM: return to home base now Mr. scout");
-		//bwapi.move(scout.getID(), homePositionX, homePositionY);
-	}
+
 	
 	
 	/*
@@ -438,5 +423,22 @@ public class ManagerMilitary extends RRAITemplate
 	    return nearestID;
     }
     
+	/*
+	 * Gets all the possible the base locations on the map
+	 * 
+	 * Returns an ArrayList of those base locations other than our home base location
+	 */
+	public void addEnemyBases()
+	{		
+		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
+		{
+			
+			if (b.isStartLocation() && (b.getX() != homePositionX) && (b.getY() != homePositionY)) 
+			{
+				this.scoutingPositions.add(new Tile(b.getX(),b.getY()));
+			}
+		}
+		this.scoutingPositions.add(new Tile(this.homePositionX, this.homePositionY));
+	}
 
 }
