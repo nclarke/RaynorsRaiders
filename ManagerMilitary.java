@@ -24,7 +24,6 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		unitTypesPerLevel = new EnumMap<Level, ArrayList<UnitTypes>>(Level.class);
 		initMap(unitTypesPerLevel);
-		//setHomePosition(); - FIXME Check the spec on linking AIs
 	}
 	
 	public void AILinkData() {
@@ -33,6 +32,7 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public void setup() {
 		System.out.println("ManageMilitary online");
+		setHomePosition();
 	}
 	
 	public void checkUp() {
@@ -57,17 +57,13 @@ public class ManagerMilitary extends RRAITemplate
 		bwapi.drawText(new Point(5,120), "Total Marines trained: " + String.valueOf(getCurrentUnitCount()), true);
     }
     
-    
-	void setHomePosition()
+	public void setHomePosition()
 	{
-		if (bwapi.getFrameCount() == 1) 
-		{
-			int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
-			if (cc == -1) cc = getNearestUnit(UnitTypes.Zerg_Hatchery.ordinal(), 0, 0);
-			if (cc == -1) cc = getNearestUnit(UnitTypes.Protoss_Nexus.ordinal(), 0, 0);
+		int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
+		if (cc == -1) cc = getNearestUnit(UnitTypes.Zerg_Hatchery.ordinal(), 0, 0);
+		if (cc == -1) cc = getNearestUnit(UnitTypes.Protoss_Nexus.ordinal(), 0, 0);
 			homePositionX = bwapi.getUnit(cc).getX();
 			homePositionY = bwapi.getUnit(cc).getY();
-		}
 	}
 	
 	/* Initializes a EnumMap of UnitTypes we want per Level */

@@ -118,6 +118,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		if (frameCount == 1)
 		{		
 			managerBuild.captureBaseLocation();
+			managerMilitary.setHomePosition();
 			managerMilitary.scoutOperation();
 			if( managerBuild.baseSetup() != 1)
 			{
