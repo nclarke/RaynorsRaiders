@@ -63,7 +63,8 @@ public class ManagerWorkers extends RRAITemplate
 			this.unitID = unitID;
 			this.asgnedBase = asgnedBase;
 			this.curOrder = workOrd;
-			//this.asgnedBaseX = 
+			this.asgnedBaseX = builder.ourBases.get(asgnedBase).getX();
+			this.asgnedBaseY = builder.ourBases.get(asgnedBase).getY();
 			
 		}
 		
@@ -118,7 +119,7 @@ public class ManagerWorkers extends RRAITemplate
 			if (neu.getTypeID() == UnitTypes.Resource_Mineral_Field.ordinal())
 			{
 				double distance = Math.sqrt(Math.pow(neu.getX() - xLoc, 2) + Math.pow(neu.getY() - yLoc, 2));
-				if (distance < (20 * 32))
+				if (distance < (10 * 32))
 				{
 					numMins++;
 
@@ -132,10 +133,9 @@ public class ManagerWorkers extends RRAITemplate
 	public void addWorker(int unitID)
 	{
 		System.out.println("In new worker");
-		Worker newWorker = new Worker();
-		newWorker.unitID = unitID;
-		newWorker.curOrder = workerOrders.MINE;  //by default have it set to mine
-		newWorker.asgnedBase = 0; //default is base zero which is main base
+		//default is base zero which is main base
+		//by default have it set to mine
+		Worker newWorker = new Worker(unitID, 0, workerOrders.MINE);
 		addWorkerToBase(newWorker, 0);
 		allWorkers.push(newWorker);
 	}
@@ -177,38 +177,15 @@ public class ManagerWorkers extends RRAITemplate
 				switch (curWorker.curOrder)
 				{
 				case MINE :
-					for (Unit neu : bwapi.getNeutralUnits()) 
-					{
-						if (neu.getTypeID() == UnitTypes.Resource_Mineral_Field.ordinal()) 
-						{
-							double distance = Math.sqrt(Math.pow(neu.getX() - curWorker.asgnedBaseX, 2)
-							+ Math.pow(neu.getY() - curWorker.asgnedBaseY, 2));
-							if ((closestId == -1) || (distance < closestDist)) 
-							{
-								closestDist = distance;
-								//bwapi.printText("Closet dist is" + String.valueOf(closestDist));
-								closestId = neu.getID();
-							}
-						}
-					} 
-					// and (if we found it) send this worker to gather it.
-					if (closestId != -1) bwapi.rightClick(unit.getID(), closestId);
+					// return idle worker to mine
+					closestId = getNearestMin(curWorker.asgnedBaseX, curWorker.asgnedBaseY); 
+					if (closestId != -1) 
+						bwapi.rightClick(unit.getID(), closestId);
 					break;
 				case GAS :
-					for (Unit neu : bwapi.getNeutralUnits()) 
-					{
-						if (neu.getTypeID() == UnitTypes.Resource_Vespene_Geyser.ordinal()) 
-						{
-							double distance = Math.sqrt(Math.pow(neu.getX() - curWorker.asgnedBaseX, 2)
-							+ Math.pow(neu.getY() - curWorker.asgnedBaseY, 2));
-							if ((closestId == -1) || (distance < closestDist)) 
-							{
-								closestDist = distance;
-								//bwapi.printText("Closet dist is" + String.valueOf(closestDist));
-								closestId = neu.getID();
-							}
-						}
-					} 
+					closestId = getNearestGas(curWorker.asgnedBaseX, curWorker.asgnedBaseY); 
+					if (closestId != -1) 
+						bwapi.rightClick(unit.getID(), closestId);
 					break;
 				case ATTACK :
 					break;
@@ -219,6 +196,47 @@ public class ManagerWorkers extends RRAITemplate
 		}
 	}
 	
+	private int getNearestMin(double workerX, double workerY) 
+	{
+		int rtnID = -1;
+		double closestDist = 99999999;
+		for (Unit neu : bwapi.getNeutralUnits()) 
+		{
+			if (neu.getTypeID() == UnitTypes.Resource_Mineral_Field.ordinal()) 
+			{
+				double distance = Math.sqrt(Math.pow(neu.getX() - workerX, 2)
+				+ Math.pow(neu.getY() - workerY, 2));
+				if ((rtnID == -1) || (distance < closestDist)) 
+				{
+					closestDist = distance;
+					//bwapi.printText("Closet dist is" + String.valueOf(closestDist));
+					rtnID = neu.getID();
+				}
+			}
+		}
+		return rtnID;
+	}
+	
+	private int getNearestGas(double workerX, double workerY)
+	{
+		int rtnID = -1;
+		double closestDist = 99999999;
+		for (Unit neu : bwapi.getNeutralUnits()) 
+		{
+			if (neu.getTypeID() == UnitTypes.Resource_Vespene_Geyser.ordinal()) 
+			{
+				double distance = Math.sqrt(Math.pow(neu.getX() - workerX, 2)
+						+ Math.pow(neu.getY() - workerY, 2));
+				if ((rtnID == -1) || (distance < closestDist)) 
+				{
+					closestDist = distance;
+					//bwapi.printText("Closet dist is" + String.valueOf(closestDist));
+					rtnID = neu.getID();
+				}
+			}
+		}
+		return rtnID;
+	}
 	public Worker getWorkerByID(int unitID)
 	{
 		for (Worker w : allWorkers)
@@ -229,27 +247,12 @@ public class ManagerWorkers extends RRAITemplate
 	
 	/*
 	 * 	if ((unit.getTypeID() == buildingTypeID) && (!unit.isCompleted())) return true;
-	 * 
-	 * 
-	 */
-	
-	public void AILinkManagerWorkers(JNIBWAPI d_bwapi, CoreReactive d_core) {
-		//Here you get your pointers to the other AI cores (JINBWAPI, core, ect ect ect)
-		//The Raynors Raiders code should call this "constructor" after all the other AI parts have
-		// been created.
-		bwapi = d_bwapi;
-		core = d_core;
-		mode = core.econ_getBuildingMode();
-		orders = core.econ_getBuildingStack();
-
-	}
-	
-
-	
+	 */	
 
 	//Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
 	//don't have a unit of this type
-	public int getNearestUnit(int unitTypeID, int x, int y) {
+	public int getNearestUnit(int unitTypeID, int x, int y)
+	{
 		int nearestID = -1;
 		double nearestDist = 9999999;
 		for (Unit unit : bwapi.getMyUnits()) {
@@ -267,24 +270,19 @@ public class ManagerWorkers extends RRAITemplate
 	//for a given building type near specified pixel position (or Point(-1,-1) if not found)
 	//(builderID should be our worker)
 
-	//Returns true if we are currently constructing the building of a given type.
-	public boolean weAreBuilding(int buildingTypeID)
-	{
-		for (Unit unit : bwapi.getMyUnits()) {
-			if ((unit.getTypeID() == buildingTypeID) && (!unit.isCompleted())) return true;
-			if (bwapi.getUnitType(unit.getTypeID()).isWorker() && unit.getConstructingTypeID() == buildingTypeID) return true;
-		}
-		return false;
-	}
+
 	@Override
 	public void debug() 
 	{
-		for (BaseLocation b : builder.ourBases) 
+		for (BaseLocation b : bwapi.getMap().getBaseLocations())//builder.ourBases 
 		{
 			int tempMins = getNumMinerals(b.getX(), b.getY());
 			int tempWorkers = getBaseWorkers(0);
-			bwapi.drawText(b.getX()-64, b.getY()-(32*2)-10, "Num mins is " + tempMins, false);
-			bwapi.drawText(b.getX()-64, b.getY()-(32*2), "Num workers is " + tempWorkers, false);
+			if (tempMins != 0)
+			{
+				bwapi.drawText(b.getX()-64, b.getY()-(32*2)-10, "Num mins is " + tempMins, false);
+				bwapi.drawText(b.getX()-64, b.getY()-(32*2), "Num workers is " + tempWorkers, false);
+			}
 		}
 		
 		

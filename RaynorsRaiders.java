@@ -91,7 +91,6 @@ public class RaynorsRaiders implements BWAPIEventListener
 		{
 			masterUnitList.add(u);
 		}
-		System.out.println("Game setup complete");
 		System.out.println("Size of master list is " + masterUnitList.size());
 		
 		coreBaby.setup();
@@ -99,6 +98,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		managerMilitary.setup();
 		managerBuild.setup();
 		managerWorkers.setup();
+		System.out.println("Game setup complete");
 		
 	}
 	
@@ -109,12 +109,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 		
 		 //Draw debug information on screen
 		if (debgFlag)
-		{
 			drawDebugInfo();
-		}
 		
 		// This sets up the base location
-
 		if (frameCount == 1)
 		{		
 			managerBuild.captureBaseLocation();
@@ -137,7 +134,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		// Call actions every 30 frames
 		if (frameCount % 30 == 0) 
 		{
-			//this.managerWorkers.handleIdle();	FIXME - was crashing, thus killing the method that called it.	
+			managerWorkers.handleIdle();
 			coreBaby.checkUp();
 			coreReactive.checkUp();
 			managerBuild.checkUp();
@@ -151,7 +148,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 				+ managerBuild.homePositionY + ")", true);
 		bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
 				+ managerBuild.getStartLocation().getY() + ")", true);
-		
+
+		bwapi.drawHealth(healthFlag);
 		for (Unit u : bwapi.getMyUnits())  
 		{
 			if (u.isUnderAttack()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.RED, false, false);
@@ -164,9 +162,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 		System.out.println("Here");
 		managerWorkers.debug();
-		
-		bwapi.drawHealth(healthFlag);
-		//managerWorkers.workerDebg();
+
 		System.out.println("End debug");
 	}
 	

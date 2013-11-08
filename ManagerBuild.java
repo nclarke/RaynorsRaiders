@@ -144,7 +144,7 @@ public class ManagerBuild extends RRAITemplate
 				}
 				
 				// train units
-				System.out.println("roster: " + roster.toString());
+				//System.out.println("roster: " + roster.toString());
 
 				switch(unitsMode) {
 				case FIRST_POSSIBLE:
