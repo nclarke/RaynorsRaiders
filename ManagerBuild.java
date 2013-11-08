@@ -142,70 +142,75 @@ public class ManagerBuild extends RRAITemplate
 					default:
 						break;
 				}
-			}
-	
-	public void enlist() 
-	{
-System.out.println("roster: " + roster.toString());
-		switch(bldgMode) {
-		case FIRST_POSSIBLE:
-			int i = 0;
-			boolean canTrain = false;
-			UnitTypes c = null;
-			UnitType soldier = null;
-			
-			// go through list until we find a trainable unit
-			while(!canTrain && i < roster.size())
-			{
-				c = roster.get(i);
-				soldier = bwapi.getUnitType(c.ordinal());
 				
-				if(bwapi.getSelf().getMinerals() - underConstructionM() < soldier.getMineralPrice() && 
-						bwapi.getSelf().getGas() - underConstructionG() < soldier.getGasPrice()) 
-				{
-					i++;
+				// train units
+				System.out.println("roster: " + roster.toString());
+
+				switch(unitsMode) {
+				case FIRST_POSSIBLE:
+					int i = 0;
+					boolean canTrain = false;
+					UnitTypes c = null;
+					UnitType soldier = null;
+					
+					// go through list until we find a trainable unit
+					while(!canTrain && i < roster.size())
+					{
+						c = roster.get(i);
+						soldier = bwapi.getUnitType(c.ordinal());
+	// check if we have the required building used for training					
+	//					if()
+	//					{
+							if(bwapi.getSelf().getMinerals() - underConstructionM() < soldier.getMineralPrice() && 
+									bwapi.getSelf().getGas() - underConstructionG() < soldier.getGasPrice()) 
+							{
+								i++;
+							}
+							else 
+							{
+								canTrain = true;
+							}
+	//					}
+					}
+
+					
+					if(canTrain)
+					{
+					   train(c);
+					   roster.remove(i);
+					   // add unit to military list
+					}
+					else 
+					{
+						System.out.println("could not build anything in roster");
+					}
+						
+					break;
+				case BLOCKING_STACK:
+					c = null;
+					soldier = null;
+					
+					c = roster.peek();
+					soldier = bwapi.getUnitType(c.ordinal());
+					
+					if(bwapi.getSelf().getMinerals() - underConstructionM() >= soldier.getMineralPrice() && 
+							bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
+					{
+						train(c);
+						roster.pop();
+						// add units to military list
+					}
+					break;
+				case HOLD_ALL:
+					System.out.println("halting construction...");
+					break;
+				default:
+					break;
+					
 				}
-				else 
-				{
-					canTrain = true;
-				}
-			}
-			
-			if(canTrain)
-			{
-			   train(c);
-			   roster.remove(i);
-			   // add unit to military list
-			}
-			else 
-			{
-				System.out.println("could not build anything in roster");
-			}
 				
-			break;
-		case BLOCKING_STACK:
-			c = null;
-			soldier = null;
-			
-			c = roster.peek();
-			soldier = bwapi.getUnitType(c.ordinal());
-			
-			if(bwapi.getSelf().getMinerals() - underConstructionM() >= soldier.getMineralPrice() && 
-					bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
-			{
-				train(c);
-				roster.pop();
-				// add units to military list
 			}
-			break;
-		case HOLD_ALL:
-			System.out.println("halting construction...");
-			break;
-		default:
-			break;
-			
-		}
-	}
+
 	
 	public void captureBaseLocation() {
 		// Remember our homeTilePosition at the first frame
