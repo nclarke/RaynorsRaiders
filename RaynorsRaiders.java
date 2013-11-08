@@ -138,7 +138,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			coreBaby.checkUp();
 			coreReactive.checkUp();
 			managerBuild.checkUp();
-			//managerMilitary.checkUp();
+			managerMilitary.checkUp();
 		}	
 	}
 	

@@ -55,12 +55,14 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public void startUp()
 	{
+		this.scoutingPositions = new LinkedList<Tile>();
 		setHomePosition();
 		scoutOperation();
 	}
 	
 	public void checkUp() {
 		//Check up - FIXME - code needs to go here.
+		scout();
 	}
 	
     public void debug()
@@ -269,12 +271,17 @@ public class ManagerMilitary extends RRAITemplate
 	 * 
 	 * Returns the scout Unit, a Unit with ID of -1 if not
 	 */
-	public Unit getScoutUnit()
+	public Unit getNewScoutUnit()
+	{
+		return getNewScoutUnit(UnitTypes.Terran_SCV.ordinal());
+		
+	}
+	
+	private Unit getNewScoutUnit(int unitID)
 	{		
 		for (Unit unit : bwapi.getMyUnits())
 		{
-			// if this unit is a command center (Terran_SCV)
-			if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal())
+			if (unit.isIdle() && unit.getTypeID() == unitID)
 			{
 				return new Unit(unit.getID());
 			}
@@ -288,19 +295,16 @@ public class ManagerMilitary extends RRAITemplate
 	 * 
 	 * Returns an ArrayList of those base locations other than our home base location
 	 */
-	public ArrayList<BaseLocation> getEnemyBases()
-	{
-		ArrayList<BaseLocation> enemyBaseLocsArr = new ArrayList<BaseLocation>();
-		
+	public void addEnemyBases()
+	{		
 		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
 		{
+			
 			if (b.isStartLocation() && (b.getX() != homePositionX) && (b.getY() != homePositionY)) 
 			{
-				enemyBaseLocsArr.add(b);
 				this.scoutingPositions.add(new Tile(b.getX(),b.getY()));
 			}
 		}
-		return enemyBaseLocsArr;
 	}
 	
 	
@@ -309,49 +313,13 @@ public class ManagerMilitary extends RRAITemplate
 	 */
 	private void scout(){
 		if(this.scout != null && scoutHasArrived() && !this.scoutingPositions.isEmpty()){
+			System.out.print("\nnew scouting location");
 			Tile next=this.scoutingPositions.peek();
 			bwapi.move(scout.getID(), next.getX(),next.getY());
 		}
-	}
-	
-	
-	/*
-	 * Action performed to tell the Scout to scout the base locations
-	 * 
-	 * scoutUnit:   a unit
-	 * enemyBaseLocs:  ArrayList of enemy's base locations
-	 * 
-	 */
-	
-	private void scoutEnemyBases(int scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs, int index)
-	{		
-		/* Need to store this list of bases and then send the scout to each base once it reaches a certain location
-		 * currently, it receives all orders at the same time and can only respond to the last one
-		 * this is why it is not returning to the base afetr it has finsihed scouting. 
-		 * 
-		 * Also, I want to make this more generic sot hat we can scout enemy bases later in the game
-		 * like include something about leaving if you see "bad" stuff
-		 */
-		
-		/*int baseNumber = 0;
-		System.out.println("MM: number of bases: "+enemyBaseLocs.size());
-		for (BaseLocation baseLoc: enemyBaseLocs) 
-		{
-			System.out.println("MM: base #"+baseNumber+" which is: "+baseLoc);
-			baseNumber++;
-			bwapi.move(scoutUnit.getID(), baseLoc.getX(), baseLoc.getY());
-		}*/
-		
-		if(index < enemyBaseLocs.size())
-		{
-			bwapi.move(scoutUnitID, enemyBaseLocs.get(index).getX(), enemyBaseLocs.get(index).getY());
-			
-			if(checkScoutArrival(this.scout, enemyBaseLocs.get(index)))
-			{
-				scoutEnemyBases(this.scout.getID(), enemyBaseLocs, index++);
-			}
+		if(this.scoutingPositions.isEmpty()){
+			System.out.println("no more scouting locations");
 		}
-		
 	}
 	
 	public boolean scoutHasArrived()
@@ -373,6 +341,40 @@ public class ManagerMilitary extends RRAITemplate
 		return false;
 	}
 	
+	
+	/*
+	 * Action performed to tell the Scout to scout the base locations
+	 * 
+	 * scoutUnit:   a unit
+	 * enemyBaseLocs:  ArrayList of enemy's base locations
+	 * 
+	 */
+	/* Need to store this list of bases and then send the scout to each base once it reaches a certain location
+	 * currently, it receives all orders at the same time and can only respond to the last one
+	 * this is why it is not returning to the base afetr it has finsihed scouting. 
+	 * 
+	 * Also, I want to make this more generic sot hat we can scout enemy bases later in the game
+	 * like include something about leaving if you see "bad" stuff
+	 */
+	/*
+	private void scoutEnemyBases(int scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs, int index)
+	{		
+
+		
+		
+		
+		if(index < enemyBaseLocs.size())
+		{
+			bwapi.move(scoutUnitID, enemyBaseLocs.get(index).getX(), enemyBaseLocs.get(index).getY());
+			
+			if(checkScoutArrival(this.scout, enemyBaseLocs.get(index)))
+			{
+				scoutEnemyBases(this.scout.getID(), enemyBaseLocs, index++);
+			}
+		}
+		
+	}
+
 	public boolean checkScoutArrival(Unit scoutUnit, BaseLocation enemyBaseLoc)
 	{
 		if((scoutUnit.getX() == enemyBaseLoc.getX()) && (scoutUnit.getX() == enemyBaseLoc.getY()))
@@ -384,16 +386,16 @@ public class ManagerMilitary extends RRAITemplate
 			return false;
 		}
 	}
-	
+	*/
 	/*
 	 * The high-level function called to do the scouting
 	 */
 	public void scoutOperation()
 	{
-		this.scout = getScoutUnit();
-		ArrayList<BaseLocation> enemyAndHome = getEnemyBases();
-		enemyAndHome.add(homeBase);
-		scoutEnemyBases(scout.getID(), enemyAndHome, 0);
+		this.scout = getNewScoutUnit();
+		addEnemyBases();
+		this.scoutingPositions.add(new Tile(this.homePositionX, this.homePositionY));
+		scout();
 		
 		//return to home base
 		//System.out.println("MM: return to home base now Mr. scout");
