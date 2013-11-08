@@ -277,11 +277,11 @@ public class ManagerMilitary extends RRAITemplate
 	/*
 	 * Action performed to tell the Scout to scout the base locations
 	 * 
-	 * scoutUnitID:   a unit's ID
+	 * scoutUnit:   a unit
 	 * enemyBaseLocs:  ArrayList of enemy's base locations
 	 * 
 	 */
-	private void scoutEnemyBases(int scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs)
+	private void scoutEnemyBases(Unit scoutUnit, ArrayList<BaseLocation> enemyBaseLocs, int index)
 	{		
 		/* Need to store this list of bases and then send the scout to each base once it reaches a certain location
 		 * currently, it receives all orders at the same time and can only respond to the last one
@@ -290,28 +290,38 @@ public class ManagerMilitary extends RRAITemplate
 		 * Also, I want to make this more generic sot hat we can scout enemy bases later in the game
 		 * like include something about leaving if you see "bad" stuff
 		 */
-		int baseNumber = 0;
+		
+		/*int baseNumber = 0;
 		System.out.println("MM: number of bases: "+enemyBaseLocs.size());
 		for (BaseLocation baseLoc: enemyBaseLocs) 
 		{
 			System.out.println("MM: base #"+baseNumber+" which is: "+baseLoc);
 			baseNumber++;
-			bwapi.move(scoutUnitID, baseLoc.getX(), baseLoc.getY());
+			bwapi.move(scoutUnit.getID(), baseLoc.getX(), baseLoc.getY());
+		}*/
+		
+		if(index < enemyBaseLocs.size())
+		{
+			bwapi.move(scoutUnit.getID(), enemyBaseLocs.get(index).getX(), enemyBaseLocs.get(index).getY());
 			
-			 /* tried to get the scout to not do anything once it reaches the enemy base - not working atm for some reason 
-			 if( ((scout.getX() == baseLoc.getX()) 
-					&& (scout.getY() == baseLoc.getY())) 
-					|| scout.isAttacking() || scout.isGatheringGas() 
-					|| scout.isGatheringMinerals() )
+			if(checkScoutArrival(scoutUnit, enemyBaseLocs.get(index)))
 			{
-				// if it did do something, tell it to go back to home base
-				bwapi.move(scoutUnitID, homePositionX, homePositionY);
-			} 
-			  */
+				scoutEnemyBases(scoutUnit, enemyBaseLocs, index++);
+			}
 		}
-		//return to home bas
-		System.out.println("MM: return to home base now Mr. scout");
-		bwapi.move(scoutUnitID, homePositionX, homePositionY);
+		
+	}
+	
+	public boolean checkScoutArrival(Unit scoutUnit, BaseLocation enemyBaseLoc)
+	{
+		if((scoutUnit.getX() == enemyBaseLoc.getX()) && (scoutUnit.getX() == enemyBaseLoc.getY()))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	/*
@@ -320,7 +330,11 @@ public class ManagerMilitary extends RRAITemplate
 	public void scoutOperation()
 	{
 		this.scout = getScoutUnit();
-		scoutEnemyBases(scout.getID(), getEnemyBases());
+		scoutEnemyBases(scout, getEnemyBases(), 0);
+		
+		//return to home base
+		System.out.println("MM: return to home base now Mr. scout");
+		bwapi.move(scout.getID(), homePositionX, homePositionY);
 	}
 	
 	
