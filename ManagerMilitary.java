@@ -1,10 +1,7 @@
 package javabot.RaynorsRaiders;
 
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.LinkedList;
+import java.util.*;
 
 import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.Level;
@@ -19,9 +16,26 @@ public class ManagerMilitary extends RRAITemplate
 	 * (AI is very rich in the beginning, gets its level changed from ZERO to TWO) */
 	EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLevel;
 	int homePositionX, homePositionY;
+	BaseLocation homeBase;
 	Unit scout;
+	LinkedList<Tile> scoutingPositions;
 	
 	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
+	
+	public class Tile {
+		int x;
+		int y;
+		public Tile(int x,int y){
+			this.x=x;
+			this.y=y;
+		}
+		public int getX(){
+			return this.x;
+		}
+		public int getY(){
+			return this.y;
+		}
+	}
 	
 	public ManagerMilitary()
 	{
@@ -73,6 +87,14 @@ public class ManagerMilitary extends RRAITemplate
 		if (cc == -1) cc = getNearestUnit(UnitTypes.Protoss_Nexus.ordinal(), 0, 0);
 			homePositionX = bwapi.getUnit(cc).getX();
 			homePositionY = bwapi.getUnit(cc).getY();
+			
+		int index;
+		for(index=0;index<bwapi.getMap().getBaseLocations().size();index++){
+			BaseLocation tmpBase = bwapi.getMap().getBaseLocations().get(index);
+			if(tmpBase.getX()==homePositionX && tmpBase.getY()==homePositionY){
+				this.homeBase=tmpBase;
+			}				
+		}
 	}
 	
 	public void addMilitaryUnit(Unit unitObj, UnitTypes unitType)
@@ -275,10 +297,23 @@ public class ManagerMilitary extends RRAITemplate
 			if (b.isStartLocation() && (b.getX() != homePositionX) && (b.getY() != homePositionY)) 
 			{
 				enemyBaseLocsArr.add(b);
+				this.scoutingPositions.add(new Tile(b.getX(),b.getY()));
 			}
 		}
 		return enemyBaseLocsArr;
 	}
+	
+	
+	/*makes scouting more generic
+	 * so it can be called anytime in game
+	 */
+	private void scout(){
+		if(this.scout != null && scoutHasArrived() && !this.scoutingPositions.isEmpty()){
+			Tile next=this.scoutingPositions.peek();
+			bwapi.move(scout.getID(), next.getX(),next.getY());
+		}
+	}
+	
 	
 	/*
 	 * Action performed to tell the Scout to scout the base locations
@@ -287,7 +322,8 @@ public class ManagerMilitary extends RRAITemplate
 	 * enemyBaseLocs:  ArrayList of enemy's base locations
 	 * 
 	 */
-	private void scoutEnemyBases(Unit scoutUnit, ArrayList<BaseLocation> enemyBaseLocs, int index)
+	
+	private void scoutEnemyBases(int scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs, int index)
 	{		
 		/* Need to store this list of bases and then send the scout to each base once it reaches a certain location
 		 * currently, it receives all orders at the same time and can only respond to the last one
@@ -308,14 +344,33 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(index < enemyBaseLocs.size())
 		{
-			bwapi.move(scoutUnit.getID(), enemyBaseLocs.get(index).getX(), enemyBaseLocs.get(index).getY());
+			bwapi.move(scoutUnitID, enemyBaseLocs.get(index).getX(), enemyBaseLocs.get(index).getY());
 			
-			if(checkScoutArrival(scoutUnit, enemyBaseLocs.get(index)))
+			if(checkScoutArrival(this.scout, enemyBaseLocs.get(index)))
 			{
-				scoutEnemyBases(scoutUnit, enemyBaseLocs, index++);
+				scoutEnemyBases(this.scout.getID(), enemyBaseLocs, index++);
 			}
 		}
 		
+	}
+	
+	public boolean scoutHasArrived()
+	{
+		Tile next;
+		if(!this.scoutingPositions.isEmpty()){
+			next=this.scoutingPositions.peek();
+								
+			if((scout.getX() == next.getX()) && (scout.getX() == next.getY()))
+			{
+				this.scoutingPositions.pop();
+				return true;
+			}	
+			else
+			{
+			return false;
+			}
+		}
+		return false;
 	}
 	
 	public boolean checkScoutArrival(Unit scoutUnit, BaseLocation enemyBaseLoc)
@@ -336,7 +391,9 @@ public class ManagerMilitary extends RRAITemplate
 	public void scoutOperation()
 	{
 		this.scout = getScoutUnit();
-		scoutEnemyBases(scout, getEnemyBases(), 0);
+		ArrayList<BaseLocation> enemyAndHome = getEnemyBases();
+		enemyAndHome.add(homeBase);
+		scoutEnemyBases(scout.getID(), enemyAndHome, 0);
 		
 		//return to home base
 		//System.out.println("MM: return to home base now Mr. scout");
