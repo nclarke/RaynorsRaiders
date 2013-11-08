@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.LinkedList;
 
 import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.Level;
@@ -20,10 +21,14 @@ public class ManagerMilitary extends RRAITemplate
 	int homePositionX, homePositionY;
 	Unit scout;
 	
+	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
+	
 	public ManagerMilitary()
 	{
 		unitTypesPerLevel = new EnumMap<Level, ArrayList<UnitTypes>>(Level.class);
 		initMap(unitTypesPerLevel);
+		
+		militaryUnits = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
 	}
 	
 	public void AILinkData() {
@@ -49,17 +54,16 @@ public class ManagerMilitary extends RRAITemplate
     	int spacing = 10;
 		
 		// Draw our home position.
-		bwapi.drawText(new Point(5,0), "Our home position: "+String.valueOf(homePositionX)+","+String.valueOf(homePositionY), true);
+		bwapi.drawText(new Point(5,0), "Our home position: " + String.valueOf(homePositionX) + ", " + String.valueOf(homePositionY), true);
 		for (BaseLocation b : bwapi.getMap().getBaseLocations()) {
 			if (b.isStartLocation()) {
 				int index  = spacing/10;
-				bwapi.drawText(new Point(5,spacing), "Base position " + index + ": " +String.valueOf(b.getX())+","+String.valueOf(b.getY()), true);
+				bwapi.drawText(new Point(5,spacing), "Base position " + index + ": " + String.valueOf(b.getX()) + ", " + String.valueOf(b.getY()), true);
 			}
-			spacing= spacing + 10;
+			spacing =+ 10;
 		}
 		
-		bwapi.drawText(new Point(5,110), "Total SCVs trained: " + String.valueOf(getWorkersCount()), true);
-		bwapi.drawText(new Point(5,120), "Total Marines trained: " + String.valueOf(getCurrentUnitCount()), true);
+		bwapi.drawText(new Point(5,120), "Total Marines trained: " + String.valueOf(getCurrentUnitCount(UnitTypes.Terran_Marine)), true);
     }
     
 	public void setHomePosition()
@@ -71,8 +75,18 @@ public class ManagerMilitary extends RRAITemplate
 			homePositionY = bwapi.getUnit(cc).getY();
 	}
 	
+	public void addMilitaryUnit(Unit unitObj, UnitTypes unitType)
+	{
+		militaryUnits.get(unitType).add(unitObj);
+	}
+	
+	public void removeMilitaryUnit(Unit unitObj, UnitTypes unitType)
+	{
+		militaryUnits.get(unitType).remove(unitObj);
+	}
+	
 	/* Initializes a EnumMap of UnitTypes we want per Level */
-	public void initMap(EnumMap<Level, ArrayList<UnitTypes>> lvlMap)
+	private void initMap(EnumMap<Level, ArrayList<UnitTypes>> lvlMap)
 	{
 		if(lvlMap != null)
 		{
@@ -207,20 +221,11 @@ public class ManagerMilitary extends RRAITemplate
 	}
 	
 	/*
-	 * Returns the current marines on the map (testing out Level.ZERO atm)
+	 * Returns the current number of units of a UnitType
 	 */
-	public int getCurrentUnitCount()
+	public int getCurrentUnitCount(UnitTypes unitType)
 	{
-		int unitsTotal = 0;
-		
-		for (Unit unit : bwapi.getMyUnits())
-		{
-			if(unit.getTypeID() == UnitTypes.Terran_Marine.ordinal())
-			{
-				unitsTotal++;
-			}
-		}
-		return unitsTotal;
+		return militaryUnits.get(unitType).size();
 	}
 	
 	public int getWorkersCount()
@@ -341,10 +346,11 @@ public class ManagerMilitary extends RRAITemplate
 	
 	/*
 	 * Give this function a base location to have a group of units (marines atm) to attack
+	 * 
 	 */
 	public void attackOperation(int pixelPositionX, int pixelPositionY)
 	{
-		if(((getCurrentUnitCount() % 12) == 0))
+		if(((getCurrentUnitCount(UnitTypes.Terran_Marine) % 12) == 0))
 		{
 			ArrayList<Unit> unitFormed = unitFormation(Level.ZERO, unitTypesPerLevel);
 

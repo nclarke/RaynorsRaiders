@@ -18,6 +18,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 
 	boolean debgFlag = false;
 	boolean healthFlag = false;
+	boolean militaryDebugFlag = false;
 	
 	/* Master unit list */
 	LinkedList<Unit> masterUnitList = new LinkedList<Unit>();
@@ -137,6 +138,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			coreBaby.checkUp();
 			coreReactive.checkUp();
 			managerBuild.checkUp();
+			//managerMilitary.checkUp();
 		}	
 	}
 	
@@ -148,7 +150,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
 				+ managerBuild.getStartLocation().getY() + ")", true);
 
-		bwapi.drawHealth(healthFlag);
+		//bwapi.drawHealth(healthFlag);
 		for (Unit u : bwapi.getMyUnits())  
 		{
 			if (u.isUnderAttack()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.RED, false, false);
@@ -161,7 +163,12 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 		System.out.println("Here");
 		managerWorkers.debug();
-
+		
+		if(militaryDebugFlag)
+		{
+			//managerMilitary.debug();
+		}
+		
 		System.out.println("End debug");
 	}
 	
@@ -176,6 +183,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 			debgFlag = !debgFlag;
 		else if (keyCode == 72) // press h to toggle health
 			healthFlag = !healthFlag;
+		else if (keyCode == 77) // press m to toggle military debugs
+			militaryDebugFlag = !militaryDebugFlag;
 	}
 	public void matchEnded(boolean winner) 
 	{
@@ -192,6 +201,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 		System.out.println("creating type id is " + bwapi.getUnit(unitID).getTypeID());
 		if (bwapi.getUnit(unitID).getTypeID() == UnitTypes.Terran_SCV.ordinal()) 
 			managerWorkers.addWorker(unitID);
+		
+		if (bwapi.getUnit(unitID).getTypeID() == UnitTypes.Terran_Marine.ordinal()) 
+			managerMilitary.addMilitaryUnit(bwapi.getUnit(unitID), UnitTypes.Terran_Marine);
 	}
 	public void unitDestroy(int unitID)
 	{
@@ -204,6 +216,10 @@ public class RaynorsRaiders implements BWAPIEventListener
 			{
 				if (u.getTypeID() == UnitTypes.Terran_SCV.ordinal())
 					managerWorkers.removeWorker(unitID);
+				
+				if (u.getTypeID() == UnitTypes.Terran_Marine.ordinal())
+					managerMilitary.removeMilitaryUnit(bwapi.getUnit(unitID), UnitTypes.Terran_Marine);
+				
 				masterUnitList.remove(u);
 				System.out.println("Remove succesfull");
 			}
