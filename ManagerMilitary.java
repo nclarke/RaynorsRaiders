@@ -16,9 +16,8 @@ public class ManagerMilitary extends RRAITemplate
 	 * (AI is very rich in the beginning, gets its level changed from ZERO to TWO) */
 	EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLevel;
 	int homePositionX, homePositionY;
+	MiltScouter scouter;
 	BaseLocation homeBase;
-	Unit scout;
-	LinkedList<Tile> scoutingPositions;
 	
 	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
 	
@@ -43,6 +42,7 @@ public class ManagerMilitary extends RRAITemplate
 		initMap(unitTypesPerLevel);
 		
 		militaryUnits = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
+		scouter = new MiltScouter(this);
 	}
 	
 	public void AILinkData() {
@@ -55,17 +55,12 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public void startUp()
 	{
-		this.scoutingPositions = new LinkedList<Tile>();
 		setHomePosition();
-		addEnemyBases();
-		this.scout = getNewScoutUnit();
-		System.out.println("scout is: "+scout);
-		scout();
 	}
 	
 	public void checkUp() {
 		//Check up - FIXME - code needs to go here.
-		scout();
+		this.scouter.scout();
 	}
 	
     public void debug()
@@ -269,124 +264,6 @@ public class ManagerMilitary extends RRAITemplate
 		return unitsTotal;
 	}
 	
-	/*
-	 * Gets the scout unit at the very start of the game
-	 * 
-	 * Returns the scout Unit, a Unit with ID of -1 if not
-	 */
-	public Unit getNewScoutUnit()
-	{
-		return getNewScoutUnit(UnitTypes.Terran_SCV.ordinal());
-		
-	}
-	
-	private Unit getNewScoutUnit(int unitID)
-	{		
-		for (Unit unit : bwapi.getMyUnits())
-		{
-			if (unit.getTypeID() == unitID && (unit.isIdle() || bwapi.getFrameCount() == 1))//not sure about checking frame count
-			{
-				return new Unit(unit.getID());
-			}
-		}
-		
-		return new Unit(-1);
-	}
-	
-
-
-	
-	
-	/*makes scouting more generic
-	 * so it can be called any time in game
-	 */
-	private void scout(){
-		if(this.scout != null && scoutHasArrived() && !this.scoutingPositions.isEmpty()){
-			System.out.print("\nnew scouting location");
-			Tile next=this.scoutingPositions.peek();
-			bwapi.move(scout.getID(), next.getX(),next.getY());
-		}
-		if(this.scoutingPositions.isEmpty()){
-			System.out.println("no more scouting locations");
-		}
-	}
-	
-	public boolean scoutHasArrived()
-	{
-		Tile next;
-		if(!this.scoutingPositions.isEmpty()){
-			next=this.scoutingPositions.peek();
-
-			if (scout.isIdle() || bwapi.getFrameCount()==1)
-			{
-				//scout is not doing anything, so he can go scout some more (or at start)
-				return true;
-			}
-			if(((scout.getX() == next.getX()) && (scout.getX() == next.getY())))
-			{
-				//scout has reached the Tile, so he can go scout some more
-				this.scoutingPositions.pop();
-				return true;
-			}	
-			else
-			{
-			return false;
-			}
-		}
-		return false;
-	}
-	
-	
-	/*
-	 * Action performed to tell the Scout to scout the base locations
-	 * 
-	 * scoutUnit:   a unit
-	 * enemyBaseLocs:  ArrayList of enemy's base locations
-	 * 
-	 */
-	/* Need to store this list of bases and then send the scout to each base once it reaches a certain location
-	 * currently, it receives all orders at the same time and can only respond to the last one
-	 * this is why it is not returning to the base afetr it has finsihed scouting. 
-	 * 
-	 * Also, I want to make this more generic sot hat we can scout enemy bases later in the game
-	 * like include something about leaving if you see "bad" stuff
-	 */
-	/*
-	private void scoutEnemyBases(int scoutUnitID, ArrayList<BaseLocation> enemyBaseLocs, int index)
-	{		
-
-		
-		
-		
-		if(index < enemyBaseLocs.size())
-		{
-			bwapi.move(scoutUnitID, enemyBaseLocs.get(index).getX(), enemyBaseLocs.get(index).getY());
-			
-			if(checkScoutArrival(this.scout, enemyBaseLocs.get(index)))
-			{
-				scoutEnemyBases(this.scout.getID(), enemyBaseLocs, index++);
-			}
-		}
-		
-	}
-
-	public boolean checkScoutArrival(Unit scoutUnit, BaseLocation enemyBaseLoc)
-	{
-		if((scoutUnit.getX() == enemyBaseLoc.getX()) && (scoutUnit.getX() == enemyBaseLoc.getY()))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	*/
-	/*
-	 * The high-level function called to do the scouting
-	 */
-
-	
 	
 	/*
 	 * Give this function a base location to have a group of units (marines atm) to attack
@@ -423,22 +300,5 @@ public class ManagerMilitary extends RRAITemplate
 	    return nearestID;
     }
     
-	/*
-	 * Gets all the possible the base locations on the map
-	 * 
-	 * Returns an ArrayList of those base locations other than our home base location
-	 */
-	public void addEnemyBases()
-	{		
-		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
-		{
-			
-			if (b.isStartLocation() && (b.getX() != homePositionX) && (b.getY() != homePositionY)) 
-			{
-				this.scoutingPositions.add(new Tile(b.getX(),b.getY()));
-			}
-		}
-		this.scoutingPositions.add(new Tile(this.homePositionX, this.homePositionY));
-	}
 
 }
