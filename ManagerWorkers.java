@@ -50,7 +50,7 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public enum workerOrders
 	{
-		MINE, GAS, ATTACK, DEFEND, BUILD, SCOUT
+		MINE, GAS, ATTACK, SCOUT
 	}
 	
 	private class Worker

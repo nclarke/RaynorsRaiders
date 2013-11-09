@@ -212,6 +212,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 	}
 	public void unitDestroy(int unitID)
 	{
+		
 		System.out.println("In unit destroyed");
 		bwapi.printText("Unit Destroyed " + String.valueOf(unitID));
 		
