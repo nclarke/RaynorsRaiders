@@ -38,7 +38,6 @@ public class CoreBaby extends RRAITemplate
 		System.out.println("CoreBaby Online");
 		// Now populate the buildingStack
 		initBuildStyle_siegeExpand();
-		
 	}
 	
 	
@@ -51,14 +50,14 @@ public class CoreBaby extends RRAITemplate
 			 order.workersNeeded <= workers.getBaseWorkers(order.baseID)
 			) {
 				react.core_econ_buildingStack.add(order.unitToMake);
+				buildingGoals.remove(order);
 			}
 		}
 		
 		/* Add workers if we need to, ALL of the workers */
 		if (workers.getBaseWorkers(0) < bwapi.getSelf().getSupplyTotal()) {
-			react.core_econ_unitsStack.add(UnitTypes.Terran_SCV);
+			react.core_econ_unitsStack.addLast(UnitTypes.Terran_SCV);
 		}
-		//Baby is doing nothing during runtime
 	}
 	
 	public void debug() 
