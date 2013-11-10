@@ -94,7 +94,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 		System.out.println("Size of master list is " + masterUnitList.size());
 		
-		coreBaby.setup();
+		//coreBaby.setup();
 		coreReactive.setup();
 		managerMilitary.setup();
 		managerBuild.setup();
@@ -126,7 +126,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			{
 				if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal()) 
 				{
-					managerWorkers.addWorker(unit.getID());
+					managerWorkers.startWorkers(unit.getID());
 				}
 			}
 		}
@@ -161,7 +161,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			
 			bwapi.drawLine(u.getX(), u.getY(), u.getTargetX(), u.getTargetY(), BWColor.WHITE, false);
 		}
-		managerWorkers.debug();
+		//managerWorkers.debug();
 		
 		if(militaryDebugFlag)
 		{
@@ -201,13 +201,32 @@ public class RaynorsRaiders implements BWAPIEventListener
 	public void playerLeft(int id) { }
 	public void unitCreate(int unitID) 
 	{
+		Unit createdUnit = bwapi.getUnit(unitID), createdFrom = null;
+		int createdUnitTpye = createdUnit.getTypeID();
 		bwapi.printText("Unit Created " + String.valueOf(unitID));
 		masterUnitList.add(bwapi.getUnit(unitID));
 		System.out.println("creating type id is " + bwapi.getUnit(unitID).getTypeID());
-		if (bwapi.getUnit(unitID).getTypeID() == UnitTypes.Terran_SCV.ordinal()) 
-			managerWorkers.addWorker(unitID);
 		
-		if (bwapi.getUnit(unitID).getTypeID() == UnitTypes.Terran_Marine.ordinal()) 
+		for (Unit u : bwapi.getMyUnits())
+		{
+			if (u.getX() == createdUnit.getX() & u.getY() == createdUnit.getY())
+			{
+				createdFrom = u;				
+			}
+		}
+		
+		if (createdUnitTpye == UnitTypes.Terran_SCV.ordinal())
+		{
+			System.out.println("Created unit location " + createdUnit.getX() + ", " + createdUnit.getY());
+			managerWorkers.addWorker(unitID, createdFrom);
+		}
+		if (createdUnitTpye == UnitTypes.Terran_Command_Center.ordinal())
+		{
+			System.out.println("Created CC");
+			managerBuild.newBaseLocation(createdUnit);
+		}
+		
+		if (createdUnitTpye == UnitTypes.Terran_Marine.ordinal()) 
 			managerMilitary.addMilitaryUnit(bwapi.getUnit(unitID), UnitTypes.Terran_Marine);
 	}
 	public void unitDestroy(int unitID)

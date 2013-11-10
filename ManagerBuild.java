@@ -224,24 +224,44 @@ public class ManagerBuild extends RRAITemplate
 	
 	/*
 	 * Assumes that this function will be called on the first frame before
-	 * we have other bases
+	 * we have other bases (ie only hace one command center)
 	 */
 	
 	public int baseSetup()
 	{
+		ourBases.clear();
 		int unitPostX = 0, unitPostY = 0;
 		int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
 		unitPostX = bwapi.getUnit(cc).getX();
 		unitPostY = bwapi.getUnit(cc).getY();
-		for (BaseLocation b : bwapi.getMap().getBaseLocations())
+		System.out.println("CC is located at: " + bwapi.getUnit(cc).getTileX() +", " + bwapi.getUnit(cc).getTileY());
+		for (BaseLocation bl : bwapi.getMap().getBaseLocations())
 		{
-			if (b.getX() == unitPostX && b.getY() == unitPostY)
+			System.out.println("Base is: " + bl.getTx() + ", " + bl.getTy());
+			if (bl.getX() == unitPostX && bl.getY() == unitPostY)
 			{
-				ourBases.add(b);
+				ourBases.add(bl);
 				System.out.println("ManagerBuild: Found our home base! Size is " + ourBases.size());
 			}
 		}
 		return ourBases.size();
+	}
+	
+	/*
+	 * Gets called whenever a new base is created. Called from RR.unitCreated
+	 */
+	
+	public void newBaseLocation(Unit newCC)
+	{
+		for (BaseLocation bl : bwapi.getMap().getBaseLocations())
+		{
+			if (bl.getX() == newCC.getX() && bl.getY() == newCC.getY())
+			{
+				ourBases.add(bl);
+				workers.addBaseToBaseWorkers();
+				System.out.println("ManagerBuild: Added new base succesfully");
+			}
+		}		
 	}
 	
 	/*
@@ -252,9 +272,23 @@ public class ManagerBuild extends RRAITemplate
 	{
 		return ourBases.get(0);
 	}
-	
-	public void getOurBases() 
+
+	public BaseLocation getBaseFromUnit(Unit curCC)
 	{
+		System.out.println("ManagerBuild: In base from unit");
+		System.out.println("Unit is at: " + curCC.getX() + ", " + curCC.getY());
+		for (BaseLocation bl : ourBases)
+		{
+			System.out.println("Loop one");
+			System.out.println("bl is at: " + bl.getX() + ", " + bl.getY());
+			if (curCC.getX() == bl.getX() && curCC.getY() == bl.getY())
+			{
+				System.out.println("MangerBuild: Got base from Unit");
+				return bl;
+			}
+		}
+		System.out.println("WARNING--------------------- getBaseFromUnit eturning null");
+		return null;
 		
 	}
 	

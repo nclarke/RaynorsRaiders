@@ -32,6 +32,34 @@ public class ManagerWorkers extends RRAITemplate
 	Unit tempUnit;
 	
 
+	public void trainWorker()
+	{
+		
+		// how many workers does each base need for max saturation?
+		int baseNdx = 0;
+		for (BaseLocation bl : builder.ourBases)
+		{
+			int ccInt = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), bl.getX(), bl.getY());
+			Unit cc = bwapi.getUnit(ccInt);
+			if ( !cc.isTraining() & baseNeedsWorkers(bl))
+			{
+				//train worker for this base
+				//train( buildingID, unitTypeID ): Trains a unit of a specified type in our building.
+				bwapi.train(cc.getID(), UnitTypes.Terran_SCV.ordinal());
+				//cc.
+			}
+			//!cc.isTraining()
+			else if ( (cc.getTrainingQueueSize() == 0) & getBaseToAddWorkers() != -1)
+			{
+				//if not training and another base needs workers train for that base
+			}
+			else 
+			{
+				//Don't train
+			}
+			baseNdx++;
+		}
+	}
 	
 	public ManagerWorkers() 
 	{
@@ -78,22 +106,79 @@ public class ManagerWorkers extends RRAITemplate
 		
 	}
 	
-	public void addWorker(int unitID)
+	/*
+	 * Should only be used for the start SCVS
+	 */
+	
+	public void startWorkers(int unitID)
 	{
-		int baseNdx = getBaseToAddWorkers();
-		System.out.println("In new worker, baseNdx is " + baseNdx);
-		//default is base zero which is main base
-		//by default have it set to mine
-		Worker newWorker = new Worker(unitID, baseNdx, workerOrders.MINE);
-		addWorkerToBase(newWorker, baseNdx);
+		Worker newWorker = new Worker(unitID, 0, workerOrders.MINE);
+		addWorkerToBase(newWorker, 0);
 		allWorkers.push(newWorker);
 	}
+	
+	/*
+	 * Goals:
+	 * Assign the worker a base and put it in the right data structure
+	 */
+	
+	public void addWorker(int unitID, Unit createdFrom)
+	{
+		System.out.println("In add worker");
+		BaseLocation createdBase = builder.getBaseFromUnit(createdFrom);
+		int baseToAdd;
+		int createdBaseNdx = builder.ourBases.indexOf(createdBase);
+		System.out.println("In new worker, baseNdx is " + createdBaseNdx);
+		//default is base zero which is main base
+		//by default have it set to mine
+		
+		Worker newWorker;
+		if (baseNeedsWorkers(createdBase))
+		{
+			 newWorker = new Worker(unitID, createdBaseNdx, workerOrders.MINE);
+			 addWorkerToBase(newWorker, createdBaseNdx);
+		}
+		else
+		{
+			baseToAdd = getBaseToAddWorkers();
+			newWorker = new Worker(unitID, baseToAdd, workerOrders.MINE);
+			addWorkerToBase(newWorker, baseToAdd);
+		}
+		System.out.println("Pushed new worker");
+		allWorkers.push(newWorker);
+	}
+	
+	/*
+	 * Returns true if this base needs more workers, false otherwise
+	 * Can change this to an int if we care how many more workers we need 
+	 */
+	
+	private boolean baseNeedsWorkers(BaseLocation baseCreatedFrom)
+	{
+		//int rtnNdx = -1, ndx = 0;
+		int baseNdx, baseWorkers, baseMins, gasWorkers;
+		baseNdx = builder.ourBases.indexOf(baseCreatedFrom);
+		//curBase = builder.ourBases.get(baseNdx);
+		baseWorkers = getBaseWorkers(baseNdx);
+		baseMins = getNumMinerals(baseCreatedFrom.getX(), baseCreatedFrom.getY());
+		if (!baseCreatedFrom.isMineralOnly())
+			gasWorkers = 3;
+		else
+			gasWorkers = 0;
+		System.out.println("base needs workers? " + (baseWorkers < ( (SCVS_PER_MIN_PATCH * baseMins) + gasWorkers)) );
+		return (baseWorkers < ( (SCVS_PER_MIN_PATCH * baseMins) + gasWorkers) );
+	}
+	
+	/*
+	 * Passing in an int that corresponds to what base you are creating from
+	 */
 	
 	private int getBaseToAddWorkers()
 	{
 		int rtnNdx = -1, ndx = 0;
 		int baseWorkers, baseMins, gasWorkers;
 		BaseLocation curBase;
+		
 		for (ndx = 0; ndx < builder.ourBases.size(); ndx++) 
 		{
 			curBase = builder.ourBases.get(ndx);
@@ -211,14 +296,44 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public void handleIdle()
 	{
-		Worker curWorker = null;
+		System.out.println("Handling Idle");
+		Unit curUnit;
 		int closestId = -1;
-		double closestDist = 99999999;
+		
+		for (Worker w : allWorkers)
+		{
+			curUnit = bwapi.getUnit(w.unitID);
+			if (curUnit.isIdle())
+			{
+				System.out.println("Idle worker with order " + w.curOrder);
+				switch (w.curOrder)
+				{
+				case MINE :
+					closestId = getNearestMin(w.asgnedBaseX, w.asgnedBaseY); 
+					if (closestId != -1) 
+						bwapi.rightClick(curUnit.getID(), closestId);
+					break;
+				case GAS :
+					closestId = getNearestUnit(UnitTypes.Terran_Refinery.ordinal(), (int)w.asgnedBaseX, (int)w.asgnedBaseY); 
+					//closestId = getNearestGas(curWorker.asgnedBaseX, curWorker.asgnedBaseY);
+					System.out.println("---------------------Idle Gas, Closest id is " + closestId);
+					if (closestId != -1) 
+						bwapi.rightClick(curUnit.getID(), closestId);
+					break;
+				case ATTACK :
+					break;
+				default :
+					break;
+				}
+			}
+		}
+		/*
 		for (Unit unit : bwapi.getMyUnits())
 		{
-			if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal() & unit.isIdle()) // if this unit is Terran_SCV (worker) and if it is idle (not doing anything),
+			if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal() && unit.isIdle()) // if this unit is Terran_SCV (worker) and if it is idle (not doing anything),
 			{
 				curWorker = getWorkerByID(unit.getID());
+				System.out.println("     Worker Idle with order " + curWorker.curOrder);
 				switch (curWorker.curOrder)
 				{
 				case MINE :
@@ -240,6 +355,8 @@ public class ManagerWorkers extends RRAITemplate
 				}
 			}
 		}
+		System.out.println("End Handle Idle");
+		*/
 	}
 	
 	private int getNearestMin(double workerX, double workerY) 
@@ -316,10 +433,11 @@ public class ManagerWorkers extends RRAITemplate
 	@Override
 	public void debug() 
 	{
+		int baseNdx = 0;
 		for (BaseLocation b : bwapi.getMap().getBaseLocations())//builder.ourBases 
 		{
 			int tempMins = getNumMinerals(b.getX(), b.getY());
-			int tempWorkers = getBaseWorkers(0);
+			int tempWorkers = getBaseWorkers(baseNdx++);
 			if (tempMins != 0)
 			{
 				bwapi.drawText(b.getX()-64, b.getY()-(32*2)-10, "Num mins is " + tempMins, false);
