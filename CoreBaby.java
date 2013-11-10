@@ -51,6 +51,7 @@ public class CoreBaby extends RRAITemplate
 			 order.workersNeeded <= workers.getBaseWorkers(order.baseID)
 			) {
 				react.core_econ_buildingStack.add(order.unitToMake);
+				buildingGoals.remove(order);
 			}
 		}
 		
