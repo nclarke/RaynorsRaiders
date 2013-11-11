@@ -16,7 +16,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * (AI is very rich in the beginning, gets its level changed from ZERO to TWO) */
 	EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLevel;
 	int homePositionX, homePositionY;
-	MiltScouter scouter;
+	//MiltScouter scouter;
 	BaseLocation homeBase;
 	
 	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
@@ -42,7 +42,7 @@ public class ManagerMilitary extends RRAITemplate
 		initMap(unitTypesPerLevel);
 		
 		militaryUnits = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
-		scouter = new MiltScouter(this);
+		//scouter = new MiltScouter(this);
 	}
 	
 	public void AILinkData() {
@@ -60,7 +60,7 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public void checkUp() {
 		//Check up - FIXME - code needs to go here.
-		this.scouter.scout();
+		//this.scouter.scout();
 	}
 	
     public void debug()

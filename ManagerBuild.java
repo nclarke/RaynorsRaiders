@@ -356,6 +356,7 @@ System.out.println("built: " +builtBuildings.toString());
         // will build near similar building types
         // will also build add-ons (not sure if structure will attempt relocating if there's not enough room)
 	public void build(UnitTypes structure) {
+		System.out.println("Building " + structure.toString());
 		UnitType bldg;
 		
 		if (structure == null)

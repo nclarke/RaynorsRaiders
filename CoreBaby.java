@@ -51,6 +51,7 @@ public class CoreBaby extends RRAITemplate
 			) {
 				react.core_econ_buildingStack.add(order.unitToMake);
 				buildingGoals.remove(order);
+				System.out.println("Adding order to make" + order.unitToMake.toString());
 			}
 		}
 		
