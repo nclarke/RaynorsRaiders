@@ -37,7 +37,7 @@ public class CoreReactive extends RRAITemplate
 		core_econ_buildAlerts = new LinkedList<BuildAlert>();
 		
 		// Set default build mode to process everything in the stack in-order and normally
-		core_econ_buildingMode = BuildMode.BLOCKING_STACK;
+		core_econ_buildingMode = BuildMode.FIRST_POSSIBLE;
 		core_econ_unitsMode = BuildMode.FIRST_POSSIBLE;
 	}
 	
