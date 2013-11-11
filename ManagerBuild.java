@@ -85,8 +85,8 @@ public class ManagerBuild extends RRAITemplate
 	public void checkUp() 
 	{
 		//System.out.println("ManagerBuild Running");
-//System.out.println("orders: " + orders.toString());
-//System.out.println("built: " +builtBuildings.toString());
+System.out.println(orders.size() + " orders: " + orders.toString());
+System.out.println("built: " +builtBuildings.toString());
 				switch(bldgMode) {
 					case FIRST_POSSIBLE:
 						int i = 0;
@@ -95,12 +95,13 @@ public class ManagerBuild extends RRAITemplate
 						UnitType bldg = null;
 						
 						// go through list until we find a buildable structure
-						while(!canBuild && i < orders.size())
+						while(!canBuild && orders.size() > 0 && i < orders.size())
 						{
 							b = orders.get(i);
 							bldg = bwapi.getUnitType(b.ordinal());
-							
-							if(bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
+				
+							if(/*(!bwapi.getUnit(b.ordinal()).isBeingConstructed()) && */
+									bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
 									bwapi.getSelf().getGas() - underConstructionG() < bldg.getGasPrice()) 
 							{
 								i++;
@@ -114,8 +115,6 @@ public class ManagerBuild extends RRAITemplate
 						if(canBuild)
 						{
 						   build(b);
-						   orders.remove(i);
-						   builtBuildings.add(b);
 						}
 						else 
 						{
@@ -124,15 +123,35 @@ public class ManagerBuild extends RRAITemplate
 							
 						break;
 					case BLOCKING_STACK:
-						b = orders.peek();
-						bldg = bwapi.getUnitType(b.ordinal());
-						
-						if(bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
-								bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
+						i = 0;
+
+						if(orders.size() > 0)
 						{
-							build(b);
-							orders.pop();
-							builtBuildings.add(b);
+							//find first building not being constructed **** MAY NEED ADJUSTMENT
+							while(i < orders.size() && (weAreBuilding(orders.get(i).ordinal())))
+							{
+								i++;
+							}
+							System.out.println("i = " + i);
+							if(i < orders.size())
+							{
+								b = orders.get(i);
+								bldg = bwapi.getUnitType(b.ordinal());
+						
+								if(bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
+								bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
+								{
+									build(b);
+								}
+							}
+							else
+							{
+								System.out.println("everything under construction");
+							}
+						}
+						else
+						{
+							System.out.println("nothing to build");
 						}
 
 						break;
@@ -144,7 +163,7 @@ public class ManagerBuild extends RRAITemplate
 				}
 				
 				// train units
-				//System.out.println("roster: " + roster.toString());
+//System.out.println("roster: " + roster.toString());
 
 				switch(unitsMode) {
 				case FIRST_POSSIBLE:
@@ -299,11 +318,14 @@ public class ManagerBuild extends RRAITemplate
 	 */
 	
 	
-	public int underConstructionM() {
+	public int underConstructionM() 
+	{
 		int cost = 0;
 		
-		for(Unit unit : bwapi.getMyUnits()) {
-			if(unit.isConstructing()) {
+		for(Unit unit : bwapi.getMyUnits()) 
+		{
+			if(unit.isConstructing()) 
+			{
 				UnitType bldg = bwapi.getUnitType(unit.getBuildTypeID());
 				
 				cost += bldg.getMineralPrice();
@@ -313,11 +335,14 @@ public class ManagerBuild extends RRAITemplate
 		return cost;
 	}
 	
-	public int underConstructionG() {
+	public int underConstructionG() 
+	{
 		int cost = 0;
 		
-		for(Unit unit : bwapi.getMyUnits()) {
-			if(unit.isConstructing()) {
+		for(Unit unit : bwapi.getMyUnits()) 
+		{
+			if(unit.isConstructing()) 
+			{
 				UnitType bldg = bwapi.getUnitType(unit.getBuildTypeID());
 				
 				cost += bldg.getGasPrice();
@@ -344,50 +369,64 @@ public class ManagerBuild extends RRAITemplate
 		
 		bldg = bwapi.getUnitType(structure.ordinal());
 		
-		if (bwapi.getSelf().getMinerals() >= bldg.getMineralPrice()) {
-		  if(bwapi.getSelf().getGas() >= bldg.getGasPrice()) {
-			if(bldg.isAddon()) {
-				//find parent structure
-				for(Unit unit : bwapi.getMyUnits()) {
-					if(unit.getTypeID() == bldg.getWhatBuildID()) {
-						bwapi.buildAddon(unit.getID(), bldg.getID());
-						break;
-					}
-				}
-				
-			} else {
-			// try to find the worker near our home position
-				int worker = getNearestUnit(UnitTypes.Terran_SCV.ordinal(), homePositionX, homePositionY);
-				if (worker != -1) {
-				// if we found him, try to select appropriate build tile position for bldg (near our home base)
-					int xtile = homePositionX, ytile = homePositionY;
-				
-					for(Unit unit : bwapi.getMyUnits()) {
-						if(unit.getTypeID() == bldg.getID()) {
-							xtile = unit.getX();
-							ytile = unit.getY();
+		if (bwapi.getSelf().getMinerals() >= bldg.getMineralPrice()) 
+		{
+			if(bwapi.getSelf().getGas() >= bldg.getGasPrice()) 
+			{
+				if(bldg.isAddon()) 
+				{
+					//find parent structure
+					for(Unit unit : bwapi.getMyUnits()) 
+					{
+						if(unit.getTypeID() == bldg.getWhatBuildID()) 
+						{
+							bwapi.buildAddon(unit.getID(), bldg.getID());
 							break;
 						}
 					}
-				    Point buildTile = getBuildTile(worker, bldg.getID(), xtile, ytile);
-				    // if we found a good build position, and we aren't already constructing a bldg 
-				    // order our worker to build it
-				    if ((buildTile.x != -1) && (!weAreBuilding(bldg.getID()))) {
-				    	bwapi.build(worker, buildTile.x, buildTile.y, bldg.getID());
-				    	//buildingBuildings.push(bldg);
-				    }
-				}
-				else {
-					react.core_econ_buildAlerts.push(BuildAlert.NO_WORKERS);
+				
+				} 
+				else 
+				{
+					// try to find the worker near our home position
+					int worker = getNearestUnit(UnitTypes.Terran_SCV.ordinal(), homePositionX, homePositionY);
+					if (worker != -1) 
+					{
+						// if we found him, try to select appropriate build tile position for bldg (near our home base)
+						int xtile = homePositionX, ytile = homePositionY;
+				
+						for(Unit unit : bwapi.getMyUnits()) 
+						{
+							if(unit.getTypeID() == bldg.getID()) 
+							{
+								xtile = unit.getX();
+								ytile = unit.getY();
+								break;
+							}
+						}
+						Point buildTile = getBuildTile(worker, bldg.getID(), xtile, ytile);
+						// if we found a good build position, and we aren't already constructing a bldg 
+						// order our worker to build it
+						if ((buildTile.x != -1) && (!weAreBuilding(bldg.getID()))) 
+						{
+							bwapi.build(worker, buildTile.x, buildTile.y, bldg.getID());
+							//buildingBuildings.push(bldg);
+						}
+					}
+					else 
+					{
+						react.econ_sendBuildAlert(BuildAlert.NO_WORKERS);
+					}
 				}
 			}
-		  }
-		  else {
-			  react.core_econ_buildAlerts.push(BuildAlert.NO_GAS);
-		  }
+			else 
+			{
+				  react.econ_sendBuildAlert(BuildAlert.NO_GAS);
+			}
 		}
-		else {
-			react.core_econ_buildAlerts.push(BuildAlert.NO_MINERALS);
+		else 
+		{
+			react.econ_sendBuildAlert(BuildAlert.NO_MINERALS);
 		}
 	}
 	
@@ -399,46 +438,60 @@ public class ManagerBuild extends RRAITemplate
     // input: upgrade(UpgradeTypes.xxxx)
     // method will do resource check before attempting upgrade
     // so far, will only upgrade at base price
-	public void upgrade(UpgradeTypes lvlup) {
+	public void upgrade(UpgradeTypes lvlup) 
+	{
 		UpgradeType gear = bwapi.getUpgradeType(lvlup.ordinal());
 	
-		if(bwapi.getSelf().getMinerals() >= gear.getMineralPriceBase()) {
-		  if(bwapi.getSelf().getGas() >= gear.getGasPriceBase()) {
-			for(Unit unit : bwapi.getMyUnits()) {
-				if(unit.getTypeID() == gear.getWhatUpgradesTypeID()) {
-					bwapi.upgrade(unit.getID(), gear.getID());
+		if(bwapi.getSelf().getMinerals() >= gear.getMineralPriceBase()) 
+		{
+			if(bwapi.getSelf().getGas() >= gear.getGasPriceBase()) 
+			{
+				for(Unit unit : bwapi.getMyUnits()) 
+				{
+					if(unit.getTypeID() == gear.getWhatUpgradesTypeID()) 
+					{
+						bwapi.upgrade(unit.getID(), gear.getID());
+					}
 				}
 			}
+			else 
+			{
+				react.econ_sendBuildAlert(BuildAlert.NO_GAS);
+			}
 		}
-		else {
-			react.core_econ_buildAlerts.push(BuildAlert.NO_GAS);
+		else 
+		{
+			react.econ_sendBuildAlert(BuildAlert.NO_MINERALS);
 		}
-	 }
-	 else {
-		 react.core_econ_buildAlerts.push(BuildAlert.NO_MINERALS);
-	 }
 	}
 
    // input: research(TechTypes.xxxx)
     // method will do resource check before attempting research
-	public void research(TechTypes item) {
+	public void research(TechTypes item) 
+	{
 		TechType tech = bwapi.getTechType(item.ordinal());
 	
-		if(bwapi.getSelf().getMinerals() >= tech.getMineralPrice()) {
-		  if(bwapi.getSelf().getGas() >= tech.getGasPrice()) {
+		if(bwapi.getSelf().getMinerals() >= tech.getMineralPrice()) 
+		{
+		  if(bwapi.getSelf().getGas() >= tech.getGasPrice()) 
+		  {
 		
-			for(Unit unit : bwapi.getMyUnits()) {
-				if(unit.getTypeID() == tech.getWhatResearchesTypeID()) {
-					bwapi.research(unit.getID(), tech.getID());
-				}
-			}
+			  for(Unit unit : bwapi.getMyUnits()) 
+			  {
+				  if(unit.getTypeID() == tech.getWhatResearchesTypeID()) 
+				  {
+					  bwapi.research(unit.getID(), tech.getID());
+				  }
+			  }
 		  }
-		  else {
-				react.core_econ_buildAlerts.push(BuildAlert.NO_GAS);
+		  else 
+		  {
+				react.econ_sendBuildAlert(BuildAlert.NO_GAS);
 		  }
 	    }
-		else {
-			 react.core_econ_buildAlerts.push(BuildAlert.NO_MINERALS);
+		else 
+		{
+			react.econ_sendBuildAlert(BuildAlert.NO_MINERALS);
 		}
 	}
 
@@ -465,12 +518,12 @@ public class ManagerBuild extends RRAITemplate
 			}
 			else 
 			{
-				react.core_econ_buildAlerts.push(BuildAlert.NO_GAS);
+				react.econ_sendBuildAlert(BuildAlert.NO_GAS);
 			}
 		}
 		else 
 		{
-			 react.core_econ_buildAlerts.push(BuildAlert.NO_MINERALS);
+			react.econ_sendBuildAlert(BuildAlert.NO_MINERALS);
 		}
 	}
 	
@@ -557,6 +610,5 @@ public class ManagerBuild extends RRAITemplate
 		}
 		return false;
 	}
-
 }
 

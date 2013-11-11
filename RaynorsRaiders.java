@@ -202,7 +202,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 	public void unitCreate(int unitID) 
 	{
 		Unit createdUnit = bwapi.getUnit(unitID), createdFrom = null;
-		int createdUnitTpye = createdUnit.getTypeID();
+		int createdUnitType = createdUnit.getTypeID();
 		bwapi.printText("Unit Created " + String.valueOf(unitID));
 		masterUnitList.add(bwapi.getUnit(unitID));
 		System.out.println("creating type id is " + bwapi.getUnit(unitID).getTypeID());
@@ -215,19 +215,35 @@ public class RaynorsRaiders implements BWAPIEventListener
 			}
 		}
 		
-		if (createdUnitTpye == UnitTypes.Terran_SCV.ordinal())
+		if (createdUnitType == UnitTypes.Terran_SCV.ordinal())
 		{
 			System.out.println("Created unit location " + createdUnit.getX() + ", " + createdUnit.getY());
 			managerWorkers.addWorker(unitID, createdFrom);
 		}
-		if (createdUnitTpye == UnitTypes.Terran_Command_Center.ordinal())
+		if (createdUnitType == UnitTypes.Terran_Command_Center.ordinal())
 		{
 			System.out.println("Created CC");
 			managerBuild.newBaseLocation(createdUnit);
 		}
 		
-		if (createdUnitTpye == UnitTypes.Terran_Marine.ordinal()) 
+		if (createdUnitType == UnitTypes.Terran_Marine.ordinal()) 
 			managerMilitary.addMilitaryUnit(bwapi.getUnit(unitID), UnitTypes.Terran_Marine);
+		
+		// needs to be extended for all buildings
+		// is there a function that can return UnitTypes?
+		if(bwapi.getUnitType(createdUnitType).isBuilding())
+		{
+			if(createdUnitType == UnitTypes.Terran_Academy.ordinal())
+			{
+				managerBuild.builtBuildings.add(UnitTypes.Terran_Academy);
+				managerBuild.orders.remove(UnitTypes.Terran_Academy);
+			}
+			else if(createdUnitType == UnitTypes.Terran_Supply_Depot.ordinal())
+			{
+				managerBuild.builtBuildings.add(UnitTypes.Terran_Supply_Depot);
+				managerBuild.orders.remove(UnitTypes.Terran_Supply_Depot);
+			}
+		}
 	}
 	public void unitDestroy(int unitID)
 	{
