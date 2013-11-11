@@ -30,7 +30,7 @@ public class CoreBaby extends RRAITemplate
 	
 	public CoreBaby() 
 	{
-
+		buildingGoals = new LinkedList<BuildOrder>();
 	}
 	
 	public void setup() 
