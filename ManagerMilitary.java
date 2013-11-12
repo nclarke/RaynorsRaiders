@@ -135,6 +135,24 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
+	public void unitOperation(int locationX, int locationY)
+	{
+		LinkedList<Unit> tmp = new LinkedList<Unit>();
+		
+		for(Unit ut: militaryUnits.get(UnitTypes.Terran_Marine))
+		{
+			if(ut.isIdle())
+			{
+				tmp.add(ut);
+			}
+		}
+		
+		if(!tmp.isEmpty())
+		{
+			unitOperationHelper(tmp, locationX, locationY);
+		}
+	}
+	
 	/*
 	 * Helper function to execute unit attacks to a location 
 	 */

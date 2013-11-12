@@ -107,8 +107,8 @@ public class CoreBaby extends RRAITemplate
 			entrance = (react.gen_findClosestRegion(military.homePositionX, military.homePositionY)).getChokePoints().get(0);
 			}
 		}
-		//FIXME new method for handling unit attacks, needs to specify UnitTypes for attack and num of units
-		//military.unitOperation(unitTypes, numOfUnits,  entrance.getCenterX(), entrance.getCenterY());
+		//FIXME new method for handling unit attacks, needs to specify UnitTypes for attack and num of units, for now it just sends all marines
+		military.unitOperation(entrance.getCenterX(), entrance.getCenterY());
 	}
 	
 	public void initBuildStyle_siegeExpand() {
