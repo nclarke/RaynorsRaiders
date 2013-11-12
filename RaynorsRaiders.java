@@ -108,12 +108,15 @@ public class RaynorsRaiders implements BWAPIEventListener
 	{
 		Integer frameCount = bwapi.getFrameCount();
 <<<<<<< HEAD
+<<<<<<< HEAD
 		/* Update Internal Mineral Counts */
 		/*ref_minerals += (bwapi.getSelf().getMinerals() - prev_minerals);
 		prev_minerals = bwapi.getSelf().getMinerals();
 		ref_gas += (bwapi.getSelf().getGas() - prev_gas);
 		prev_gas = bwapi.getSelf().getGas();*/
 		/* possibly resync */
+=======
+>>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
 =======
 >>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
 		
@@ -139,6 +142,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 				}
 			}
 <<<<<<< HEAD
+<<<<<<< HEAD
 			
 			/* Set up all minerals and gas */
 			//ref_supplyUsed = bwapi.getSelf().getSupplyUsed() / 2;
@@ -147,6 +151,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 			ref_gas = bwapi.getSelf().getGas();
 			prev_minerals = ref_minerals;
 			prev_gas = ref_gas;*/
+=======
+>>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
 =======
 >>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
 		}
