@@ -29,21 +29,18 @@ public class MiltScouter
 		this.MM = MM;
 		System.out.println("Scouter online");
 		this.scoutingPositions = new LinkedList<ManagerMilitary.Tile>();
-//		startUp();
 	}
 	
 	
 	public void setup() {
-		System.out.println("Scouter online");
+		System.out.println("Setup scouter online");
 	}
 	
 	public void startUp()
 	{
 		System.out.println("scouter!");
 		this.scoutingPositions = new LinkedList<ManagerMilitary.Tile>();
-		System.out.println("scouter!");
 		this.scout = getNewScoutUnit();
-		System.out.println("scout is: "+scout);
 		scout();
 	}
 	
@@ -65,11 +62,7 @@ public class MiltScouter
 	}
 	
 	private Unit getNewScoutUnit(int typeID)
-	{		
-		System.out.println("MM is: "+this.MM);
-		System.out.println("MM bwapi is: "+this.MM.bwapi);
-		System.out.println("MM units: "+this. MM.bwapi.getMyUnits());
-		System.out.println("boiw go!");
+	{
 		for (Unit unit : MM.bwapi.getMyUnits())
 		{
 			if (unit.getTypeID() == typeID && (unit.isIdle() || MM.bwapi.getFrameCount() == 1))//not sure about checking frame count
@@ -90,6 +83,7 @@ public class MiltScouter
 	 */
 	public void scout(){
 		if (this.scout == null){
+			System.out.println("this new scout is: "+this.scout);
 			this.scout = getNewScoutUnit();
 			System.out.println("new scout is: "+this.scout);
 			addEnemyBases();
@@ -110,17 +104,20 @@ public class MiltScouter
 		if(!this.scoutingPositions.isEmpty()){
 			next=this.scoutingPositions.peek();
 
-			if (scout.isIdle() || MM.bwapi.getFrameCount()==1)
+			//			System.out.println("frameCoutn: "+MM.bwapi.getFrameCount());
+			if (scout.isIdle() || MM.bwapi.getFrameCount() < 1)
 			{
 				//scout is not doing anything, so he can go scout some more (or at start)
 				return true;
 			}
 			else if(((scout.getX() != next.getX()) || (scout.getX() != next.getY())))
 			{
+				//				System.out.println("here2");
 				return false;
 			}	
 			else
 			{
+				//				System.out.println("here3");
 				//scout has reached the Tile, so he can go scout some more
 				this.scoutingPositions.pop();
 				return true;
@@ -166,7 +163,7 @@ public class MiltScouter
 				this.scoutingPositions.add(MM.new Tile(b.getX(), b.getY()));//, y).Tile(b.getX(),b.getY()));
 			}
 		}
-//		this.scoutingPositions.add(MM.new Tile(this.homePositionX, this.homePositionY));
+		this.scoutingPositions.add(MM.new Tile(this.homePositionX, this.homePositionY));
 	}
 
 }
