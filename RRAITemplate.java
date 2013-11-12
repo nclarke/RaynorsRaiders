@@ -4,7 +4,6 @@ import javabot.JNIBWAPI;
 
 public class RRAITemplate 
 {
-	RaynorsRaiders main;
 	JNIBWAPI bwapi;
 	CoreReactive react;
 	CoreBaby baby;
@@ -18,7 +17,6 @@ public class RRAITemplate
 	}
 	
 	public void AILink(
-	 RaynorsRaiders d_main,
 	 JNIBWAPI d_bwapi,
 	 CoreReactive d_react,
 	 CoreBaby d_baby,
@@ -27,7 +25,6 @@ public class RRAITemplate
 	 ManagerWorkers d_workers
 	 )
 	{
-		main = d_main;
 	    bwapi = d_bwapi;
 		react = d_react;
 		baby = d_baby;

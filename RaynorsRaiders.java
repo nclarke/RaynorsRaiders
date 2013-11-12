@@ -32,12 +32,6 @@ public class RaynorsRaiders implements BWAPIEventListener
 	ManagerBuild 		managerBuild;
 	ManagerWorkers		managerWorkers;
 	ManagerMilitary     managerMilitary;
-	Integer ref_supplyUsed;
-	Integer ref_supplyTotal;
-	Integer ref_minerals;
-	Integer ref_gas;
-	Integer prev_minerals;
-	Integer prev_gas;
 
 	public static void main(String[] args) 
 	{
@@ -56,17 +50,15 @@ public class RaynorsRaiders implements BWAPIEventListener
 		managerMilitary = new ManagerMilitary();
 		coreBaby = new CoreBaby();
 		
-
-		
 		/* Send AI Pointers to all the AIs (this is the "second" constructor */
-		coreReactive.AILink(this, bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		coreBaby.AILink(this, bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		managerBuild.AILink(this, bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		managerMilitary.AILink(this, bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		managerWorkers.AILink(this, bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
+		coreReactive.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
+		coreBaby.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
+		managerBuild.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
+		managerMilitary.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
+		managerWorkers.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
 		
 		bwapi.start();
-	}
+	} 
 	
 	
 	public void connected()
@@ -115,12 +107,15 @@ public class RaynorsRaiders implements BWAPIEventListener
 	public void gameUpdate() 
 	{
 		Integer frameCount = bwapi.getFrameCount();
+<<<<<<< HEAD
 		/* Update Internal Mineral Counts */
 		/*ref_minerals += (bwapi.getSelf().getMinerals() - prev_minerals);
 		prev_minerals = bwapi.getSelf().getMinerals();
 		ref_gas += (bwapi.getSelf().getGas() - prev_gas);
 		prev_gas = bwapi.getSelf().getGas();*/
 		/* possibly resync */
+=======
+>>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
 		
 		 //Draw debug information on screen
 		if (debgFlag)
@@ -143,6 +138,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 					managerWorkers.startWorkers(unit.getID());
 				}
 			}
+<<<<<<< HEAD
 			
 			/* Set up all minerals and gas */
 			//ref_supplyUsed = bwapi.getSelf().getSupplyUsed() / 2;
@@ -151,6 +147,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 			ref_gas = bwapi.getSelf().getGas();
 			prev_minerals = ref_minerals;
 			prev_gas = ref_gas;*/
+=======
+>>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
 		}
 		
 		// Call actions every 30 frames
