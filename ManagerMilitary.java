@@ -59,13 +59,14 @@ public class ManagerMilitary extends RRAITemplate
 		//Check up - FIXME - code needs to go here.
 		this.scouter.scout();
 		
-		/*for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
+		//for testing purposes - tries to send 5 marines to an enemy base atm
+		or (BaseLocation b : bwapi.getMap().getBaseLocations()) 
 		{
 			if (b.isStartLocation() )
 			{
 				unitOperation(b.getX(), b.getY());
 			}
-		}*/
+		}
 	}
 	
     public void debug()
@@ -114,16 +115,16 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public void addMilitaryUnit(Unit unitObj, UnitTypes unitType)
 	{
-		System.out.println("Adding unit to militaryUnit");
+		System.out.println("Military Manager: Adding unit to militaryUnit");
 		militaryUnits.get(unitType).add(unitObj);
-		System.out.println("Added unit to militaryUnit");
+		System.out.println("Military Manager: Added unit to militaryUnit");
 	}
 	
 	public void removeMilitaryUnit(Unit unitObj, UnitTypes unitType)
 	{
-		System.out.println("Removing unit in militaryUnit");
+		System.out.println("Military Manager: Removing unit in militaryUnit");
 		militaryUnits.get(unitType).remove(unitObj);
-		System.out.println("Removd unit in militaryUnit");
+		System.out.println("Military Manager: Removd unit in militaryUnit");
 	}
 	
 	/*
@@ -162,9 +163,9 @@ public class ManagerMilitary extends RRAITemplate
 		
 		for(Unit ut: militaryUnits.get(UnitTypes.Terran_Marine))
 		{
-			if(tmp.size() < 12)
+			if(tmp.size() < 5)
 			{
-				if(ut.isIdle())
+				//if(ut.isIdle())
 				tmp.add(ut);
 			}
 		}
@@ -181,8 +182,10 @@ public class ManagerMilitary extends RRAITemplate
 	private void unitOperationHelper(LinkedList<Unit> unitGroup, int locationX, int locationY)
 	{
 		rallyUnits(unitGroup, homePositionX, homePositionY);
-		rallyReadyCheck(unitGroup, homePositionX, homePositionY);
-		attackEnemyLocation(unitGroup, locationX, locationY);
+		//if(rallyReadyCheck(unitGroup, homePositionX, homePositionY))
+		//{
+			attackEnemyLocation(unitGroup, locationX, locationY);
+		//}
 	}
 	
 	/*
@@ -201,8 +204,8 @@ public class ManagerMilitary extends RRAITemplate
 			{
 				bwapi.move(unit.getID(), pixelPositionX, pixelPositionY);
 			}
-			//System.out.println("RALLY TEST");
 		}
+		//System.out.println("RALLY TEST");
 	}
 	
 	/*
@@ -215,14 +218,11 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(unitGroup != null)
 		{
-			for(Unit unit: unitGroup)
+			if((unitGroup.getLast().getX() == pixelPositionX) && (unitGroup.getLast().getY() == pixelPositionY))
 			{
-				if((unit.getX() == pixelPositionX) && (unit.getY() == pixelPositionY))
-				{
-					checkReadyFlag = true;
-				}
+				checkReadyFlag = true;
 			}
-		}	
+		}
 		return checkReadyFlag;
 	}
 	

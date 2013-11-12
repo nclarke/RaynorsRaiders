@@ -108,7 +108,7 @@ public class CoreBaby extends RRAITemplate
 			}
 		}
 		//FIXME new method for handling unit attacks, needs to specify UnitTypes for attack and num of units, for now it just sends all marines
-		military.unitOperation(entrance.getCenterX(), entrance.getCenterY());
+		//military.unitOperation(entrance.getCenterX(), entrance.getCenterY());
 	}
 	
 	public void initBuildStyle_siegeExpand() {
