@@ -88,10 +88,6 @@ public class ManagerBuild extends RRAITemplate
 	// calls build() method if it finds something to construct
 	public void checkUp() 
 	{
-		////System.out.println("ManagerBuild Running");
-		System.out.println(orders.size() + " orders: " + orders.toString());
-		System.out.println("Checking if null: " + orders.toString());
-//System.out.println("built: " +builtBuildings.toString());
 		switch(bldgMode) {
 			case FIRST_POSSIBLE:
 				int i = 0;
@@ -231,7 +227,12 @@ public class ManagerBuild extends RRAITemplate
 		}
 				
 	}
-
+	
+	public void debug() {
+		System.out.println(orders.size() + " orders: " + orders.toString());
+		System.out.println("Checking if null: " + orders.toString());
+		System.out.println("built: " +builtBuildings.toString());
+	}
 	
 	public void captureBaseLocation() {
 		// Remember our homeTilePosition at the first frame
