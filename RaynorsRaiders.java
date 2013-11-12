@@ -245,12 +245,10 @@ public class RaynorsRaiders implements BWAPIEventListener
 		{
 			managerBuild.buildingBuildings.add(createdUnit);
 			
-			for(UnitTypes bldgType : managerBuild.orders)
+			UnitTypes typeToCheck = UnitTypes.values()[createdUnitType];
+			if (managerBuild.orders.contains(typeToCheck))
 			{
-				if(createdUnitType == bldgType.ordinal())
-				{
-					managerBuild.orders.removeFirstOccurrence(bldgType);
-				}
+				managerBuild.orders.removeFirstOccurrence(typeToCheck);
 			}
 		}
 	}
