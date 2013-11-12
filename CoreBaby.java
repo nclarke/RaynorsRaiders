@@ -75,11 +75,17 @@ public class CoreBaby extends RRAITemplate
 			else if (order.workersNeeded > workers.getBaseWorkers(0)) {
 				workers.trainWorker();
 			}
+			else if (bwapi.getSelf().getSupplyUsed()/2 + 10 > bwapi.getSelf().getSupplyTotal()/2) 
+			{
+				builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
+			}
 		}
 		else
 		{
-			//next phase?	
-			builder.orders.add(UnitTypes.Terran_Supply_Depot);
+			if (bwapi.getSelf().getSupplyUsed()/2 + 10 > bwapi.getSelf().getSupplyTotal()/2) 
+			{
+				builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
+			}
 		}
 
 		
