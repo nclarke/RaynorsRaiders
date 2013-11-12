@@ -50,7 +50,7 @@ public class ManagerMilitary extends RRAITemplate
 	}
 	
 	public void setup() {
-		System.out.println("ManageMilitary online");
+		//System.out.println("ManageMilitary online");
 	}
 	
 	public void startUp()
@@ -201,7 +201,7 @@ public class ManagerMilitary extends RRAITemplate
 			{
 				bwapi.move(unit.getID(), pixelPositionX, pixelPositionY);
 			}
-			System.out.println("RALLY TEST");
+			//System.out.println("RALLY TEST");
 		}
 	}
 	
@@ -238,7 +238,7 @@ public class ManagerMilitary extends RRAITemplate
 			{
 				bwapi.attack(unit.getID(), pixelPositionX, pixelPositionY);
 			}
-			System.out.println("ATTACK TEST");
+			//System.out.println("ATTACK TEST");
 		}
 	}
 	
@@ -278,7 +278,7 @@ public class ManagerMilitary extends RRAITemplate
 			rallyUnits(unitFormed, homePositionX, homePositionY);
 			attackEnemyLocation(unitFormed, pixelPositionX, pixelPositionY);
 		}
-		System.out.println("Attacked");
+		//System.out.println("Attacked");
 	}
 	
 	   // Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we

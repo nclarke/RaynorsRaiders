@@ -20,13 +20,12 @@ import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 public class ManagerBuild extends RRAITemplate
 {
 	
-	CoreReactive.BuildMode bldgMode;
-	CoreReactive.BuildMode unitsMode;
+	BuildMode bldgMode;
+	BuildMode unitsMode;
 	LinkedList<UnitTypes> orders;
 	LinkedList<UnitTypes> roster;
 	LinkedList<UnitTypes> builtBuildings;
 	LinkedList<UnitTypes> buildingBuildings;
-	//LinkedList<UnitTypes> Buildings;
 	LinkedList<BaseLocation> ourBases;
 	
 	UnitTypes tempType;
@@ -49,6 +48,11 @@ public class ManagerBuild extends RRAITemplate
 		DESTROYED, ENEMIES, ENEMIES_DESTROYED
 	}
 	
+	public enum BuildMode 
+	{
+		FIRST_POSSIBLE, BLOCKING_STACK, HOLD_ALL, RESET_BLOCKING_STACK
+	};
+	
 	private class BaseRR
 	{
 		private BaseLocation baseLoc;
@@ -70,165 +74,163 @@ public class ManagerBuild extends RRAITemplate
 
 	public void AILinkData() 
 	{
-		bldgMode = react.econ_getBuildingMode();
-		unitsMode = react.econ_getUnitsMode();
-		orders = react.econ_getBuildingStack();
-		roster = react.econ_getUnitsStack();		
+		bldgMode = BuildMode.BLOCKING_STACK;
+		unitsMode = BuildMode.FIRST_POSSIBLE;
+		orders = new LinkedList<UnitTypes>();
+		roster = new LinkedList<UnitTypes>();		
 	}
 	
 	public void setup() {
-		System.out.println("ManagerBuild Online");
+		//System.out.println("ManagerBuild Online");
 	}
 	
 	// looks for a building to construct according to the build mode
 	// calls build() method if it finds something to construct
 	public void checkUp() 
 	{
-		//System.out.println("ManagerBuild Running");
-System.out.println(orders.size() + " orders: " + orders.toString());
-System.out.println("built: " +builtBuildings.toString());
-				switch(bldgMode) {
-					case FIRST_POSSIBLE:
-						int i = 0;
-						boolean canBuild = false;
-						UnitTypes b = null;
-						UnitType bldg = null;
-						
-						// go through list until we find a buildable structure
-						while(!canBuild && orders.size() > 0 && i < orders.size())
-						{
-							b = orders.get(i);
-							bldg = bwapi.getUnitType(b.ordinal());
+		////System.out.println("ManagerBuild Running");
+		System.out.println(orders.size() + " orders: " + orders.toString());
+		System.out.println("Checking if null: " + orders.toString());
+//System.out.println("built: " +builtBuildings.toString());
+		switch(bldgMode) {
+			case FIRST_POSSIBLE:
+				int i = 0;
+				boolean canBuild = false;
+				UnitTypes b = null;
+				UnitType bldg = null;
 				
-							if(/*(!bwapi.getUnit(b.ordinal()).isBeingConstructed()) && */
-									bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
-									bwapi.getSelf().getGas() - underConstructionG() < bldg.getGasPrice()) 
-							{
-								i++;
-							}
-							else 
-							{
-								canBuild = true;
-							}
-						}
-						
-						if(canBuild)
-						{
-						   build(b);
-						}
-						else 
-						{
-							System.out.println("could not build anything in stack");
-						}
-							
-						break;
-					case BLOCKING_STACK:
-						i = 0;
-
-						if(orders.size() > 0)
-						{
-							//find first building not being constructed **** MAY NEED ADJUSTMENT
-							while(i < orders.size() && (weAreBuilding(orders.get(i).ordinal())))
-							{
-								i++;
-							}
-							System.out.println("i = " + i);
-							if(i < orders.size())
-							{
-								b = orders.get(i);
-								bldg = bwapi.getUnitType(b.ordinal());
-						
-								if(bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
-								bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
-								{
-									build(b);
-								}
-							}
-							else
-							{
-								System.out.println("everything under construction");
-							}
-						}
-						else
-						{
-							System.out.println("nothing to build");
-						}
-
-						break;
-					case HOLD_ALL:
-						System.out.println("halting construction...");
-						break;
-					default:
-						break;
-				}
-				
-				// train units
-//System.out.println("roster: " + roster.toString());
-
-				switch(unitsMode) {
-				case FIRST_POSSIBLE:
-					int i = 0;
-					boolean canTrain = false;
-					UnitTypes c = null;
-					UnitType soldier = null;
-					
-					// go through list until we find a trainable unit
-					while(!canTrain && i < roster.size())
+				// go through list until we find a buildable structure
+				while(!canBuild && orders.size() > 0 && i < orders.size())
+				{
+					b = orders.get(i);
+					bldg = bwapi.getUnitType(b.ordinal());
+		
+					if(/*(!bwapi.getUnit(b.ordinal()).isBeingConstructed()) && */
+							bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
+							bwapi.getSelf().getGas() - underConstructionG() < bldg.getGasPrice()) 
 					{
-						c = roster.get(i);
-						soldier = bwapi.getUnitType(c.ordinal());
-	// check if we have the required building used for training					
-	//					if()
-	//					{
-							if(bwapi.getSelf().getMinerals() - underConstructionM() < soldier.getMineralPrice() && 
-									bwapi.getSelf().getGas() - underConstructionG() < soldier.getGasPrice()) 
-							{
-								i++;
-							}
-							else 
-							{
-								canTrain = true;
-							}
-	//					}
-					}
-
-					
-					if(canTrain)
-					{
-					   train(c);
-					   roster.remove(i);
-					   // add unit to military list
+						i++;
 					}
 					else 
 					{
-						System.out.println("could not build anything in roster");
+						canBuild = true;
 					}
-						
-					break;
-				case BLOCKING_STACK:
-					c = null;
-					soldier = null;
-					
-					c = roster.peek();
-					soldier = bwapi.getUnitType(c.ordinal());
-					
-					if(bwapi.getSelf().getMinerals() - underConstructionM() >= soldier.getMineralPrice() && 
-							bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
-					{
-						train(c);
-						roster.pop();
-						// add units to military list
-					}
-					break;
-				case HOLD_ALL:
-					System.out.println("halting construction...");
-					break;
-				default:
-					break;
-					
 				}
 				
+				if(canBuild)
+				{
+				   build(b);
+				}
+				else 
+				{
+					//System.out.println("could not build anything in stack");
+				}
+					
+				break;
+			case BLOCKING_STACK:
+				i = 0;
+
+				if(orders.size() > 0)
+				{
+					//find first building not being constructed **** MAY NEED ADJUSTMENT
+					while(i < orders.size() && (weAreBuilding(orders.get(i).ordinal())))
+					{
+						i++;
+					}
+					//System.out.println("i = " + i);
+					if(i < orders.size())
+					{
+						b = orders.get(i);
+						bldg = bwapi.getUnitType(b.ordinal());
+				
+						if(bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
+						bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
+						{
+							if (build(b)) {
+								orders.remove(i);
+							}
+						}
+					}
+					else
+					{
+						//System.out.println("everything under construction");
+					}
+				}
+				else
+				{
+					//System.out.println("nothing to build");
+				}
+
+				break;
+			case HOLD_ALL:
+				//System.out.println("halting construction...");
+				break;
+			default:
+				break;
+		}
+
+		switch(unitsMode) {
+		case FIRST_POSSIBLE:
+			int i = 0;
+			boolean canTrain = false;
+			UnitTypes c = null;
+			UnitType soldier = null;
+			
+			// Go through list until we find a trainable unit
+			while(!canTrain && i < roster.size())
+			{
+				c = roster.get(i);
+				soldier = bwapi.getUnitType(c.ordinal());
+
+				//Need to check if we have the required building used for training					
+				if(bwapi.getSelf().getMinerals() - underConstructionM() < soldier.getMineralPrice() && 
+						bwapi.getSelf().getGas() - underConstructionG() < soldier.getGasPrice()) 
+				{
+					i++;
+				}
+				else 
+				{
+					canTrain = true;
+				}
 			}
+
+			
+			if(canTrain)
+			{
+			   train(c);
+			   roster.remove(i);
+			   // add unit to military list
+			}
+			else 
+			{
+				//System.out.println("could not build anything in roster");
+			}
+				
+			break;
+		case BLOCKING_STACK:
+			c = null;
+			soldier = null;
+			
+			c = roster.peek();
+			soldier = bwapi.getUnitType(c.ordinal());
+			
+			if(bwapi.getSelf().getMinerals() - underConstructionM() >= soldier.getMineralPrice() && 
+					bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
+			{
+				train(c);
+				roster.pop();
+				// add units to military list
+			}
+			break;
+		case HOLD_ALL:
+			//System.out.println("halting construction...");
+			break;
+		default:
+			break;
+			
+		}
+				
+	}
 
 	
 	public void captureBaseLocation() {
@@ -253,14 +255,14 @@ System.out.println("built: " +builtBuildings.toString());
 		int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
 		unitPostX = bwapi.getUnit(cc).getX();
 		unitPostY = bwapi.getUnit(cc).getY();
-		System.out.println("CC is located at: " + bwapi.getUnit(cc).getTileX() +", " + bwapi.getUnit(cc).getTileY());
+		//System.out.println("CC is located at: " + bwapi.getUnit(cc).getTileX() +", " + bwapi.getUnit(cc).getTileY());
 		for (BaseLocation bl : bwapi.getMap().getBaseLocations())
 		{
-			System.out.println("Base is: " + bl.getTx() + ", " + bl.getTy());
+			//System.out.println("Base is: " + bl.getTx() + ", " + bl.getTy());
 			if (bl.getX() == unitPostX && bl.getY() == unitPostY)
 			{
 				ourBases.add(bl);
-				System.out.println("ManagerBuild: Found our home base! Size is " + ourBases.size());
+				//System.out.println("ManagerBuild: Found our home base! Size is " + ourBases.size());
 			}
 		}
 		return ourBases.size();
@@ -278,7 +280,7 @@ System.out.println("built: " +builtBuildings.toString());
 			{
 				ourBases.add(bl);
 				workers.addBaseToBaseWorkers();
-				System.out.println("ManagerBuild: Added new base succesfully");
+				//System.out.println("ManagerBuild: Added new base succesfully");
 			}
 		}		
 	}
@@ -294,19 +296,19 @@ System.out.println("built: " +builtBuildings.toString());
 
 	public BaseLocation getBaseFromUnit(Unit curCC)
 	{
-		System.out.println("ManagerBuild: In base from unit");
-		System.out.println("Unit is at: " + curCC.getX() + ", " + curCC.getY());
+		//System.out.println("ManagerBuild: In base from unit");
+		//System.out.println("Unit is at: " + curCC.getX() + ", " + curCC.getY());
 		for (BaseLocation bl : ourBases)
 		{
-			System.out.println("Loop one");
-			System.out.println("bl is at: " + bl.getX() + ", " + bl.getY());
+			//System.out.println("Loop one");
+			//System.out.println("bl is at: " + bl.getX() + ", " + bl.getY());
 			if (curCC.getX() == bl.getX() && curCC.getY() == bl.getY())
 			{
-				System.out.println("MangerBuild: Got base from Unit");
+				//System.out.println("MangerBuild: Got base from Unit");
 				return bl;
 			}
 		}
-		System.out.println("WARNING--------------------- getBaseFromUnit eturning null");
+		//System.out.println("WARNING--------------------- getBaseFromUnit eturning null");
 		return null;
 		
 	}
@@ -355,17 +357,18 @@ System.out.println("built: " +builtBuildings.toString());
         // input: build(UnitTypes.xxxx) 
         // will build near similar building types
         // will also build add-ons (not sure if structure will attempt relocating if there's not enough room)
-	public void build(UnitTypes structure) {
-		System.out.println("Building " + structure.toString());
+	public boolean build(UnitTypes structure) {
+		//System.out.println("Building " + structure.toString());
 		UnitType bldg;
 		
 		if (structure == null)
 		{
-			return;
+			return false;
 		}
 		if (structure.ordinal() == UnitTypes.Terran_Command_Center.ordinal())
 		{
 			buildExpand();
+			return false;
 		}
 		
 		bldg = bwapi.getUnitType(structure.ordinal());
@@ -411,6 +414,7 @@ System.out.println("built: " +builtBuildings.toString());
 						if ((buildTile.x != -1) && (!weAreBuilding(bldg.getID()))) 
 						{
 							bwapi.build(worker, buildTile.x, buildTile.y, bldg.getID());
+							return true;
 							//buildingBuildings.push(bldg);
 						}
 					}
@@ -429,6 +433,7 @@ System.out.println("built: " +builtBuildings.toString());
 		{
 			react.econ_sendBuildAlert(BuildAlert.NO_MINERALS);
 		}
+		return false;
 	}
 	
 	public void buildExpand()

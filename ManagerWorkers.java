@@ -124,11 +124,11 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public void addWorker(int unitID, Unit createdFrom)
 	{
-		System.out.println("In add worker");
+		//System.out.println("In add worker");
 		BaseLocation createdBase = builder.getBaseFromUnit(createdFrom);
 		int baseToAdd;
 		int createdBaseNdx = builder.ourBases.indexOf(createdBase);
-		System.out.println("In new worker, baseNdx is " + createdBaseNdx);
+		//System.out.println("In new worker, baseNdx is " + createdBaseNdx);
 		//default is base zero which is main base
 		//by default have it set to mine
 		
@@ -144,7 +144,7 @@ public class ManagerWorkers extends RRAITemplate
 			newWorker = new Worker(unitID, baseToAdd, workerOrders.MINE);
 			addWorkerToBase(newWorker, baseToAdd);
 		}
-		System.out.println("Pushed new worker");
+		//System.out.println("Pushed new worker");
 		allWorkers.push(newWorker);
 	}
 	
@@ -165,7 +165,7 @@ public class ManagerWorkers extends RRAITemplate
 			gasWorkers = 3;
 		else
 			gasWorkers = 0;
-		System.out.println("base needs workers? " + (baseWorkers < ( (SCVS_PER_MIN_PATCH * baseMins) + gasWorkers)) );
+		//System.out.println("base needs workers? " + (baseWorkers < ( (SCVS_PER_MIN_PATCH * baseMins) + gasWorkers)) );
 		return (baseWorkers < ( (SCVS_PER_MIN_PATCH * baseMins) + gasWorkers) );
 	}
 	
@@ -191,13 +191,13 @@ public class ManagerWorkers extends RRAITemplate
 			if (baseWorkers < ( (SCVS_PER_MIN_PATCH * baseMins) + gasWorkers) )
 				return ndx;
 		}
-		System.out.println("MANAGERWORKER: All bases are full, can't assign new workers");
+		//System.out.println("MANAGERWORKER: All bases are full, can't assign new workers");
 		return rtnNdx;
 	}
 	
 	public void removeWorker(int unitID)
 	{
-		System.out.println("In lost worker");
+		//System.out.println("In lost worker");
 		int ndx = 0;
 		Worker toRemove = new Worker();
 		toRemove.unitID = unitID;
@@ -207,7 +207,7 @@ public class ManagerWorkers extends RRAITemplate
 		{
 			if (allWorkers.get(ndx).unitID == unitID)
 			{
-				System.out.println("Found remove");
+				//System.out.println("Found remove");
 				removeWorkerFromBase(allWorkers.get(ndx), allWorkers.get(ndx).asgnedBase);
 				allWorkers.remove(ndx);
 			}
@@ -296,7 +296,7 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public void handleIdle()
 	{
-		System.out.println("Handling Idle");
+		//System.out.println("Handling Idle");
 		Unit curUnit;
 		int closestId = -1;
 		
@@ -305,7 +305,7 @@ public class ManagerWorkers extends RRAITemplate
 			curUnit = bwapi.getUnit(w.unitID);
 			if (curUnit.isIdle())
 			{
-				System.out.println("Idle worker with order " + w.curOrder);
+				//System.out.println("Idle worker with order " + w.curOrder);
 				switch (w.curOrder)
 				{
 				case MINE :
@@ -316,7 +316,7 @@ public class ManagerWorkers extends RRAITemplate
 				case GAS :
 					closestId = getNearestUnit(UnitTypes.Terran_Refinery.ordinal(), (int)w.asgnedBaseX, (int)w.asgnedBaseY); 
 					//closestId = getNearestGas(curWorker.asgnedBaseX, curWorker.asgnedBaseY);
-					System.out.println("---------------------Idle Gas, Closest id is " + closestId);
+					//System.out.println("---------------------Idle Gas, Closest id is " + closestId);
 					if (closestId != -1) 
 						bwapi.rightClick(curUnit.getID(), closestId);
 					break;
@@ -333,7 +333,7 @@ public class ManagerWorkers extends RRAITemplate
 			if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal() && unit.isIdle()) // if this unit is Terran_SCV (worker) and if it is idle (not doing anything),
 			{
 				curWorker = getWorkerByID(unit.getID());
-				System.out.println("     Worker Idle with order " + curWorker.curOrder);
+				//System.out.println("     Worker Idle with order " + curWorker.curOrder);
 				switch (curWorker.curOrder)
 				{
 				case MINE :
@@ -344,7 +344,7 @@ public class ManagerWorkers extends RRAITemplate
 				case GAS :
 					closestId = getNearestUnit(UnitTypes.Terran_Refinery.ordinal(), (int)curWorker.asgnedBaseX, (int)curWorker.asgnedBaseY); 
 					//closestId = getNearestGas(curWorker.asgnedBaseX, curWorker.asgnedBaseY);
-					System.out.println("---------------------Idle Gas, Closest id is " + closestId);
+					//System.out.println("---------------------Idle Gas, Closest id is " + closestId);
 					if (closestId != -1) 
 						bwapi.rightClick(unit.getID(), closestId);
 					break;
@@ -355,7 +355,7 @@ public class ManagerWorkers extends RRAITemplate
 				}
 			}
 		}
-		System.out.println("End Handle Idle");
+		//System.out.println("End Handle Idle");
 		*/
 	}
 	

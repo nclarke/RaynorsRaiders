@@ -40,7 +40,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 	
 	public RaynorsRaiders() 
 	{
-		System.out.println("TOP of RR");
+		//System.out.println("TOP of RR");
 		bwapi = new JNIBWAPI(this);
 		
 		/* Construct builders */
@@ -68,8 +68,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 	
 	public void gameStarted()
 	{
-		System.out.println("In RaynorsRaiders");
-		System.out.println("Game Started");
+		//System.out.println("In RaynorsRaiders");
+		//System.out.println("Game Started");
 		
 
 		// allow me to manually control units during the game
@@ -80,9 +80,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 		bwapi.setGameSpeed(30);
 		
 		// analyze the map
-		System.out.println("Analyzing map... Please wait");
+		//System.out.println("Analyzing map... Please wait");
 		bwapi.loadMapData(true);
-		System.out.println("Map Analyzed");
+		//System.out.println("Map Analyzed");
 		
 		
 		
@@ -92,14 +92,14 @@ public class RaynorsRaiders implements BWAPIEventListener
 		{
 			masterUnitList.add(u);
 		}
-		System.out.println("Size of master list is " + masterUnitList.size());
+		//System.out.println("Size of master list is " + masterUnitList.size());
 		
 		coreBaby.setup();
 		coreReactive.setup();
 		managerMilitary.setup();
 		managerBuild.setup();
 		managerWorkers.setup();
-		System.out.println("Game setup complete");
+		//System.out.println("Game setup complete");
 		
 	}
 	
@@ -120,7 +120,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			if( managerBuild.baseSetup() != 1)
 			{
 				//Throw error here
-				System.out.println("ERROR: BaseSetup does not equal 1");
+				//System.out.println("ERROR: BaseSetup does not equal 1");
 			}
 			for (Unit unit : bwapi.getMyUnits()) 
 			{
@@ -129,6 +129,15 @@ public class RaynorsRaiders implements BWAPIEventListener
 					managerWorkers.startWorkers(unit.getID());
 				}
 			}
+		}
+		if (frameCount % 60 == 0) {
+			System.out.println("Checking null pointers:" + 
+		     " cR=" + coreReactive.toString() + 
+		     " cB=" + coreBaby.toString() +
+		     " mB=" + managerBuild.toString() +
+		     " mW=" + managerWorkers.toString() +
+		     " mM=" + managerMilitary.toString()
+		     );
 		}
 		
 		// Call actions every 30 frames
@@ -139,12 +148,13 @@ public class RaynorsRaiders implements BWAPIEventListener
 			coreReactive.checkUp();
 			managerBuild.checkUp();
 			managerMilitary.checkUp();
-		}	
+		}
+
 	}
 	
 	public void drawDebugInfo() 
 	{
-		//System.out.println("Start debug");
+		////System.out.println("Start debug");
 		bwapi.drawText(0, 0, "Home base location is ( " + managerBuild.homePositionX + ", "
 				+ managerBuild.homePositionY + ")", true);
 		bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
@@ -168,13 +178,13 @@ public class RaynorsRaiders implements BWAPIEventListener
 			//managerMilitary.debug();
 		}
 		
-		//System.out.println("End debug");
+		////System.out.println("End debug");
 	}
 	
 	
 	public void gameEnded() 
 	{
-		System.out.println("RaynorsRaiders: Game Ended");
+		//System.out.println("RaynorsRaiders: Game Ended");
 	}
 	/*
 	 *	Letters are in ascii so just look up ascii code for the letter you want 
@@ -193,8 +203,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 	}
 	public void matchEnded(boolean winner) 
 	{
-		System.out.println("RaynorsRaiders: Match Ended");
-		System.out.println("RaynorsRaiders: Did we win? " + winner);
+		//System.out.println("RaynorsRaiders: Match Ended");
+		//System.out.println("RaynorsRaiders: Did we win? " + winner);
 	}
 	public void nukeDetect(int x, int y) { }
 	public void nukeDetect() { }
@@ -205,7 +215,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		int createdUnitType = createdUnit.getTypeID();
 		bwapi.printText("Unit Created " + String.valueOf(unitID));
 		masterUnitList.add(bwapi.getUnit(unitID));
-		System.out.println("creating type id is " + bwapi.getUnit(unitID).getTypeID());
+		//System.out.println("creating type id is " + bwapi.getUnit(unitID).getTypeID());
 		
 		for (Unit u : bwapi.getMyUnits())
 		{
@@ -217,12 +227,12 @@ public class RaynorsRaiders implements BWAPIEventListener
 		
 		if (createdUnitType == UnitTypes.Terran_SCV.ordinal())
 		{
-			System.out.println("Created unit location " + createdUnit.getX() + ", " + createdUnit.getY());
+			//System.out.println("Created unit location " + createdUnit.getX() + ", " + createdUnit.getY());
 			managerWorkers.addWorker(unitID, createdFrom);
 		}
 		if (createdUnitType == UnitTypes.Terran_Command_Center.ordinal())
 		{
-			System.out.println("Created CC");
+			//System.out.println("Created CC");
 			managerBuild.newBaseLocation(createdUnit);
 		}
 		
@@ -236,19 +246,17 @@ public class RaynorsRaiders implements BWAPIEventListener
 			if(createdUnitType == UnitTypes.Terran_Academy.ordinal())
 			{
 				managerBuild.builtBuildings.add(UnitTypes.Terran_Academy);
-				managerBuild.orders.remove(UnitTypes.Terran_Academy);
 			}
 			else if(createdUnitType == UnitTypes.Terran_Supply_Depot.ordinal())
 			{
 				managerBuild.builtBuildings.add(UnitTypes.Terran_Supply_Depot);
-				managerBuild.orders.remove(UnitTypes.Terran_Supply_Depot);
 			}
 		}
 	}
 	public void unitDestroy(int unitID)
 	{
 		
-		System.out.println("In unit destroyed");
+		//System.out.println("In unit destroyed");
 		bwapi.printText("Unit Destroyed " + String.valueOf(unitID));
 		
 		for (Unit u : masterUnitList)
@@ -262,7 +270,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 					managerMilitary.removeMilitaryUnit(bwapi.getUnit(unitID), UnitTypes.Terran_Marine);
 				
 				masterUnitList.remove(u);
-				System.out.println("Remove succesfull");
+				//System.out.println("Remove succesfull");
 			}
 		}
 	}
