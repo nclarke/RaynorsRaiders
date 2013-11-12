@@ -130,15 +130,6 @@ public class RaynorsRaiders implements BWAPIEventListener
 				}
 			}
 		}
-		if (frameCount % 60 == 0) {
-			System.out.println("Checking null pointers:" + 
-		     " cR=" + coreReactive.toString() + 
-		     " cB=" + coreBaby.toString() +
-		     " mB=" + managerBuild.toString() +
-		     " mW=" + managerWorkers.toString() +
-		     " mM=" + managerMilitary.toString()
-		     );
-		}
 		
 		// Call actions every 30 frames
 		if (frameCount % 30 == 0) 
