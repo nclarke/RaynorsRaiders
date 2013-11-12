@@ -227,8 +227,10 @@ public class RaynorsRaiders implements BWAPIEventListener
 			managerBuild.newBaseLocation(createdUnit);
 		}
 		
-		if (createdUnitType == UnitTypes.Terran_Marine.ordinal()) 
-			managerMilitary.addMilitaryUnit(bwapi.getUnit(unitID), UnitTypes.Terran_Marine);
+		if (createdUnitType == UnitTypes.Terran_Marine.ordinal())
+		{
+			managerMilitary.addMilitaryUnit(createdUnit, UnitTypes.Terran_Marine);
+		}
 		
 		// needs to be extended for all buildings
 		// is there a function that can return UnitTypes?
@@ -258,7 +260,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 					managerWorkers.removeWorker(unitID);
 				
 				if (u.getTypeID() == UnitTypes.Terran_Marine.ordinal())
+				{
 					managerMilitary.removeMilitaryUnit(bwapi.getUnit(unitID), UnitTypes.Terran_Marine);
+				}
 				
 				masterUnitList.remove(u);
 				//System.out.println("Remove succesfull");

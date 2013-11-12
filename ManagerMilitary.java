@@ -38,6 +38,7 @@ public class ManagerMilitary extends RRAITemplate
 	public ManagerMilitary()
 	{		
 		militaryUnits = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
+		initMilitaryUnit();
 		scouter = new MiltScouter(this);
 	}
 	
@@ -57,6 +58,14 @@ public class ManagerMilitary extends RRAITemplate
 	public void checkUp() {
 		//Check up - FIXME - code needs to go here.
 		this.scouter.scout();
+		
+		/*for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
+		{
+			if (b.isStartLocation() )
+			{
+				unitOperation(b.getX(), b.getY());
+			}
+		}*/
 	}
 	
     public void debug()
@@ -73,7 +82,7 @@ public class ManagerMilitary extends RRAITemplate
 			spacing =+ 10;
 		}
 		
-		bwapi.drawText(new Point(5,120), "Total Marines trained: " + String.valueOf(getCurrentUnitCount(UnitTypes.Terran_Marine)), true);
+		//bwapi.drawText(new Point(5,120), "Total Marines trained: " + String.valueOf(getCurrentUnitCount(UnitTypes.Terran_Marine)), true);
     }
     
 	public void setHomePosition()
@@ -93,16 +102,28 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
+	
+	public void initMilitaryUnit()
+	{
+		for(UnitTypes ut: UnitTypes.values())
+		{
+			LinkedList<Unit> tmp = new LinkedList<Unit>();
+			militaryUnits.put(ut, tmp);
+		}
+	}
+	
 	public void addMilitaryUnit(Unit unitObj, UnitTypes unitType)
 	{
-		//FIXME - causing crashes
-		//militaryUnits.get(unitType).add(unitObj);
+		System.out.println("Adding unit to militaryUnit");
+		militaryUnits.get(unitType).add(unitObj);
+		System.out.println("Added unit to militaryUnit");
 	}
 	
 	public void removeMilitaryUnit(Unit unitObj, UnitTypes unitType)
 	{
-		//FIXME - causing crashes
-		//militaryUnits.get(unitType).remove(unitObj);
+		System.out.println("Removing unit in militaryUnit");
+		militaryUnits.get(unitType).remove(unitObj);
+		System.out.println("Removd unit in militaryUnit");
 	}
 	
 	/*
@@ -141,8 +162,9 @@ public class ManagerMilitary extends RRAITemplate
 		
 		for(Unit ut: militaryUnits.get(UnitTypes.Terran_Marine))
 		{
-			if(ut.isIdle())
+			if(tmp.size() < 12)
 			{
+				if(ut.isIdle())
 				tmp.add(ut);
 			}
 		}
