@@ -44,20 +44,24 @@ public class CoreBaby extends RRAITemplate
 	public void checkUp() 
 	{
 		/* Check and add to build orders if we can */
-		for (BuildOrder order: buildingGoals) {
-			if (
-			 order.supplyNeeded <= bwapi.getSelf().getSupplyTotal() //&&
-			 //order.workersNeeded <= workers.getBaseWorkers(order.baseID)
-			) {
-				builder.orders.addLast(order.unitToMake);
-				buildingGoals.remove(order);
-				//System.out.println("Adding order to make" + order.unitToMake.toString());
+		if (buildingGoals.size() > 0) {
+			for (BuildOrder order: buildingGoals) {
+				if (
+				 order.supplyNeeded <= bwapi.getSelf().getSupplyTotal() //&&
+				 //order.workersNeeded <= workers.getBaseWorkers(order.baseID)
+				) {
+					builder.orders.addLast(order.unitToMake);
+					buildingGoals.remove(order);
+					//System.out.println("Adding order to make" + order.unitToMake.toString());
+				}
 			}
 		}
 		
 		/* Add workers if we need to, ALL of the workers */
 		//if (workers.getBaseWorkers(0) < bwapi.getSelf().getSupplyTotal()) {
-			builder.roster.addLast(UnitTypes.Terran_SCV);
+			if (react.gen_findUnits(UnitTypes.Terran_SCV).size() < 28) {
+				builder.roster.addLast(UnitTypes.Terran_SCV);
+			}
 			builder.roster.addLast(UnitTypes.Terran_Marine);
 			builder.roster.addLast(UnitTypes.Terran_Vulture);
 			

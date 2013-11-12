@@ -6,6 +6,7 @@ import javabot.JNIBWAPI;
 import javabot.types.*;
 import javabot.types.UnitType.UnitTypes;
 import javabot.util.*;
+import javabot.RaynorsRaiders.CoreBaby.BuildOrder;
 import javabot.model.*;
 
 public class CoreReactive extends RRAITemplate 
@@ -34,6 +35,11 @@ public class CoreReactive extends RRAITemplate
 	/* This is to be run frequently, and is the quick-decider for things such as resources */
 	public void checkUp() 
 	{
+		for (BuildAlert alert: core_econ_buildAlerts) {
+			if (alert == BuildAlert.NO_ROOM) {
+				builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
+			}
+		}
 	}
 	
 	public void debug() 
