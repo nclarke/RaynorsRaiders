@@ -38,10 +38,7 @@ public class CoreReactive extends RRAITemplate
 		/** Adds supply depots every so often to make sure that we can still build **/
 		if (bwapi.getSelf().getSupplyUsed() + 5 >= bwapi.getSelf().getSupplyTotal()
 			&& bwapi.getSelf().getSupplyTotal() < 200
-			&& (
-				(builder.orders.size() > 0 && builder.orders.peekFirst() != UnitTypes.Terran_Supply_Depot)
-				|| builder.orders.size() <= 0
-			   )
+			&& builder.orders.indexOf(UnitTypes.Terran_Supply_Depot) != -1
 			) {
 			builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
 		}
