@@ -72,7 +72,7 @@ public class CoreBaby extends RRAITemplate
 				//System.out.println("Adding order to make" + order.unitToMake.toString());
 				buildingGoals.remove(order);
 			}
-			else if (order.workersNeeded <= workers.getBaseWorkers(0)) {
+			else if (order.workersNeeded > workers.getBaseWorkers(0)) {
 				workers.trainWorker();
 			}
 		}
