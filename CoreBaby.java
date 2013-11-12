@@ -75,7 +75,9 @@ public class CoreBaby extends RRAITemplate
 			else if (order.workersNeeded > workers.getBaseWorkers(0)) {
 				workers.trainWorker();
 			}
-			else if (bwapi.getSelf().getSupplyUsed()/2 + 10 > bwapi.getSelf().getSupplyTotal()/2) 
+			else if (
+			 bwapi.getSelf().getSupplyUsed()/2 + 10 > bwapi.getSelf().getSupplyTotal()/2
+			 && builder.orders.getFirst() != UnitTypes.Terran_Supply_Depot) 
 			{
 				builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
 			}
@@ -92,6 +94,9 @@ public class CoreBaby extends RRAITemplate
 		/* Add units */
 		
 		builder.roster.addLast(UnitTypes.Terran_Marine);
+		builder.roster.addLast(UnitTypes.Terran_Marine);
+		builder.roster.addLast(UnitTypes.Terran_Marine);
+		//builder.roster.addLast(UnitTypes.Terran_Medic);
 		builder.roster.addLast(UnitTypes.Terran_Vulture);
 	}
 	
@@ -113,8 +118,18 @@ public class CoreBaby extends RRAITemplate
 			entrance = (react.gen_findClosestRegion(military.homePositionX, military.homePositionY)).getChokePoints().get(0);
 			}
 		}
+		LinkedList<UnitTypes> unitList = new LinkedList<UnitTypes>();
+		unitList.add(UnitTypes.Terran_Marine);
+		//unitList.add(UnitTypes.Terran_Medic);
+		unitList.add(UnitTypes.Terran_Vulture);
+		
 		//FIXME new method for handling unit attacks, needs to specify UnitTypes for attack and num of units, for now it just sends all marines
-		//military.unitOperation(entrance.getCenterX(), entrance.getCenterY());
+		military.unitOperation(
+		 unitList,
+		 20,
+		 entrance.getCenterX(), 
+		 entrance.getCenterY()
+		);
 	}
 	
 	public void initBuildStyle_siegeExpand() {
