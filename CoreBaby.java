@@ -72,15 +72,21 @@ public class CoreBaby extends RRAITemplate
 				//System.out.println("Adding order to make" + order.unitToMake.toString());
 				buildingGoals.remove(order);
 			}
-			else if (order.workersNeeded > workers.getBaseWorkers(0)) {
+			System.out.println("Adding workers?");
+			if (order.workersNeeded > workers.getBaseWorkers(0)) 
+			{	
 				workers.trainWorker();
 			}
-			else if (
-			 bwapi.getSelf().getSupplyUsed()/2 + 10 > bwapi.getSelf().getSupplyTotal()/2
-			 && builder.orders.getFirst() != UnitTypes.Terran_Supply_Depot) 
+			if (
+			 bwapi.getSelf().getSupplyUsed()/2 + 10 > bwapi.getSelf().getSupplyTotal()/2) 
 			{
-				builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
+				//System.out.println("Supply depot needed");
+				if (builder.orders.peek() != UnitTypes.Terran_Supply_Depot) {
+					System.out.println("Adding supply depot since supply is running out");
+					builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
+				}
 			}
+			
 		}
 		else
 		{
@@ -94,10 +100,10 @@ public class CoreBaby extends RRAITemplate
 		/* Add units */
 		
 		builder.roster.addLast(UnitTypes.Terran_Marine);
-		builder.roster.addLast(UnitTypes.Terran_Marine);
-		builder.roster.addLast(UnitTypes.Terran_Marine);
 		//builder.roster.addLast(UnitTypes.Terran_Medic);
 		builder.roster.addLast(UnitTypes.Terran_Vulture);
+		
+		initEntrenchBase();
 	}
 	
 	public void debug() 
@@ -111,7 +117,7 @@ public class CoreBaby extends RRAITemplate
 		if (baseStart != null) {
 			if (react.gen_findClosestRegion(military.homePositionX, military.homePositionY).getChokePoints().isEmpty())
 			{
-				
+				System.out.println("No chokepoint?");
 			}
 			else 
 			{
@@ -126,7 +132,7 @@ public class CoreBaby extends RRAITemplate
 		//FIXME new method for handling unit attacks, needs to specify UnitTypes for attack and num of units, for now it just sends all marines
 		military.unitOperation(
 		 unitList,
-		 20,
+		 2,
 		 entrance.getCenterX(), 
 		 entrance.getCenterY()
 		);
