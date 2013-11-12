@@ -242,13 +242,14 @@ public class RaynorsRaiders implements BWAPIEventListener
 		// is there a function that can return UnitTypes?
 		if(bwapi.getUnitType(createdUnitType).isBuilding())
 		{
-			if(createdUnitType == UnitTypes.Terran_Academy.ordinal())
+			managerBuild.buildingBuildings.add(createdUnit);
+			
+			for(UnitTypes bldgType : managerBuild.orders)
 			{
-				managerBuild.builtBuildings.add(UnitTypes.Terran_Academy);
-			}
-			else if(createdUnitType == UnitTypes.Terran_Supply_Depot.ordinal())
-			{
-				managerBuild.builtBuildings.add(UnitTypes.Terran_Supply_Depot);
+				if(createdUnitType == bldgType.ordinal())
+				{
+					managerBuild.orders.removeFirstOccurrence(bldgType);
+				}
 			}
 		}
 	}

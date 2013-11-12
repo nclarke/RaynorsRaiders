@@ -24,8 +24,8 @@ public class ManagerBuild extends RRAITemplate
 	BuildMode unitsMode;
 	LinkedList<UnitTypes> orders;
 	LinkedList<UnitTypes> roster;
-	LinkedList<UnitTypes> builtBuildings;
-	LinkedList<UnitTypes> buildingBuildings;
+	LinkedList<Unit> builtBuildings;
+	LinkedList<Unit> buildingBuildings;
 	LinkedList<BaseLocation> ourBases;
 	
 	UnitTypes tempType;
@@ -37,8 +37,8 @@ public class ManagerBuild extends RRAITemplate
 	public ManagerBuild() {
 		//SET UP ALL INTERNAL VARIABLES HERE
 		super();
-		builtBuildings = new LinkedList<UnitTypes>();
-		builtBuildings.push(UnitTypes.Terran_Command_Center);
+		builtBuildings = new LinkedList<Unit>();
+		buildingBuildings = new LinkedList<Unit>();
 		ourBases = new LinkedList<BaseLocation>();
 		bldgMode = BuildMode.BLOCKING_STACK;
 		unitsMode = BuildMode.FIRST_POSSIBLE;
@@ -83,12 +83,48 @@ public class ManagerBuild extends RRAITemplate
 	
 	public void setup() {
 		//System.out.println("ManagerBuild Online");
+		for(Unit unit : bwapi.getMyUnits())
+		{
+			if(unit.getTypeID() == UnitTypes.Terran_Command_Center.ordinal())
+			{
+				builtBuildings.add(unit);
+			}
+		}
 	}
 	
+	public void constructionStatus()
+	{
+		for(Unit bldg : buildingBuildings)
+		{
+//System.out.println(bwapi.getUnitType(bldg.getTypeID()).getName() + " ready in " + bldg.getRemainingBuildTimer());
+			if(bldg.getRemainingBuildTimer() == 0)
+			{
+				builtBuildings.add(bldg);
+				buildingBuildings.remove(bldg);
+			}
+		}
+	}
 	// looks for a building to construct according to the build mode
 	// calls build() method if it finds something to construct
 	public void checkUp() 
 	{
+/*
+System.out.println("orders: " + orders.toString());
+System.out.print("under construction: ");
+for(Unit bldg : buildingBuildings)
+{
+	UnitType btype = bwapi.getUnitType(bldg.getTypeID());
+	System.out.print(btype.getName() + " ");
+}
+System.out.println();
+System.out.println("completed buildings:");
+for(Unit bldg : builtBuildings)
+{
+	UnitType btype = bwapi.getUnitType(bldg.getTypeID());
+	System.out.print(btype.getName() + " ");
+}
+*/
+        // building construction
 		switch(bldgMode) {
 			case FIRST_POSSIBLE:
 				int i = 0;
@@ -102,8 +138,7 @@ public class ManagerBuild extends RRAITemplate
 					b = orders.get(i);
 					bldg = bwapi.getUnitType(b.ordinal());
 		
-					if(/*(!bwapi.getUnit(b.ordinal()).isBeingConstructed()) && */
-							bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
+					if(weAreBuilding(b.ordinal()) && bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
 							bwapi.getSelf().getGas() - underConstructionG() < bldg.getGasPrice()) 
 					{
 						i++;
@@ -134,7 +169,7 @@ public class ManagerBuild extends RRAITemplate
 					{
 						i++;
 					}
-					//System.out.println("i = " + i);
+					
 					if(i < orders.size())
 					{
 						b = orders.get(i);
@@ -143,9 +178,7 @@ public class ManagerBuild extends RRAITemplate
 						if(bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
 						bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
 						{
-							if (build(b)) {
-								orders.remove(i);
-							}
+							build(b);
 						}
 					}
 					else
@@ -166,6 +199,9 @@ public class ManagerBuild extends RRAITemplate
 				break;
 		}
 
+		constructionStatus();
+		
+		// unit training
 		switch(unitsMode) {
 		case FIRST_POSSIBLE:
 			int i = 0;
