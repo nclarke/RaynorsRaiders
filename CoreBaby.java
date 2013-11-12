@@ -46,8 +46,8 @@ public class CoreBaby extends RRAITemplate
 		/* Check and add to build orders if we can */
 		for (BuildOrder order: buildingGoals) {
 			if (
-			 order.supplyNeeded <= bwapi.getSelf().getSupplyTotal() &&
-			 order.workersNeeded <= workers.getBaseWorkers(order.baseID)
+			 order.supplyNeeded <= bwapi.getSelf().getSupplyTotal() //&&
+			 //order.workersNeeded <= workers.getBaseWorkers(order.baseID)
 			) {
 				builder.orders.addLast(order.unitToMake);
 				buildingGoals.remove(order);
@@ -56,9 +56,9 @@ public class CoreBaby extends RRAITemplate
 		}
 		
 		/* Add workers if we need to, ALL of the workers */
-		if (workers.getBaseWorkers(0) < bwapi.getSelf().getSupplyTotal()) {
+		//if (workers.getBaseWorkers(0) < bwapi.getSelf().getSupplyTotal()) {
 			builder.roster.addLast(UnitTypes.Terran_SCV);
-		}
+		//}
 	}
 	
 	public void debug() 
