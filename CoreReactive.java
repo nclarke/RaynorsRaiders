@@ -67,38 +67,4 @@ public class CoreReactive extends RRAITemplate
 		}
 		return listToBuild;
 	}
-	
-	public Region gen_findClosestRegion(Integer d_x, Integer d_y) 
-	{
-		Region winningRegion = null;
-		Double distanceFromWinning;
-		Double distanceFromWorking;
-		for (Region workingRegion : bwapi.getMap().getRegions()) 
-		{
-			if (winningRegion != null) 
-			{
-				distanceFromWinning = 
-				 Math.sqrt(
-				  Math.abs(d_x - winningRegion.getCenterX()) +
-				  Math.abs(d_y - winningRegion.getCenterY())
-				 );
-				distanceFromWorking = 
-				 Math.sqrt(
-				  Math.abs(d_x - workingRegion.getCenterX()) +
-				  Math.abs(d_y - workingRegion.getCenterY())
-				 );
-				if (distanceFromWorking > distanceFromWinning) 
-				{
-					winningRegion = workingRegion;
-				}
-			}
-			else
-			{
-				winningRegion = workingRegion;
-			}
-		}
-		
-		return winningRegion;
-	}
-	
 }

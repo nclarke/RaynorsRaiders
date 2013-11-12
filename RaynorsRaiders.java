@@ -107,21 +107,6 @@ public class RaynorsRaiders implements BWAPIEventListener
 	public void gameUpdate() 
 	{
 		Integer frameCount = bwapi.getFrameCount();
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-		/* Update Internal Mineral Counts */
-		/*ref_minerals += (bwapi.getSelf().getMinerals() - prev_minerals);
-		prev_minerals = bwapi.getSelf().getMinerals();
-		ref_gas += (bwapi.getSelf().getGas() - prev_gas);
-		prev_gas = bwapi.getSelf().getGas();*/
-		/* possibly resync */
-=======
->>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
-=======
->>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
-=======
->>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
 		
 		 //Draw debug information on screen
 		if (debgFlag)
@@ -144,23 +129,6 @@ public class RaynorsRaiders implements BWAPIEventListener
 					managerWorkers.startWorkers(unit.getID());
 				}
 			}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-			
-			/* Set up all minerals and gas */
-			//ref_supplyUsed = bwapi.getSelf().getSupplyUsed() / 2;
-			//ref_supplyTotal = bwapi.getSelf().getSupplyTotal() / 2;
-			/*ref_minerals = bwapi.getSelf().getMinerals(); 
-			ref_gas = bwapi.getSelf().getGas();
-			prev_minerals = ref_minerals;
-			prev_gas = ref_gas;*/
-=======
->>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
-=======
->>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
-=======
->>>>>>> parent of f6c2751... Added in a gas/mineral count that we can deplete so we dont oversubscribe our rescources.
 		}
 		
 		// Call actions every 30 frames
@@ -168,7 +136,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		{
 			managerWorkers.handleIdle();
 			coreBaby.checkUp();
-			coreReactive.checkUp();
+			//coreReactive.checkUp();
 			managerBuild.checkUp();
 			managerMilitary.checkUp();
 		}
@@ -268,11 +236,11 @@ public class RaynorsRaiders implements BWAPIEventListener
 		{
 			if(createdUnitType == UnitTypes.Terran_Academy.ordinal())
 			{
-			//	managerBuild.builtBuildings.add(UnitTypes.Terran_Academy);
+				managerBuild.builtBuildings.add(UnitTypes.Terran_Academy);
 			}
 			else if(createdUnitType == UnitTypes.Terran_Supply_Depot.ordinal())
 			{
-			//	managerBuild.builtBuildings.add(UnitTypes.Terran_Supply_Depot);
+				managerBuild.builtBuildings.add(UnitTypes.Terran_Supply_Depot);
 			}
 		}
 	}

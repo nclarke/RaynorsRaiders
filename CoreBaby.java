@@ -1,18 +1,13 @@
 package javabot.RaynorsRaiders;
 
 import java.util.*;
-
 import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.*;
-import javabot.model.ChokePoint;
-import javabot.model.Region;
 import javabot.types.UnitType.UnitTypes;
 
 public class CoreBaby extends RRAITemplate 
 {
 	LinkedList<BuildOrder> buildingGoals;
-	LinkedList<MilitaryOrder> militaryGoals;
-	LinkedList<UnitTypes> unitMixtures;
 	//LinkedList<Orders> unitGoals;
 	
 	public class BuildOrder {
@@ -33,13 +28,6 @@ public class CoreBaby extends RRAITemplate
 		}
 	}
 	
-	public class MilitaryOrder {
-		Integer strength;
-		boolean entrench;
-		boolean choke;
-		Integer wobble;
-	}
-	
 	public CoreBaby() 
 	{
 		buildingGoals = new LinkedList<BuildOrder>();
@@ -50,13 +38,11 @@ public class CoreBaby extends RRAITemplate
 		//System.out.println("CoreBaby Online");
 		// Now populate the buildingStack
 		initBuildStyle_siegeExpand();
-		initEntrenchBase();
 	}
 	
 	
 	public void checkUp() 
 	{
-		/* --- Base Building --- */
 		/* Check and add to build orders if we can */
 		BuildOrder order = buildingGoals.peek();
 		
@@ -69,37 +55,39 @@ public class CoreBaby extends RRAITemplate
 			 order.workersNeeded <= workers.getBaseWorkers(0)
 			) {
 				builder.orders.addLast(order.unitToMake);
-				//System.out.println("Adding order to make" + order.unitToMake.toString());
+				System.out.println("Adding order to make" + order.unitToMake.toString());
 				buildingGoals.remove(order);
 			}
-			else if (order.workersNeeded > workers.getBaseWorkers(0)) {
-				workers.trainWorker();
-			}
+			
 		}
 		else
 		{
-			//next phase?	
+			//next phase?
+			
 		}
+		
+		/*if (
+		    (builder.orders.peek() != UnitTypes.Terran_Supply_Depot && bwapi.getSelf().getSupplyUsed()/2 + 5 >= bwapi.getSelf().getSupplyTotal()/2)
+		   )
+		{
+			builder.orders.addLast(UnitTypes.Terran_Supply_Depot);
+		}*/
 
 		
-		/* Add units */
-		
+		/* Add workers if we need to, ALL of the workers */
+		//if (workers.getBaseWorkers(0) < bwapi.getSelf().getSupplyTotal()) {
+		if (workers.getBaseWorkers(0) < 21) {
+			workers.trainWorker();
+		}
 		builder.roster.addLast(UnitTypes.Terran_Marine);
 		builder.roster.addLast(UnitTypes.Terran_Vulture);
+			
+		//}
 	}
 	
 	public void debug() 
 	{
 		//Put debug info here for the Baby
-	}
-	
-	public void initEntrenchBase() {
-		ChokePoint entrance = null;
-		Region baseStart = react.gen_findClosestRegion(military.homePositionX, military.homePositionY);
-		if (baseStart != null) {
-			entrance = (react.gen_findClosestRegion(military.homePositionX, military.homePositionY)).getChokePoints().get(0);
-		}
-		military.attackOperation(entrance.getCenterX(), entrance.getCenterY());
 	}
 	
 	public void initBuildStyle_siegeExpand() {
