@@ -107,17 +107,18 @@ public class CoreBaby extends RRAITemplate
 				//System.out.println("Adding order to make" + order.unitToMake.toString());
 				buildingGoals.remove(order);
 			}
-			System.out.println("Adding workers?");
+			
 			if (order.workersNeeded > workers.getBaseWorkers(0)) 
 			{	
 				workers.trainWorker();
 			}
+			
 			if (
 			 bwapi.getSelf().getSupplyUsed()/2 + 10 > bwapi.getSelf().getSupplyTotal()/2) 
 			{
 				//System.out.println("Supply depot needed");
 				if (builder.orders.peek() != UnitTypes.Terran_Supply_Depot) {
-					System.out.println("Adding supply depot since supply is running out");
+					//System.out.println("Adding supply depot since supply is running out");
 					builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
 				}
 			}
@@ -136,8 +137,11 @@ public class CoreBaby extends RRAITemplate
 		
 		if (unit != null)
 		{
-			builder.roster.addLast(unit);
-			unitMixtures.pop();
+			builder.roster.addLast(UnitTypes.Terran_Marine);
+			builder.roster.addLast(UnitTypes.Terran_Vulture);
+			
+			//builder.roster.addLast(unit);
+			//unitMixtures.pop();
 		}
 		
 		/* Military Orders */
@@ -164,6 +168,7 @@ public class CoreBaby extends RRAITemplate
 	public void initUnitStyle_basic()
 	{
 		for (int i = 0; i < 20; i++) {
+			System.out.println("Adding units");
 			unitMixtures.add(UnitTypes.Terran_Marine);
 			unitMixtures.add(UnitTypes.Terran_Vulture);
 		}

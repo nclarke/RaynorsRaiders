@@ -257,6 +257,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		
 		//System.out.println("In unit destroyed");
 		bwapi.printText("Unit Destroyed " + String.valueOf(unitID));
+		Unit taggedForDeath = null;
 		
 		for (Unit u : masterUnitList)
 		{
@@ -269,11 +270,10 @@ public class RaynorsRaiders implements BWAPIEventListener
 				{
 					managerMilitary.removeMilitaryUnit(bwapi.getUnit(unitID), UnitTypes.Terran_Marine);
 				}
-				
-				masterUnitList.remove(u);
-				//System.out.println("Remove succesfull");
+				taggedForDeath = u;
 			}
 		}
+		masterUnitList.remove(taggedForDeath);
 	}
 	public void unitDiscover(int unitID) { }
 	public void unitEvade(int unitID) { }

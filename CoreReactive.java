@@ -80,7 +80,7 @@ public class CoreReactive extends RRAITemplate
 				distanceFromWinning = 
 				 Math.sqrt(
 				  Math.pow(Math.abs(d_x - winningRegion.getCenterX()), 2) +
-				  Math.pow(Math.abs(d_y - winningRegion.getCenterY()), 2)
+				Math.pow(Math.abs(d_y - winningRegion.getCenterY()), 2)
 				 );
 				distanceFromWorking = 
 				 Math.sqrt(
