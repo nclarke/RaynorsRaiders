@@ -258,11 +258,11 @@ public class RaynorsRaiders implements BWAPIEventListener
 		{
 			if(createdUnitType == UnitTypes.Terran_Academy.ordinal())
 			{
-				managerBuild.builtBuildings.add(UnitTypes.Terran_Academy);
+			//	managerBuild.builtBuildings.add(UnitTypes.Terran_Academy);
 			}
 			else if(createdUnitType == UnitTypes.Terran_Supply_Depot.ordinal())
 			{
-				managerBuild.builtBuildings.add(UnitTypes.Terran_Supply_Depot);
+			//	managerBuild.builtBuildings.add(UnitTypes.Terran_Supply_Depot);
 			}
 		}
 	}
