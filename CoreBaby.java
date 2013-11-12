@@ -6,6 +6,7 @@ import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.*;
 import javabot.model.ChokePoint;
 import javabot.model.Region;
+import javabot.types.UnitType;
 import javabot.types.UnitType.UnitTypes;
 
 public class CoreBaby extends RRAITemplate 
@@ -13,7 +14,6 @@ public class CoreBaby extends RRAITemplate
 	LinkedList<BuildOrder> buildingGoals;
 	LinkedList<MilitaryOrder> militaryGoals;
 	LinkedList<UnitTypes> unitMixtures;
-	//LinkedList<Orders> unitGoals;
 	
 	public class BuildOrder {
 		Integer supplyNeeded;
@@ -33,23 +33,59 @@ public class CoreBaby extends RRAITemplate
 		}
 	}
 	
+	public enum BattleMode
+	{
+		ENTRENCH, MARAUD, RAZE
+	}
+	
+	public enum BattleTargets
+	{
+		MILITARY, INNOCENTS, ALL
+	}
+	
 	public class MilitaryOrder {
 		Integer strength;
-		boolean entrench;
-		boolean choke;
+		Integer x,y;
 		Integer wobble;
+		BattleMode mode;
+		BattleTargets target;
+		LinkedList<UnitTypes> units;
+		
+		public MilitaryOrder(
+		 Integer d_strength,
+		 Integer d_xLoc,
+		 Integer d_yLoc,
+		 Integer d_wobble,
+		 BattleMode d_mode,
+		 BattleTargets d_target,
+		 LinkedList<UnitTypes> d_units)
+		{
+			strength = d_strength;
+			x = d_xLoc;
+			y = d_yLoc;
+			wobble = d_wobble;
+			mode = d_mode;
+			target = d_target;
+			units = d_units;
+		}
 	}
 	
 	public CoreBaby() 
 	{
 		buildingGoals = new LinkedList<BuildOrder>();
+		militaryGoals = new LinkedList<MilitaryOrder>();
+		unitMixtures = new LinkedList<UnitTypes>();
 	}
 	
 	public void setup() 
 	{
-		//System.out.println("CoreBaby Online");
-		// Now populate the buildingStack
+		//Begin tactics path
 		initBuildStyle_siegeExpand();
+		initUnitStyle_basic();
+	}
+	
+	public void startUp()
+	{
 		initEntrenchBase();
 	}
 	
@@ -57,7 +93,6 @@ public class CoreBaby extends RRAITemplate
 	public void checkUp() 
 	{
 		/* --- Base Building --- */
-		/* Check and add to build orders if we can */
 		BuildOrder order = buildingGoals.peek();
 		
 		if (order != null) {
@@ -95,20 +130,44 @@ public class CoreBaby extends RRAITemplate
 				builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
 			}
 		}
-
 		
 		/* Add units */
+		UnitTypes unit = unitMixtures.peek();
 		
-		builder.roster.addLast(UnitTypes.Terran_Marine);
-		//builder.roster.addLast(UnitTypes.Terran_Medic);
-		builder.roster.addLast(UnitTypes.Terran_Vulture);
+		if (unit != null)
+		{
+			builder.roster.addLast(unit);
+			unitMixtures.pop();
+		}
 		
-		initEntrenchBase();
+		/* Military Orders */
+		MilitaryOrder groundPound = militaryGoals.peek();
+		
+		if (groundPound != null)
+		{
+			if (true)
+			{
+				military.unitOperation(groundPound.units, groundPound.strength, groundPound.x, groundPound.y);
+				militaryGoals.pop();
+			}
+		}
+		
+
+		
 	}
 	
 	public void debug() 
 	{
 		//Put debug info here for the Baby
+	}
+	
+	public void initUnitStyle_basic()
+	{
+		for (int i = 0; i < 20; i++) {
+			unitMixtures.add(UnitTypes.Terran_Marine);
+			unitMixtures.add(UnitTypes.Terran_Vulture);
+		}
+		
 	}
 	
 	public void initEntrenchBase() {
@@ -126,15 +185,18 @@ public class CoreBaby extends RRAITemplate
 		}
 		LinkedList<UnitTypes> unitList = new LinkedList<UnitTypes>();
 		unitList.add(UnitTypes.Terran_Marine);
-		//unitList.add(UnitTypes.Terran_Medic);
 		unitList.add(UnitTypes.Terran_Vulture);
 		
-		//FIXME new method for handling unit attacks, needs to specify UnitTypes for attack and num of units, for now it just sends all marines
-		military.unitOperation(
-		 unitList,
-		 2,
-		 entrance.getCenterX(), 
-		 entrance.getCenterY()
+		militaryGoals.add(
+		 new MilitaryOrder(
+		  5,
+		  entrance.getFirstSideX(),
+		  entrance.getFirstSideY(),
+		  0,
+		  BattleMode.ENTRENCH,
+		  BattleTargets.ALL,
+		  unitList
+		 )
 		);
 	}
 	

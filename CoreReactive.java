@@ -79,13 +79,13 @@ public class CoreReactive extends RRAITemplate
 			{
 				distanceFromWinning = 
 				 Math.sqrt(
-				  Math.abs(d_x - winningRegion.getCenterX()) +
-				  Math.abs(d_y - winningRegion.getCenterY())
+				  Math.pow(Math.abs(d_x - winningRegion.getCenterX()), 2) +
+				  Math.pow(Math.abs(d_y - winningRegion.getCenterY()), 2)
 				 );
 				distanceFromWorking = 
 				 Math.sqrt(
-				  Math.abs(d_x - workingRegion.getCenterX()) +
-				  Math.abs(d_y - workingRegion.getCenterY())
+				  Math.pow(Math.abs(d_x - workingRegion.getCenterX()), 2) +
+				  Math.pow(Math.abs(d_y - workingRegion.getCenterY()), 2)
 				 );
 				if (distanceFromWorking > distanceFromWinning) 
 				{

@@ -135,6 +135,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 					managerWorkers.startWorkers(unit.getID());
 				}
 			}
+			coreBaby.startUp();
 		}
 		
 		// Call actions every 30 frames
