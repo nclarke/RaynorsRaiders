@@ -17,8 +17,8 @@ public class CoreBaby extends RRAITemplate
 		Integer baseID;
 		
 		public BuildOrder(
-	     Integer d_supply,
-	     Integer d_workers,
+		 Integer d_workers, 
+		 Integer d_supply,
 	     UnitTypes d_unit,
 	     Integer d_base) {
 			supplyNeeded = d_supply;
@@ -44,28 +44,43 @@ public class CoreBaby extends RRAITemplate
 	public void checkUp() 
 	{
 		/* Check and add to build orders if we can */
-		if (buildingGoals.size() > 0) {
-			for (BuildOrder order: buildingGoals) {
-				if (
-				 order.supplyNeeded <= bwapi.getSelf().getSupplyTotal() &&
-				 order.workersNeeded <= workers.getBaseWorkers(0)
-				) {
-					builder.orders.addLast(order.unitToMake);
-					buildingGoals.remove(order);
-					//System.out.println("Adding order to make" + order.unitToMake.toString());
-				}
+		BuildOrder order = buildingGoals.peek();
+		
+		if (order != null) {
+			System.out.println("Order on top: " + order.supplyNeeded + "/" + order.workersNeeded
+			 + " Comp: " + bwapi.getSelf().getSupplyTotal()/2 + "/" + workers.getBaseWorkers(0)
+			 + " U: " + bwapi.getSelf().getSupplyUsed()/2);
+			if (
+			 order.supplyNeeded <= bwapi.getSelf().getSupplyTotal()/2 &&
+			 order.workersNeeded <= workers.getBaseWorkers(0)
+			) {
+				builder.orders.addLast(order.unitToMake);
+				System.out.println("Adding order to make" + order.unitToMake.toString());
+				buildingGoals.remove(order);
 			}
+			
+		}
+		else
+		{
+			//next phase?
+			
 		}
 		
+		/*if (
+		    (builder.orders.peek() != UnitTypes.Terran_Supply_Depot && bwapi.getSelf().getSupplyUsed()/2 + 5 >= bwapi.getSelf().getSupplyTotal()/2)
+		   )
+		{
+			builder.orders.addLast(UnitTypes.Terran_Supply_Depot);
+		}*/
 
 		
 		/* Add workers if we need to, ALL of the workers */
 		//if (workers.getBaseWorkers(0) < bwapi.getSelf().getSupplyTotal()) {
-			if (workers.getBaseWorkers(0) < 21) {
-				workers.trainWorker();
-			}
-			builder.roster.addLast(UnitTypes.Terran_Marine);
-			builder.roster.addLast(UnitTypes.Terran_Vulture);
+		if (workers.getBaseWorkers(0) < 21) {
+			workers.trainWorker();
+		}
+		builder.roster.addLast(UnitTypes.Terran_Marine);
+		builder.roster.addLast(UnitTypes.Terran_Vulture);
 			
 		//}
 	}
