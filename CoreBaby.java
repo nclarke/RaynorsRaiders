@@ -57,6 +57,8 @@ public class CoreBaby extends RRAITemplate
 			}
 		}
 		
+
+		
 		/* Add workers if we need to, ALL of the workers */
 		//if (workers.getBaseWorkers(0) < bwapi.getSelf().getSupplyTotal()) {
 			if (react.gen_findUnits(UnitTypes.Terran_SCV).size() < 28) {
@@ -82,9 +84,9 @@ public class CoreBaby extends RRAITemplate
 		buildingGoals.addLast(new BuildOrder(15,18,UnitTypes.Terran_Supply_Depot,0));
 		buildingGoals.addLast(new BuildOrder(16,26,UnitTypes.Terran_Factory,0));
 		buildingGoals.addLast(new BuildOrder(16,26,UnitTypes.Terran_Machine_Shop,0));
-		buildingGoals.addLast(new BuildOrder(21,26,UnitTypes.Terran_Command_Center,1));
+		buildingGoals.addLast(new BuildOrder(21,26,UnitTypes.Terran_Command_Center,0));
 		buildingGoals.addLast(new BuildOrder(24,26,UnitTypes.Terran_Supply_Depot,0));
-		buildingGoals.addLast(new BuildOrder(25,34,UnitTypes.Terran_Siege_Tank_Siege_Mode,0)); // this might be wrong
+		//buildingGoals.addLast(new BuildOrder(25,34,UnitTypes.Terran_Siege_Tank_Siege_Mode,0)); // this might be wrong
 		buildingGoals.addLast(new BuildOrder(28,34,UnitTypes.Terran_Engineering_Bay,0));
 	}
 	

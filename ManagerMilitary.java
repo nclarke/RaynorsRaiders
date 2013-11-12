@@ -99,12 +99,14 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public void addMilitaryUnit(Unit unitObj, UnitTypes unitType)
 	{
-		militaryUnits.get(unitType).add(unitObj);
+		//FIXME - causing crashes
+		//militaryUnits.get(unitType).add(unitObj);
 	}
 	
 	public void removeMilitaryUnit(Unit unitObj, UnitTypes unitType)
 	{
-		militaryUnits.get(unitType).remove(unitObj);
+		//FIXME - causing crashes
+		//militaryUnits.get(unitType).remove(unitObj);
 	}
 	
 	/* Initializes a EnumMap of UnitTypes we want per Level */

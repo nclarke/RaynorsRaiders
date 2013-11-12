@@ -35,10 +35,15 @@ public class CoreReactive extends RRAITemplate
 	/* This is to be run frequently, and is the quick-decider for things such as resources */
 	public void checkUp() 
 	{
-		for (BuildAlert alert: core_econ_buildAlerts) {
-			if (alert == BuildAlert.NO_ROOM) {
-				builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
-			}
+		/** Adds supply depots every so often to make sure that we can still build **/
+		if (bwapi.getSelf().getSupplyUsed() + 5 >= bwapi.getSelf().getSupplyTotal()
+			&& bwapi.getSelf().getSupplyTotal() < 200
+			&& (
+				(builder.orders.size() > 0 && builder.orders.peekFirst() != UnitTypes.Terran_Supply_Depot)
+				|| builder.orders.size() <= 0
+			   )
+			) {
+			builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
 		}
 	}
 	
