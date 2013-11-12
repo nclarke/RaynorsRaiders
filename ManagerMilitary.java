@@ -14,7 +14,6 @@ public class ManagerMilitary extends RRAITemplate
 
 	/* EnumMap for us to know what UnitTypes to train per Level - Level is determined by how well AI is doing in the game 
 	 * (AI is very rich in the beginning, gets its level changed from ZERO to TWO) */
-	EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLevel;
 	int homePositionX, homePositionY;
 	MiltScouter scouter;
 	BaseLocation homeBase;
@@ -37,10 +36,7 @@ public class ManagerMilitary extends RRAITemplate
 	}
 	
 	public ManagerMilitary()
-	{
-		unitTypesPerLevel = new EnumMap<Level, ArrayList<UnitTypes>>(Level.class);
-		initMap(unitTypesPerLevel);
-		
+	{		
 		militaryUnits = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
 		scouter = new MiltScouter(this);
 	}
@@ -109,97 +105,59 @@ public class ManagerMilitary extends RRAITemplate
 		//militaryUnits.get(unitType).remove(unitObj);
 	}
 	
-	/* Initializes a EnumMap of UnitTypes we want per Level */
-	private void initMap(EnumMap<Level, ArrayList<UnitTypes>> lvlMap)
-	{
-		if(lvlMap != null)
-		{
-			ArrayList<UnitTypes> levelZero = new ArrayList<UnitTypes>(Arrays.asList(UnitTypes.Terran_Marine));
-			lvlMap.put(Level.ZERO, levelZero);
-			
-			ArrayList<UnitTypes> levelOne = new ArrayList<UnitTypes>(
-					Arrays.asList(UnitTypes.Terran_Marine, UnitTypes.Terran_Medic));
-			lvlMap.put(Level.ONE, levelOne);
-			
-			ArrayList<UnitTypes> levelTwo = new ArrayList<UnitTypes>(
-					Arrays.asList(UnitTypes.Terran_Marine, UnitTypes.Terran_Medic, UnitTypes.Terran_Vulture));
-			lvlMap.put(Level.TWO, levelTwo);
-		}
-	}
-	
-	/* 
-	 * Helper function for unitFormation
+	/*
+	 * Method used for gathering the specified UnitTypes and # of units to attack a location
 	 * 
-	 * levelEnum:         takes in a Level Enum type (i.e. Level.ZERO)
-	 * unitTypesPerLevel: for reading in the different UnitTypes we want per level
-	 * 
-	 * Returns an ArrayList of Units (max = 12) of the UnitTypes wanted in levelEnum
+	 * unitTypes:	UnitTypes of units requested
+	 * numOfUnits:  number of units needed (don't know how many units you want each)
+	 * locationX:   Pixel X coordinate on the map
+	 * locationY:   Pixel X coordinate on the map
 	 */
-	private ArrayList<Unit> unitFormationHelper(Level levelEnum, EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLvl)
+	public void unitOperation(List<UnitTypes> unitTypes, int numOfUnits,  int locationX, int locationY)
 	{
-		final int maxUnits = 12;
-		ArrayList<Unit> unitRally = new ArrayList<Unit>();
+		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		if(unitTypesPerLvl != null)
+		for(UnitTypes unitTy: unitTypes)
 		{
-			for (Unit unit : bwapi.getMyUnits())
+			for(Unit ut: militaryUnits.get(unitTy))
 			{
-				for(int index = 0; index < unitTypesPerLvl.get(levelEnum).size(); index++)
+				if(tmp.size() < numOfUnits)
 				{
-					if(unit.getTypeID() == unitTypesPerLvl.get(levelEnum).get(index).ordinal())
-					{
-						if(unitRally.size() < maxUnits)
-						{
-							unitRally.add(unit);
-						}
-					}
+					if(ut.isIdle())
+					tmp.add(ut);
 				}
 			}
 		}
-		return unitRally;
+		
+		if(!tmp.isEmpty())
+		{
+			unitOperationHelper(tmp, locationX, locationY);
+		}
 	}
 	
 	/*
-	 * Handles the cases of different levels of the AI during the Game
-	 * 
-	 * levelEnum:         takes in a Level Enum type (i.e. Level.ZERO)
-	 * unitTypesPerLevel: for reading in the different UnitTypes we want per level
-	 * 
-	 * Returns the ArrayList of Units passed in from unitFormationHelper
+	 * Helper function to execute unit attacks to a location 
 	 */
-	private ArrayList<Unit> unitFormation(Level levelEnum, EnumMap<Level, ArrayList<UnitTypes>> unitTypesPerLvl)
-	{	
-		if(levelEnum.equals(Level.ZERO))
-		{
-			return unitFormationHelper(Level.ZERO, unitTypesPerLvl);
-		}
-		else if(levelEnum.equals(Level.ONE))
-		{
-			return unitFormationHelper(Level.ONE, unitTypesPerLvl);
-		}
-		else if(levelEnum.equals(Level.TWO))
-		{
-			return unitFormationHelper(Level.TWO, unitTypesPerLvl);
-		}
-		else
-		{
-			return unitFormationHelper(Level.ZERO, unitTypesPerLvl);
-		}
+	private void unitOperationHelper(LinkedList<Unit> unitGroup, int locationX, int locationY)
+	{
+		rallyUnits(unitGroup, homePositionX, homePositionY);
+		rallyReadyCheck(unitGroup, homePositionX, homePositionY);
+		attackEnemyLocation(unitGroup, locationX, locationY);
 	}
 	
 	/*
-	 * Commands the Units stored in an ArrayList to attack a location on the map
+	 * Commands the Units stored in an LinkedList to attack a location on the map
 	 * 
-	 * unitFormation:   ArrayList of Units we wanted to rally
+	 * unitFormation:   LinkedList of Units we wanted to rally
 	 * pixelPositionX:  Rally position's X
 	 * pixelPositionY:  Rally position's Y
 	 * 
 	 */
-	private void rallyUnits(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY )
+	private void rallyUnits(LinkedList<Unit> unitGroup, int pixelPositionX, int pixelPositionY )
 	{
-		if(unitFormation != null)
+		if(unitGroup != null)
 		{
-			for(Unit unit: unitFormation)
+			for(Unit unit: unitGroup)
 			{
 				bwapi.move(unit.getID(), pixelPositionX, pixelPositionY);
 			}
@@ -207,36 +165,40 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
-	private boolean rallyReadyCheck(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY)
+	/*
+	 * Checks to see if all the units in a group are gathered at Command Center 
+	 * before going out to attack together
+	 */
+	private boolean rallyReadyCheck(LinkedList<Unit> unitGroup, int pixelPositionX, int pixelPositionY)
 	{
-		boolean checkFlag = false;
+		boolean checkReadyFlag = false;
 		
-		if(unitFormation != null)
+		if(unitGroup != null)
 		{
-			for(Unit unit: unitFormation)
+			for(Unit unit: unitGroup)
 			{
 				if((unit.getX() == pixelPositionX) && (unit.getY() == pixelPositionY))
 				{
-					checkFlag = true;
+					checkReadyFlag = true;
 				}
 			}
 		}	
-		return checkFlag;
+		return checkReadyFlag;
 	}
 	
 	/*
-	 * Rally the Units stored in an ArrayList to a location on the map
+	 * Rally the Units stored in an LinkedList to a location on the map
 	 * 
-	 * unitFormation:   ArrayList of Units we wanted to rally
+	 * unitFormation:   LinkedList of Units we wanted to rally
 	 * pixelPositionX:  Attack position's X
 	 * pixelPositionY:  Attack position's Y
 	 * 
 	 */
-	private void attackEnemyLocation(ArrayList<Unit> unitFormation, int pixelPositionX, int pixelPositionY)
+	private void attackEnemyLocation(LinkedList<Unit> unitGroup, int pixelPositionX, int pixelPositionY)
 	{
-		if(unitFormation != null)
+		if(unitGroup != null)
 		{
-			for(Unit unit: unitFormation)
+			for(Unit unit: unitGroup)
 			{
 				bwapi.attack(unit.getID(), pixelPositionX, pixelPositionY);
 			}
@@ -247,12 +209,12 @@ public class ManagerMilitary extends RRAITemplate
 	/*
 	 * Returns the current number of units of a UnitType
 	 */
-	public int getCurrentUnitCount(UnitTypes unitType)
+	private int getCurrentUnitCount(UnitTypes unitType)
 	{
 		return militaryUnits.get(unitType).size();
 	}
 	
-	public int getWorkersCount()
+	private int getWorkersCount()
 	{
 		int unitsTotal = 0;
 		
@@ -264,23 +226,6 @@ public class ManagerMilitary extends RRAITemplate
 			}
 		}
 		return unitsTotal;
-	}
-	
-	
-	/*
-	 * Give this function a base location to have a group of units (marines atm) to attack
-	 * 
-	 */
-	public void attackOperation(int pixelPositionX, int pixelPositionY)
-	{
-		if(((getCurrentUnitCount(UnitTypes.Terran_Marine) % 12) == 0))
-		{
-			ArrayList<Unit> unitFormed = unitFormation(Level.ZERO, unitTypesPerLevel);
-
-			rallyUnits(unitFormed, homePositionX, homePositionY);
-			attackEnemyLocation(unitFormed, pixelPositionX, pixelPositionY);
-		}
-		//System.out.println("Attacked");
 	}
 	
 	   // Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
