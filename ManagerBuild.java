@@ -40,6 +40,10 @@ public class ManagerBuild extends RRAITemplate
 		builtBuildings = new LinkedList<UnitTypes>();
 		builtBuildings.push(UnitTypes.Terran_Command_Center);
 		ourBases = new LinkedList<BaseLocation>();
+		bldgMode = BuildMode.BLOCKING_STACK;
+		unitsMode = BuildMode.FIRST_POSSIBLE;
+		orders = new LinkedList<UnitTypes>();
+		roster = new LinkedList<UnitTypes>();	
 	}
 	
 	public enum baseStatus 
@@ -74,10 +78,7 @@ public class ManagerBuild extends RRAITemplate
 
 	public void AILinkData() 
 	{
-		bldgMode = BuildMode.BLOCKING_STACK;
-		unitsMode = BuildMode.FIRST_POSSIBLE;
-		orders = new LinkedList<UnitTypes>();
-		roster = new LinkedList<UnitTypes>();		
+	
 	}
 	
 	public void setup() {
