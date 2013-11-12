@@ -60,11 +60,11 @@ public class ManagerMilitary extends RRAITemplate
 		this.scouter.scout();
 		
 		//for testing purposes - tries to send 5 marines to an enemy base atm
-		or (BaseLocation b : bwapi.getMap().getBaseLocations()) 
+		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
 		{
 			if (b.isStartLocation() )
 			{
-				unitOperation(b.getX(), b.getY());
+				unitOperation(b.getX(), b.getY()); 
 			}
 		}
 	}
