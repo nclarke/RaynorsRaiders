@@ -18,7 +18,7 @@ public class ManagerMilitary extends RRAITemplate
 	MiltScouter scouter;
 	BaseLocation homeBase;
 	
-	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
+	private EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
 	
 	public class Tile {
 		int x;
@@ -104,7 +104,7 @@ public class ManagerMilitary extends RRAITemplate
 	}
 	
 	
-	public void initMilitaryUnit()
+	private void initMilitaryUnit()
 	{
 		for(UnitTypes ut: UnitTypes.values())
 		{
