@@ -11,14 +11,11 @@ import javabot.util.*;
 
 public class ManagerMilitary extends RRAITemplate
 {
-
-	/* EnumMap for us to know what UnitTypes to train per Level - Level is determined by how well AI is doing in the game 
-	 * (AI is very rich in the beginning, gets its level changed from ZERO to TWO) */
 	int homePositionX, homePositionY;
 	MiltScouter scouter;
 	BaseLocation homeBase;
 	
-	private EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
+	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
 	
 	public class Tile {
 		int x;
@@ -56,17 +53,16 @@ public class ManagerMilitary extends RRAITemplate
 	}
 	
 	public void checkUp() {
-		//Check up - FIXME - code needs to go here.
 		this.scouter.scout();
 		
 		//for testing purposes - tries to send 5 marines to an enemy base atm
-		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
+		/*for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
 		{
 			if (b.isStartLocation() )
 			{
 				unitOperation(b.getX(), b.getY()); 
 			}
-		}
+		}*/
 	}
 	
     public void debug()
@@ -268,7 +264,7 @@ public class ManagerMilitary extends RRAITemplate
 		return unitsTotal;
 	}
 	
-	   // Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
+	// Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
     // don't have a unit of this type
     public int getNearestUnit(int unitTypeID, int x, int y) 
     {
