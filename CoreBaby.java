@@ -126,7 +126,7 @@ public class CoreBaby extends RRAITemplate
 		}
 		else
 		{
-			if (bwapi.getSelf().getSupplyUsed()/2 + 10 > bwapi.getSelf().getSupplyTotal()/2) 
+			if (bwapi.getSelf().getSupplyUsed()/2 + 5 > bwapi.getSelf().getSupplyTotal()/2) 
 			{
 				builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
 			}
@@ -137,11 +137,11 @@ public class CoreBaby extends RRAITemplate
 		
 		if (unit != null)
 		{
-			builder.roster.addLast(UnitTypes.Terran_Marine);
-			builder.roster.addLast(UnitTypes.Terran_Vulture);
+			//builder.roster.addLast(UnitTypes.Terran_Marine);
+			//builder.roster.addLast(UnitTypes.Terran_Vulture);
 			
-			//builder.roster.addLast(unit);
-			//unitMixtures.pop();
+			builder.roster.addLast(unit);
+			unitMixtures.pop();
 		}
 		
 		/* Military Orders */
