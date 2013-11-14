@@ -135,6 +135,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 					managerWorkers.startWorkers(unit.getID());
 				}
 			}
+			coreBaby.startUp();
 		}
 		
 		// Call actions every 30 frames
@@ -271,30 +272,26 @@ public class RaynorsRaiders implements BWAPIEventListener
 			managerBuild.newBaseLocation(createdUnit);
 		}
 		
-		if (createdUnitType == UnitTypes.Terran_Marine.ordinal())
-		{
-			managerMilitary.addMilitaryUnit(createdUnit, UnitTypes.Terran_Marine);
-		}
+		managerMilitary.addCreatedMilitaryUnits(createdUnit, createdUnitType);
 		
 		// needs to be extended for all buildings
 		// is there a function that can return UnitTypes?
 		if(bwapi.getUnitType(createdUnitType).isBuilding())
 		{
-			if(createdUnitType == UnitTypes.Terran_Academy.ordinal())
+			managerBuild.buildingBuildings.add(createdUnit);
+			
+			UnitTypes typeToCheck = UnitTypes.values()[createdUnitType];
+			if (managerBuild.orders.contains(typeToCheck))
 			{
-				managerBuild.builtBuildings.add(UnitTypes.Terran_Academy);
-			}
-			else if(createdUnitType == UnitTypes.Terran_Supply_Depot.ordinal())
-			{
-				managerBuild.builtBuildings.add(UnitTypes.Terran_Supply_Depot);
+				managerBuild.orders.removeFirstOccurrence(typeToCheck);
 			}
 		}
 	}
 	public void unitDestroy(int unitID)
-	{
-		
+	{		
 		//System.out.println("In unit destroyed");
 		bwapi.printText("Unit Destroyed " + String.valueOf(unitID));
+		Unit taggedForDeath = null;
 		
 		for (Unit u : masterUnitList)
 		{
@@ -303,13 +300,19 @@ public class RaynorsRaiders implements BWAPIEventListener
 				if (u.getTypeID() == UnitTypes.Terran_SCV.ordinal())
 					managerWorkers.removeWorker(unitID);
 				
-				if (u.getTypeID() == UnitTypes.Terran_Marine.ordinal())
-				{
-					managerMilitary.removeMilitaryUnit(bwapi.getUnit(unitID), UnitTypes.Terran_Marine);
-				}
+				managerMilitary.removeDestroyedMilitaryUnits(bwapi.getUnit(unitID), u.getTypeID());
 				
-				masterUnitList.remove(u);
-				//System.out.println("Remove succesfull");
+				taggedForDeath = u;
+			}
+		}
+		masterUnitList.remove(taggedForDeath);
+
+		for(Unit bldg : managerBuild.builtBuildings)
+		{
+			if(bldg.getID() == unitID)
+			{
+				managerBuild.builtBuildings.remove(bldg);
+				break;
 			}
 		}
 	}

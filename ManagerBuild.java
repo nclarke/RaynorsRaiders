@@ -24,8 +24,8 @@ public class ManagerBuild extends RRAITemplate
 	BuildMode unitsMode;
 	LinkedList<UnitTypes> orders;
 	LinkedList<UnitTypes> roster;
-	LinkedList<UnitTypes> builtBuildings;
-	LinkedList<UnitTypes> buildingBuildings;
+	LinkedList<Unit> builtBuildings;
+	LinkedList<Unit> buildingBuildings;
 	LinkedList<BaseLocation> ourBases;
 	
 	UnitTypes tempType;
@@ -37,8 +37,8 @@ public class ManagerBuild extends RRAITemplate
 	public ManagerBuild() {
 		//SET UP ALL INTERNAL VARIABLES HERE
 		super();
-		builtBuildings = new LinkedList<UnitTypes>();
-		builtBuildings.push(UnitTypes.Terran_Command_Center);
+		builtBuildings = new LinkedList<Unit>();
+		buildingBuildings = new LinkedList<Unit>();
 		ourBases = new LinkedList<BaseLocation>();
 		bldgMode = BuildMode.BLOCKING_STACK;
 		unitsMode = BuildMode.FIRST_POSSIBLE;
@@ -83,12 +83,50 @@ public class ManagerBuild extends RRAITemplate
 	
 	public void setup() {
 		//System.out.println("ManagerBuild Online");
+		for(Unit unit : bwapi.getMyUnits())
+		{
+			if(unit.getTypeID() == UnitTypes.Terran_Command_Center.ordinal())
+			{
+				builtBuildings.add(unit);
+			}
+		}
 	}
 	
+	private void constructionStatus()
+	{
+		for(Unit bldg : buildingBuildings)
+		{
+//System.out.println(bwapi.getUnitType(bldg.getTypeID()).getName() + " ready in " + bldg.getRemainingBuildTimer());
+			if(bldg.isCompleted())
+			{
+				builtBuildings.add(bldg);
+				buildingBuildings.remove(bldg);
+			}
+		}
+	}
 	// looks for a building to construct according to the build mode
 	// calls build() method if it finds something to construct
 	public void checkUp() 
 	{
+/*
+System.out.println("orders: " + orders.toString());
+System.out.print("under construction: ");
+for(Unit bldg : buildingBuildings)
+{
+	UnitType btype = bwapi.getUnitType(bldg.getTypeID());
+	System.out.print(btype.getName() + " ");
+}
+System.out.println();
+
+System.out.println("completed buildings:");
+for(Unit bldg : builtBuildings)
+{
+	UnitType btype = bwapi.getUnitType(bldg.getTypeID());
+	System.out.print(btype.getName() + " ");
+}
+System.out.println();
+*/
+        // building construction
 		switch(bldgMode) {
 			case FIRST_POSSIBLE:
 				int i = 0;
@@ -102,8 +140,7 @@ public class ManagerBuild extends RRAITemplate
 					b = orders.get(i);
 					bldg = bwapi.getUnitType(b.ordinal());
 		
-					if(/*(!bwapi.getUnit(b.ordinal()).isBeingConstructed()) && */
-							bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
+					if(weAreBuilding(b.ordinal()) && bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
 							bwapi.getSelf().getGas() - underConstructionG() < bldg.getGasPrice()) 
 					{
 						i++;
@@ -117,6 +154,12 @@ public class ManagerBuild extends RRAITemplate
 				if(canBuild)
 				{
 				   build(b);
+				   
+// temp solution				
+					if(b.ordinal() == UnitTypes.Terran_Refinery.ordinal())
+					{
+						orders.remove(b);
+					}
 				}
 				else 
 				{
@@ -134,7 +177,7 @@ public class ManagerBuild extends RRAITemplate
 					{
 						i++;
 					}
-					//System.out.println("i = " + i);
+					
 					if(i < orders.size())
 					{
 						b = orders.get(i);
@@ -143,8 +186,11 @@ public class ManagerBuild extends RRAITemplate
 						if(bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
 						bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
 						{
-							if (build(b)) {
-								orders.remove(i);
+							build(b);
+// temp solution				
+							if(b.ordinal() == UnitTypes.Terran_Refinery.ordinal())
+							{
+								orders.remove(b);
 							}
 						}
 					}
@@ -166,10 +212,16 @@ public class ManagerBuild extends RRAITemplate
 				break;
 		}
 
-		switch(unitsMode) {
+		constructionStatus();
+		
+//System.out.println("roster: " + roster.toString());
+		// unit training
+		switch(unitsMode) 
+		{
 		case FIRST_POSSIBLE:
 			int i = 0;
 			boolean canTrain = false;
+			boolean trainingGroundsPresent = false;
 			UnitTypes c = null;
 			UnitType soldier = null;
 			
@@ -179,8 +231,16 @@ public class ManagerBuild extends RRAITemplate
 				c = roster.get(i);
 				soldier = bwapi.getUnitType(c.ordinal());
 
-				//Need to check if we have the required building used for training					
-				if(bwapi.getSelf().getMinerals() - underConstructionM() < soldier.getMineralPrice() && 
+				for(Unit bldg : builtBuildings)
+				{
+					if(bldg.getTypeID() == soldier.getWhatBuildID())
+					{
+						trainingGroundsPresent = true;
+						break;
+					}
+				}
+				
+				if(!trainingGroundsPresent || bwapi.getSelf().getMinerals() - underConstructionM() < soldier.getMineralPrice() && 
 						bwapi.getSelf().getGas() - underConstructionG() < soldier.getGasPrice()) 
 				{
 					i++;
@@ -190,7 +250,6 @@ public class ManagerBuild extends RRAITemplate
 					canTrain = true;
 				}
 			}
-
 			
 			if(canTrain)
 			{
@@ -322,7 +381,7 @@ public class ManagerBuild extends RRAITemplate
 	 */
 	
 	
-	public int underConstructionM() 
+	private int underConstructionM() 
 	{
 		int cost = 0;
 		
@@ -339,7 +398,7 @@ public class ManagerBuild extends RRAITemplate
 		return cost;
 	}
 	
-	public int underConstructionG() 
+	private int underConstructionG() 
 	{
 		int cost = 0;
 		
@@ -513,7 +572,7 @@ public class ManagerBuild extends RRAITemplate
 		{
 			if(bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
 			{
-				for(Unit unit : bwapi.getMyUnits()) 
+				for(Unit unit : builtBuildings) 
 				{
 					if(unit.getTypeID() == soldier.getWhatBuildID()) 
 					{
@@ -538,7 +597,7 @@ public class ManagerBuild extends RRAITemplate
 	
 	//Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
 	//don't have a unit of this type
-	public int getNearestUnit(int unitTypeID, int x, int y) {
+	private int getNearestUnit(int unitTypeID, int x, int y) {
 		int nearestID = -1;
 		double nearestDist = 9999999;
 		for (Unit unit : bwapi.getMyUnits()) {
@@ -557,11 +616,12 @@ public class ManagerBuild extends RRAITemplate
 	//Returns the Point object representing the suitable build tile position
 	//for a given building type near specified pixel position (or Point(-1,-1) if not found)
 	//(builderID should be our worker)
-	public Point getBuildTile(int builderID, int buildingTypeID, int x, int y) {
+	private Point getBuildTile(int builderID, int buildingTypeID, int x, int y) {
 		Point ret = new Point(-1, -1);
 		int maxDist = 3;
 		int stopDist = 40;
 		int tileX = x/32; int tileY = y/32;
+		int tilesize = 4;
 	
 		// Refinery, Assimilator, Extractor
 		if (bwapi.getUnitType(buildingTypeID).isRefinery()) {
@@ -581,7 +641,20 @@ public class ManagerBuild extends RRAITemplate
 						boolean unitsInWay = false;
 						for (Unit u : bwapi.getAllUnits()) {
 							if (u.getID() == builderID) continue;
-							if ((Math.abs(u.getTileX()-i) < 4) && (Math.abs(u.getTileY()-j) < 4)) unitsInWay = true;
+							
+							if(buildingTypeID == UnitTypes.Terran_Command_Center.ordinal() || u.getTypeID() == UnitTypes.Terran_Command_Center.ordinal() || 
+									buildingTypeID == UnitTypes.Terran_Factory.ordinal() || u.getTypeID() == UnitTypes.Terran_Factory.ordinal() ||
+									buildingTypeID == UnitTypes.Terran_Factory.ordinal() || u.getTypeID() == UnitTypes.Terran_Science_Facility.ordinal() ||
+									buildingTypeID == UnitTypes.Terran_Factory.ordinal() || u.getTypeID() == UnitTypes.Terran_Starport.ordinal())
+							{
+								tilesize = 6;
+							}
+							else
+							{
+								tilesize = 4;
+							}
+							
+							if ((Math.abs(u.getTileX()-i) < tilesize) && (Math.abs(u.getTileY()-j) < tilesize)) unitsInWay = true;
 						}
 						if (!unitsInWay) {
 							ret.x = i; ret.y = j;
@@ -611,7 +684,7 @@ public class ManagerBuild extends RRAITemplate
 	}
 
 	//Returns true if we are currently constructing the building of a given type.
-	public boolean weAreBuilding(int buildingTypeID) {
+	private boolean weAreBuilding(int buildingTypeID) {
 		for (Unit unit : bwapi.getMyUnits()) {
 			if ((unit.getTypeID() == buildingTypeID) && (!unit.isCompleted())) return true;
 			if (bwapi.getUnitType(unit.getTypeID()).isWorker() && unit.getConstructingTypeID() == buildingTypeID) return true;
