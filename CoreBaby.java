@@ -96,15 +96,15 @@ public class CoreBaby extends RRAITemplate
 		BuildOrder order = buildingGoals.peek();
 		
 		if (order != null) {
-			System.out.println("Order on top: " + order.supplyNeeded + "/" + order.workersNeeded
-			 + " Comp: " + bwapi.getSelf().getSupplyTotal()/2 + "/" + workers.getBaseWorkers(0)
-			 + " U: " + bwapi.getSelf().getSupplyUsed()/2);
+			//System.out.println("Order on top: " + order.supplyNeeded + "/" + order.workersNeeded
+			// + " Comp: " + bwapi.getSelf().getSupplyTotal()/2 + "/" + workers.getBaseWorkers(0)
+			// + " U: " + bwapi.getSelf().getSupplyUsed()/2);
 			if (
 			 order.supplyNeeded <= bwapi.getSelf().getSupplyTotal()/2 &&
 			 order.workersNeeded <= workers.getBaseWorkers(0)
 			) {
 				builder.orders.addLast(order.unitToMake);
-				//System.out.println("Adding order to make" + order.unitToMake.toString());
+				////System.out.println("Adding order to make" + order.unitToMake.toString());
 				buildingGoals.remove(order);
 			}
 			
@@ -116,9 +116,9 @@ public class CoreBaby extends RRAITemplate
 			if (
 			 bwapi.getSelf().getSupplyUsed()/2 + 10 > bwapi.getSelf().getSupplyTotal()/2) 
 			{
-				//System.out.println("Supply depot needed");
+				////System.out.println("Supply depot needed");
 				if (builder.orders.peek() != UnitTypes.Terran_Supply_Depot) {
-					//System.out.println("Adding supply depot since supply is running out");
+					////System.out.println("Adding supply depot since supply is running out");
 					builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
 				}
 			}
@@ -168,7 +168,7 @@ public class CoreBaby extends RRAITemplate
 	public void initUnitStyle_basic()
 	{
 		for (int i = 0; i < 20; i++) {
-			System.out.println("Adding units");
+			//System.out.println("Adding units");
 			unitMixtures.add(UnitTypes.Terran_Marine);
 			unitMixtures.add(UnitTypes.Terran_Vulture);
 		}
@@ -177,15 +177,15 @@ public class CoreBaby extends RRAITemplate
 	
 	public void initEntrenchBase() {
 		ChokePoint entrance = null;
-		Region baseStart = react.gen_findClosestRegion(military.homePositionX, military.homePositionY);
+		Region baseStart = react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY);
 		if (baseStart != null) {
-			if (react.gen_findClosestRegion(military.homePositionX, military.homePositionY).getChokePoints().isEmpty())
+			if (react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY).getChokePoints().isEmpty())
 			{
-				System.out.println("No chokepoint?");
+				//System.out.println("No chokepoint?");
 			}
 			else 
 			{
-			entrance = (react.gen_findClosestRegion(military.homePositionX, military.homePositionY)).getChokePoints().get(0);
+			entrance = (react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY)).getChokePoints().get(0);
 			}
 		}
 		LinkedList<UnitTypes> unitList = new LinkedList<UnitTypes>();
@@ -214,7 +214,7 @@ public class CoreBaby extends RRAITemplate
 		buildingGoals.addLast(new BuildOrder(15,18,UnitTypes.Terran_Supply_Depot,0));
 		buildingGoals.addLast(new BuildOrder(16,26,UnitTypes.Terran_Factory,0));
 		buildingGoals.addLast(new BuildOrder(16,26,UnitTypes.Terran_Machine_Shop,0));
-		buildingGoals.addLast(new BuildOrder(21,26,UnitTypes.Terran_Command_Center,0));
+		buildingGoals.addLast(new BuildOrder(21,26,UnitTypes.Terran_Command_Center,1));
 		buildingGoals.addLast(new BuildOrder(24,26,UnitTypes.Terran_Supply_Depot,0));
 		//buildingGoals.addLast(new BuildOrder(25,34,UnitTypes.Terran_Siege_Tank_Siege_Mode,0)); // this might be wrong
 		buildingGoals.addLast(new BuildOrder(28,34,UnitTypes.Terran_Engineering_Bay,0));
