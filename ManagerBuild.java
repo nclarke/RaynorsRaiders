@@ -92,12 +92,12 @@ public class ManagerBuild extends RRAITemplate
 		}
 	}
 	
-	public void constructionStatus()
+	private void constructionStatus()
 	{
 		for(Unit bldg : buildingBuildings)
 		{
 //System.out.println(bwapi.getUnitType(bldg.getTypeID()).getName() + " ready in " + bldg.getRemainingBuildTimer());
-			if(bldg.getRemainingBuildTimer() == 0)
+			if(bldg.isCompleted())
 			{
 				builtBuildings.add(bldg);
 				buildingBuildings.remove(bldg);
@@ -117,13 +117,15 @@ for(Unit bldg : buildingBuildings)
 	System.out.print(btype.getName() + " ");
 }
 System.out.println();
+*/
 System.out.println("completed buildings:");
 for(Unit bldg : builtBuildings)
 {
 	UnitType btype = bwapi.getUnitType(bldg.getTypeID());
 	System.out.print(btype.getName() + " ");
 }
-*/
+System.out.println();
+
         // building construction
 		switch(bldgMode) {
 			case FIRST_POSSIBLE:
@@ -152,6 +154,12 @@ for(Unit bldg : builtBuildings)
 				if(canBuild)
 				{
 				   build(b);
+				   
+// temp solution				
+					if(b.ordinal() == UnitTypes.Terran_Refinery.ordinal())
+					{
+						orders.remove(b);
+					}
 				}
 				else 
 				{
@@ -179,6 +187,11 @@ for(Unit bldg : builtBuildings)
 						bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
 						{
 							build(b);
+// temp solution				
+							if(b.ordinal() == UnitTypes.Terran_Refinery.ordinal())
+							{
+								orders.remove(b);
+							}
 						}
 					}
 					else
@@ -201,11 +214,14 @@ for(Unit bldg : builtBuildings)
 
 		constructionStatus();
 		
+//System.out.println("roster: " + roster.toString());
 		// unit training
-		switch(unitsMode) {
+		switch(unitsMode) 
+		{
 		case FIRST_POSSIBLE:
 			int i = 0;
 			boolean canTrain = false;
+			boolean trainingGroundsPresent = false;
 			UnitTypes c = null;
 			UnitType soldier = null;
 			
@@ -215,8 +231,16 @@ for(Unit bldg : builtBuildings)
 				c = roster.get(i);
 				soldier = bwapi.getUnitType(c.ordinal());
 
-				//Need to check if we have the required building used for training					
-				if(bwapi.getSelf().getMinerals() - underConstructionM() < soldier.getMineralPrice() && 
+				for(Unit bldg : builtBuildings)
+				{
+					if(bldg.getTypeID() == soldier.getWhatBuildID())
+					{
+						trainingGroundsPresent = true;
+						break;
+					}
+				}
+				
+				if(!trainingGroundsPresent || bwapi.getSelf().getMinerals() - underConstructionM() < soldier.getMineralPrice() && 
 						bwapi.getSelf().getGas() - underConstructionG() < soldier.getGasPrice()) 
 				{
 					i++;
@@ -226,7 +250,6 @@ for(Unit bldg : builtBuildings)
 					canTrain = true;
 				}
 			}
-
 			
 			if(canTrain)
 			{
@@ -358,7 +381,7 @@ for(Unit bldg : builtBuildings)
 	 */
 	
 	
-	public int underConstructionM() 
+	private int underConstructionM() 
 	{
 		int cost = 0;
 		
@@ -375,7 +398,7 @@ for(Unit bldg : builtBuildings)
 		return cost;
 	}
 	
-	public int underConstructionG() 
+	private int underConstructionG() 
 	{
 		int cost = 0;
 		
@@ -549,7 +572,7 @@ for(Unit bldg : builtBuildings)
 		{
 			if(bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
 			{
-				for(Unit unit : bwapi.getMyUnits()) 
+				for(Unit unit : builtBuildings) 
 				{
 					if(unit.getTypeID() == soldier.getWhatBuildID()) 
 					{
@@ -574,7 +597,7 @@ for(Unit bldg : builtBuildings)
 	
 	//Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
 	//don't have a unit of this type
-	public int getNearestUnit(int unitTypeID, int x, int y) {
+	private int getNearestUnit(int unitTypeID, int x, int y) {
 		int nearestID = -1;
 		double nearestDist = 9999999;
 		for (Unit unit : bwapi.getMyUnits()) {
@@ -593,11 +616,12 @@ for(Unit bldg : builtBuildings)
 	//Returns the Point object representing the suitable build tile position
 	//for a given building type near specified pixel position (or Point(-1,-1) if not found)
 	//(builderID should be our worker)
-	public Point getBuildTile(int builderID, int buildingTypeID, int x, int y) {
+	private Point getBuildTile(int builderID, int buildingTypeID, int x, int y) {
 		Point ret = new Point(-1, -1);
 		int maxDist = 3;
 		int stopDist = 40;
 		int tileX = x/32; int tileY = y/32;
+		int tilesize = 4;
 	
 		// Refinery, Assimilator, Extractor
 		if (bwapi.getUnitType(buildingTypeID).isRefinery()) {
@@ -617,7 +641,20 @@ for(Unit bldg : builtBuildings)
 						boolean unitsInWay = false;
 						for (Unit u : bwapi.getAllUnits()) {
 							if (u.getID() == builderID) continue;
-							if ((Math.abs(u.getTileX()-i) < 4) && (Math.abs(u.getTileY()-j) < 4)) unitsInWay = true;
+							
+							if(buildingTypeID == UnitTypes.Terran_Command_Center.ordinal() || u.getTypeID() == UnitTypes.Terran_Command_Center.ordinal() || 
+									buildingTypeID == UnitTypes.Terran_Factory.ordinal() || u.getTypeID() == UnitTypes.Terran_Factory.ordinal() ||
+									buildingTypeID == UnitTypes.Terran_Factory.ordinal() || u.getTypeID() == UnitTypes.Terran_Science_Facility.ordinal() ||
+									buildingTypeID == UnitTypes.Terran_Factory.ordinal() || u.getTypeID() == UnitTypes.Terran_Starport.ordinal())
+							{
+								tilesize = 6;
+							}
+							else
+							{
+								tilesize = 4;
+							}
+							
+							if ((Math.abs(u.getTileX()-i) < tilesize) && (Math.abs(u.getTileY()-j) < tilesize)) unitsInWay = true;
 						}
 						if (!unitsInWay) {
 							ret.x = i; ret.y = j;
@@ -647,7 +684,7 @@ for(Unit bldg : builtBuildings)
 	}
 
 	//Returns true if we are currently constructing the building of a given type.
-	public boolean weAreBuilding(int buildingTypeID) {
+	private boolean weAreBuilding(int buildingTypeID) {
 		for (Unit unit : bwapi.getMyUnits()) {
 			if ((unit.getTypeID() == buildingTypeID) && (!unit.isCompleted())) return true;
 			if (bwapi.getUnitType(unit.getTypeID()).isWorker() && unit.getConstructingTypeID() == buildingTypeID) return true;

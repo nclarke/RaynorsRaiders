@@ -253,8 +253,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 	}
 	public void unitDestroy(int unitID)
-	{
-		
+	{		
 		//System.out.println("In unit destroyed");
 		bwapi.printText("Unit Destroyed " + String.valueOf(unitID));
 		Unit taggedForDeath = null;
@@ -274,6 +273,15 @@ public class RaynorsRaiders implements BWAPIEventListener
 			}
 		}
 		masterUnitList.remove(taggedForDeath);
+
+		for(Unit bldg : managerBuild.builtBuildings)
+		{
+			if(bldg.getID() == unitID)
+			{
+				managerBuild.builtBuildings.remove(bldg);
+				break;
+			}
+		}
 	}
 	public void unitDiscover(int unitID) { }
 	public void unitEvade(int unitID) { }
