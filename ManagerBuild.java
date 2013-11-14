@@ -117,7 +117,7 @@ for(Unit bldg : buildingBuildings)
 	System.out.print(btype.getName() + " ");
 }
 System.out.println();
-*/
+
 System.out.println("completed buildings:");
 for(Unit bldg : builtBuildings)
 {
@@ -125,7 +125,7 @@ for(Unit bldg : builtBuildings)
 	System.out.print(btype.getName() + " ");
 }
 System.out.println();
-
+*/
         // building construction
 		switch(bldgMode) {
 			case FIRST_POSSIBLE:
