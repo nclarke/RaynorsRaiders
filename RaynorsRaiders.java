@@ -170,6 +170,44 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 		//managerWorkers.debug();
 		
+		int buildOrderNdx = 100;
+		for (CoreBaby.BuildOrder bo : coreBaby.buildingGoals)
+		{
+			bwapi.drawText(0, buildOrderNdx, bo.unitToMake.toString(), true);
+			buildOrderNdx += 10;
+		}
+		buildOrderNdx = 100;
+		//System.out.println("Ordersssss to build is: " + managerBuild.orders.size());
+		if (managerBuild.orders.size() != 0)
+		{
+			for (UnitTypes ut : managerBuild.orders)
+			{
+				bwapi.drawText(200, buildOrderNdx,ut.toString(), true);
+				buildOrderNdx += 10;
+			}
+		}
+		else
+		{
+			bwapi.drawText(200, buildOrderNdx, "No orders", true);
+			buildOrderNdx += 10;
+		}
+		buildOrderNdx = buildOrderNdx + 30;
+		//if (managerBuild.buildingBuildings.size() != 0) 
+		//{
+			//for (UnitTypes ut2 : managerBuild.buildingBuildings)
+			//{
+				//bwapi.drawText(200, buildOrderNdx,ut2.toString(), true);
+				//buildOrderNdx += 10;
+			//}
+		//}
+		//else
+		//{
+			//bwapi.drawText(200, buildOrderNdx, "Nothing building", true);
+			//buildOrderNdx += 10;
+		//}
+		//System.out.println("Here");
+		
+		
 		if(militaryDebugFlag)
 		{
 			//managerMilitary.debug();
