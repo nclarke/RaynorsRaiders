@@ -1,6 +1,7 @@
 package javabot.RaynorsRaiders;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javabot.JNIBWAPI;
@@ -31,6 +32,12 @@ public class ManagerBuild extends RRAITemplate
 	UnitTypes tempType;
 	Unit tempUnit;
 	
+	ArrayList<BuildingRR> buildingsStack;
+	int builtIndex;
+	int priorityIndex;
+	int readyIndex;
+	
+	
 	int homePositionX;
 	int homePositionY;
 	
@@ -56,6 +63,15 @@ public class ManagerBuild extends RRAITemplate
 	{
 		FIRST_POSSIBLE, BLOCKING_STACK, HOLD_ALL, RESET_BLOCKING_STACK
 	};
+
+	public class BuildingRR {
+		int requiredSupply;
+		int requiredSCVs;
+		int baseAssignment;
+		UnitTypes blueprint;
+		Unit unit;
+		boolean attemptBuild;
+	}
 	
 	private class BaseRR
 	{

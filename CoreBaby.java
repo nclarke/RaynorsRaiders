@@ -102,7 +102,8 @@ public class CoreBaby extends RRAITemplate
 			if (
 			 order.supplyNeeded <= bwapi.getSelf().getSupplyTotal()/2 &&
 			 order.workersNeeded <= workers.getBaseWorkers(0)
-			) {
+			) 
+			{
 				builder.orders.addLast(order.unitToMake);
 				////System.out.println("Adding order to make" + order.unitToMake.toString());
 				buildingGoals.remove(order);
@@ -117,7 +118,8 @@ public class CoreBaby extends RRAITemplate
 			 bwapi.getSelf().getSupplyUsed()/2 + 10 > bwapi.getSelf().getSupplyTotal()/2) 
 			{
 				////System.out.println("Supply depot needed");
-				if (builder.orders.peek() != UnitTypes.Terran_Supply_Depot) {
+				if (builder.orders.peek() != UnitTypes.Terran_Supply_Depot) 
+				{
 					////System.out.println("Adding supply depot since supply is running out");
 					builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
 				}
@@ -155,9 +157,6 @@ public class CoreBaby extends RRAITemplate
 				militaryGoals.pop();
 			}
 		}
-		
-
-		
 	}
 	
 	public void debug() 
@@ -167,7 +166,8 @@ public class CoreBaby extends RRAITemplate
 	
 	public void initUnitStyle_basic()
 	{
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 20; i++)
+		{
 			//System.out.println("Adding units");
 			unitMixtures.add(UnitTypes.Terran_Marine);
 			unitMixtures.add(UnitTypes.Terran_Vulture);
@@ -175,10 +175,12 @@ public class CoreBaby extends RRAITemplate
 		
 	}
 	
-	public void initEntrenchBase() {
+	public void initEntrenchBase() 
+	{
 		ChokePoint entrance = null;
 		Region baseStart = react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY);
-		if (baseStart != null) {
+		if (baseStart != null) 
+		{
 			if (react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY).getChokePoints().isEmpty())
 			{
 				//System.out.println("No chokepoint?");
@@ -205,7 +207,8 @@ public class CoreBaby extends RRAITemplate
 		);
 	}
 	
-	public void initBuildStyle_siegeExpand() {
+	public void initBuildStyle_siegeExpand() 
+	{
 		buildingGoals.addLast(new BuildOrder(9,10,UnitTypes.Terran_Supply_Depot,0));
 		//buildingGoals.addLast(new BuildOrder(9,10,UnitTypes.Terran_Supply_Depot,0));
 		//buildingGoals.addLast(new BuildOrder(9,10,UnitTypes.Terran_Supply_Depot,0)); // the "wall"
