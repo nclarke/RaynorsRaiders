@@ -128,7 +128,7 @@ public class CoreBaby extends RRAITemplate
 		}
 		else
 		{
-			if (bwapi.getSelf().getSupplyUsed()/2 + 5 > bwapi.getSelf().getSupplyTotal()/2) 
+			if (bwapi.getSelf().getSupplyUsed()/2 + 4 > bwapi.getSelf().getSupplyTotal()/2) 
 			{
 				builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
 			}
@@ -209,16 +209,17 @@ public class CoreBaby extends RRAITemplate
 	
 	public void initBuildStyle_siegeExpand() 
 	{
-		buildingGoals.addLast(new BuildOrder(9,10,UnitTypes.Terran_Supply_Depot,0));
+		//buildingGoals.addLast(new BuildOrder(9,10,UnitTypes.Terran_Supply_Depot,0));
 		//buildingGoals.addLast(new BuildOrder(9,10,UnitTypes.Terran_Supply_Depot,0));
 		//buildingGoals.addLast(new BuildOrder(9,10,UnitTypes.Terran_Supply_Depot,0)); // the "wall"
 		buildingGoals.addLast(new BuildOrder(12,18,UnitTypes.Terran_Barracks,0));
 		buildingGoals.addLast(new BuildOrder(12,18,UnitTypes.Terran_Refinery,0));
-		buildingGoals.addLast(new BuildOrder(15,18,UnitTypes.Terran_Supply_Depot,0));
+		buildingGoals.addLast(new BuildOrder(12,18,UnitTypes.Terran_Barracks,0));
+		//buildingGoals.addLast(new BuildOrder(15,18,UnitTypes.Terran_Supply_Depot,0));
 		buildingGoals.addLast(new BuildOrder(16,26,UnitTypes.Terran_Factory,0));
 		buildingGoals.addLast(new BuildOrder(16,26,UnitTypes.Terran_Machine_Shop,0));
 		buildingGoals.addLast(new BuildOrder(21,26,UnitTypes.Terran_Command_Center,1));
-		buildingGoals.addLast(new BuildOrder(24,26,UnitTypes.Terran_Supply_Depot,0));
+		//buildingGoals.addLast(new BuildOrder(24,26,UnitTypes.Terran_Supply_Depot,0));
 		//buildingGoals.addLast(new BuildOrder(25,34,UnitTypes.Terran_Siege_Tank_Siege_Mode,0)); // this might be wrong
 		buildingGoals.addLast(new BuildOrder(28,34,UnitTypes.Terran_Engineering_Bay,0));
 	}
