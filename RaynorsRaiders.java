@@ -6,6 +6,7 @@ package javabot.RaynorsRaiders;
 import java.awt.Point;
 import java.util.LinkedList;
 
+import javabot.RaynorsRaiders.ManagerBuild.BuildingRR;
 import javabot.model.*;
 import javabot.types.*;
 import javabot.*;
@@ -278,12 +279,13 @@ public class RaynorsRaiders implements BWAPIEventListener
 		// is there a function that can return UnitTypes?
 		if(bwapi.getUnitType(createdUnitType).isBuilding())
 		{
-			managerBuild.buildingBuildings.add(createdUnit);
-			
-			UnitTypes typeToCheck = UnitTypes.values()[createdUnitType];
-			if (managerBuild.orders.contains(typeToCheck))
+			if(createdUnitType == managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).blueprint.ordinal())
 			{
-				managerBuild.orders.removeFirstOccurrence(typeToCheck);
+				managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).unit = createdUnit;
+				managerBuild.nextToBuildIndex++;
+				
+				// sort under construction according to build time
+
 			}
 		}
 	}

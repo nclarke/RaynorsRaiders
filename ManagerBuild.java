@@ -46,6 +46,11 @@ public class ManagerBuild extends RRAITemplate
 		super();
 		builtBuildings = new LinkedList<Unit>();
 		buildingBuildings = new LinkedList<Unit>();
+		
+		buildingsStack = new ArrayList<BuildingRR>();
+		completedBuildingsIndex = 0;
+		nextToBuildIndex = 0;
+
 		ourBases = new LinkedList<BaseLocation>();
 		bldgMode = BuildMode.BLOCKING_STACK;
 		unitsMode = BuildMode.FIRST_POSSIBLE;
@@ -99,24 +104,26 @@ public class ManagerBuild extends RRAITemplate
 	
 	public void setup() {
 		//System.out.println("ManagerBuild Online");
-		for(Unit unit : bwapi.getMyUnits())
+/*		for(Unit unit : bwapi.getMyUnits())
 		{
 			if(unit.getTypeID() == UnitTypes.Terran_Command_Center.ordinal())
 			{
 				builtBuildings.add(unit);
 			}
 		}
+*/
 	}
 	
 	private void constructionStatus()
 	{
-		for(Unit bldg : buildingBuildings)
+		for(int i = completedBuildingsIndex; i < nextToBuildIndex; i++)
 		{
+			Unit bldg = buildingsStack.get(i).unit;
 //System.out.println(bwapi.getUnitType(bldg.getTypeID()).getName() + " ready in " + bldg.getRemainingBuildTimer());
+
 			if(bldg.isCompleted())
 			{
-				builtBuildings.add(bldg);
-				buildingBuildings.remove(bldg);
+				completedBuildingsIndex++;
 			}
 		}
 	}
@@ -124,39 +131,24 @@ public class ManagerBuild extends RRAITemplate
 	// calls build() method if it finds something to construct
 	public void checkUp() 
 	{
-/*
-System.out.println("orders: " + orders.toString());
-System.out.print("under construction: ");
-for(Unit bldg : buildingBuildings)
-{
-	UnitType btype = bwapi.getUnitType(bldg.getTypeID());
-	System.out.print(btype.getName() + " ");
-}
-System.out.println();
-
-System.out.println("completed buildings:");
-for(Unit bldg : builtBuildings)
-{
-	UnitType btype = bwapi.getUnitType(bldg.getTypeID());
-	System.out.print(btype.getName() + " ");
-}
-System.out.println();
-*/
+//System.out.println("completed buildings index = " + completedBuildingsIndex);
+//System.out.println("next to build index = " + nextToBuildIndex);
+//System.out.println(buildingsStack.toString());
         // building construction
 		switch(bldgMode) {
 			case FIRST_POSSIBLE:
-				int i = 0;
+				int i = nextToBuildIndex; // if nextToBuildIndex == buildingsStack.size(), then the list doesn't have any orders to process
 				boolean canBuild = false;
 				UnitTypes b = null;
 				UnitType bldg = null;
 				
 				// go through list until we find a buildable structure
-				while(!canBuild && orders.size() > 0 && i < orders.size())
+				while(!canBuild && i < buildingsStack.size())
 				{
-					b = orders.get(i);
+					b = buildingsStack.get(i).blueprint;
 					bldg = bwapi.getUnitType(b.ordinal());
 		
-					if(weAreBuilding(b.ordinal()) && bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
+					if(weAreBuilding(b.ordinal()) || !buildingsStack.get(i).attemptBuild || bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
 							bwapi.getSelf().getGas() - underConstructionG() < bldg.getGasPrice()) 
 					{
 						i++;
@@ -170,12 +162,6 @@ System.out.println();
 				if(canBuild)
 				{
 				   build(b);
-				   
-// temp solution				
-					if(b.ordinal() == UnitTypes.Terran_Refinery.ordinal())
-					{
-						orders.remove(b);
-					}
 				}
 				else 
 				{
@@ -184,42 +170,27 @@ System.out.println();
 					
 				break;
 			case BLOCKING_STACK:
-				i = 0;
+				i = nextToBuildIndex;
 
-				if(orders.size() > 0)
+				if(i < buildingsStack.size())
 				{
-					//find first building not being constructed **** MAY NEED ADJUSTMENT
-					while(i < orders.size() && (weAreBuilding(orders.get(i).ordinal())))
-					{
-						i++;
-					}
+					b = buildingsStack.get(i).blueprint;
+					bldg = bwapi.getUnitType(b.ordinal());
 					
-					if(i < orders.size())
+					if(buildingsStack.get(i).attemptBuild && bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
+					bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
 					{
-						b = orders.get(i);
-						bldg = bwapi.getUnitType(b.ordinal());
-				
-						if(bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
-						bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
-						{
-							build(b);
-// temp solution				
-							if(b.ordinal() == UnitTypes.Terran_Refinery.ordinal())
-							{
-								orders.remove(b);
-							}
-						}
+						build(b);
 					}
 					else
 					{
-						//System.out.println("everything under construction");
+						// insufficient resources
 					}
 				}
 				else
 				{
-					//System.out.println("nothing to build");
+					// nothing to build
 				}
-
 				break;
 			case HOLD_ALL:
 				//System.out.println("halting construction...");
