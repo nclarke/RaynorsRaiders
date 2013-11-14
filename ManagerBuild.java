@@ -33,9 +33,9 @@ public class ManagerBuild extends RRAITemplate
 	Unit tempUnit;
 	
 	ArrayList<BuildingRR> buildingsStack;
-	int builtIndex;
-	int priorityIndex;
-	int readyIndex;
+	int completedBuildingsIndex;    //to last completed, How far down do the built units go?
+	int nextToBuildIndex; //Priority and the next to build
+	//bottom index is implied
 	
 	
 	int homePositionX;
