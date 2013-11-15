@@ -302,7 +302,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 				if (u.getTypeID() == UnitTypes.Terran_SCV.ordinal())
 					managerWorkers.removeWorker(unitID);
 				
-				managerMilitary.removeDestroyedMilitaryUnits(bwapi.getUnit(unitID), u.getTypeID());
+				managerMilitary.removeDestroyedMilitaryUnits(unitID, u.getTypeID());
 				
 				taggedForDeath = u;
 			}

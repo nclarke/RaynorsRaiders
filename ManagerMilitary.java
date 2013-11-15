@@ -16,6 +16,7 @@ public class ManagerMilitary extends RRAITemplate
 	BaseLocation homeBase;
 	
 	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
+	LinkedList<LinkedList<Unit>> currUnitGroups;
 	
 	public class Tile {
 		int x;
@@ -35,6 +36,7 @@ public class ManagerMilitary extends RRAITemplate
 	public ManagerMilitary()
 	{		
 		militaryUnits = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
+		currUnitGroups = new LinkedList<LinkedList<Unit>>();
 		initMilitaryUnit();
 		scouter = new MiltScouter(this);
 	}
@@ -111,15 +113,27 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public void addMilitaryUnit(Unit unitObj, UnitTypes unitType)
 	{
-		System.out.println("Military Manager: Adding unit " + unitObj.getID() + " to militaryUnit");
-		militaryUnits.get(unitType).add(unitObj);
-		System.out.println("Military Manager: Added unit " + unitObj.getID() + " to militaryUnit");
+		//System.out.println("Military Manager: Adding unit " + unitObj.getID() + " to militaryUnit");
+		if(!unitObj.isBeingConstructed())
+		{
+			militaryUnits.get(unitType).add(unitObj);
+			System.out.println("Military Manager: Added. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
+		}
+		//System.out.println("Military Manager: Added unit " + unitObj.getID() + " to militaryUnit");
 	}
 	
-	public void removeMilitaryUnit(Unit unitObj, UnitTypes unitType)
+	public void removeMilitaryUnit(int unitObj, UnitTypes unitType)
 	{
 		//System.out.println("Military Manager: Removing unit " + unitObj.getID() + " in militaryUnit");
-		militaryUnits.get(unitType).remove(unitObj);
+		for(int index = 0; index < militaryUnits.get(unitType).size(); index++)
+		{
+			if(unitObj == (militaryUnits.get(unitType).get(index).getID()))
+			{
+				militaryUnits.get(unitType).remove(index);
+				System.out.println("Military Manager: Removed. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
+				//break;
+			}
+		}
 		//System.out.println("Military Manager: Removd unit " + unitObj.getID() + " in militaryUnit");
 	}
 	
@@ -162,43 +176,43 @@ public class ManagerMilitary extends RRAITemplate
 			addMilitaryUnit(createdUnit, UnitTypes.Terran_Wraith);
 	}
 	
-	public void removeDestroyedMilitaryUnits(Unit createdUnit, int unitTypeID)
+	public void removeDestroyedMilitaryUnits(int destroyedUnit, int unitTypeID)
 	{
 		if(unitTypeID == UnitTypes.Terran_Marine.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Marine);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Marine);
 		
 		if(unitTypeID == UnitTypes.Terran_Firebat.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Firebat);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Firebat);
 		
 		if(unitTypeID == UnitTypes.Terran_Ghost.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Ghost);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Ghost);
 			
 		if(unitTypeID == UnitTypes.Terran_Goliath.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Goliath);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Goliath);
 			
 		if(unitTypeID == UnitTypes.Terran_Medic.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Medic);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Medic);
 			
 		if(unitTypeID == UnitTypes.Terran_Valkyrie.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Valkyrie);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Valkyrie);
 			
 		if(unitTypeID == UnitTypes.Terran_Vulture.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Vulture);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Vulture);
 			
 		if(unitTypeID == UnitTypes.Terran_Vulture_Spider_Mine.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Vulture_Spider_Mine);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Vulture_Spider_Mine);
 			
 		if(unitTypeID == UnitTypes.Terran_Dropship.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Dropship);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Dropship);
 			
 		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
 			
 		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Siege_Mode.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
 			
 		if(unitTypeID == UnitTypes.Terran_Wraith.ordinal())
-			removeMilitaryUnit(createdUnit, UnitTypes.Terran_Wraith);
+			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Wraith);
 	}
 	
 	/*
@@ -209,28 +223,29 @@ public class ManagerMilitary extends RRAITemplate
 	 * locationX:   Pixel X coordinate on the map
 	 * locationY:   Pixel X coordinate on the map
 	 */
-	public void unitOperation(List<UnitTypes> unitTypes, int numOfUnits,  int locationX, int locationY)
+	public void unitOperation(LinkedList<UnitTypes> unitTypes, int numOfUnits,  int locationX, int locationY)
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
 		for(UnitTypes unitTy: unitTypes)
 		{
-			for(Unit ut: militaryUnits.get(unitTy))
+			for(int index = 0; index < militaryUnits.get(unitTy).size(); index++)
 			{
 				if(tmp.size() < numOfUnits)
 				{
-					if(ut.isIdle())
-					{
-						System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
-						tmp.add(ut);
-						System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
-					}
+					//if(ut.isIdle())
+					//{
+						//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
+						tmp.add(militaryUnits.get(unitTy).get(index));
+						//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
+					//}
 				}
 			}
 		}
 		
-		if(!tmp.isEmpty())
+		if(tmp.size() == numOfUnits)
 		{
+			currUnitGroups.add(tmp);
 			unitOperationHelper(tmp, locationX, locationY);
 		}
 	}
@@ -239,20 +254,20 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(Unit ut: militaryUnits.get(UnitTypes.Terran_Marine))
+		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Marine).size(); index++)
 		{
 			if(tmp.size() < numOfUnits)
 			{
-				if(ut.isIdle())
-				{
-					System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
-					tmp.add(ut);
-					System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
-				}
+				//if(ut.isIdle())
+				//{
+					//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
+					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
+					//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
+				//}
 			}
 		}
 		
-		if(!tmp.isEmpty())
+		if(tmp.size() == numOfUnits)
 		{
 			unitOperationHelper(tmp, locationX, locationY);
 		}
@@ -262,20 +277,21 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(Unit ut: militaryUnits.get(UnitTypes.Terran_Marine))
+		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Marine).size(); index++)
 		{
+			//System.out.println("Military Manager: INDEX " + index + " Size of group is " + tmp.size());
 			if(tmp.size() < 5)
 			{
-				//if(ut.isIdle())
-				//{
-					System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
-					tmp.add(ut);
-					System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
-				//}
+				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle())
+				{
+					//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
+					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
+					//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
+				}
 			}
 		}
 		
-		if(!tmp.isEmpty())
+		if(tmp.size() == 5)
 		{
 			unitOperationHelper(tmp, locationX, locationY);
 		}
@@ -286,13 +302,17 @@ public class ManagerMilitary extends RRAITemplate
 	 */
 	private void unitOperationHelper(LinkedList<Unit> unitGroup, int locationX, int locationY)
 	{
-		//rallyUnits(unitGroup, homePositionX, homePositionY);
-		//if(rallyReadyCheck(unitGroup, homePositionX, homePositionY))
-		//{
-			System.out.println("Military Manager: In unitOperationHelper");
+		rallyUnits(unitGroup, homePositionX, homePositionY);
+		System.out.println("Rallied");
+		//boolean test = rallyReadyCheck(unitGroup, homePositionX, homePositionY);
+		//System.out.println(test);
+		if(rallyReadyCheck(unitGroup, homePositionX, homePositionY))
+		{
+			//System.out.println("Military Manager: In unitOperationHelper");
 			attackEnemyLocation(unitGroup, locationX, locationY);
-			System.out.println("Military Manager: Exited unitOperationHelper");
-		//}
+			System.out.println("Attacking");
+			//System.out.println("Military Manager: Exited unitOperationHelper");
+		}
 	}
 	
 	/*
@@ -307,9 +327,9 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		if(unitGroup != null)
 		{
-			for(Unit unit: unitGroup)
+			for(int index = 0; index < unitGroup.size(); index++)
 			{
-				bwapi.move(unit.getID(), pixelPositionX, pixelPositionY);
+				bwapi.move(unitGroup.get(index).getID(), pixelPositionX, pixelPositionY);
 			}
 		}
 		//System.out.println("RALLY TEST");
@@ -325,9 +345,13 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(unitGroup != null)
 		{
-			if((unitGroup.getLast().getX() == pixelPositionX) && (unitGroup.getLast().getY() == pixelPositionY))
+			for(int index = 0; index < unitGroup.size(); index++)
 			{
-				checkReadyFlag = true;
+				if(unitGroup.get(index).isIdle())
+				{
+					checkReadyFlag = true;
+					System.out.println(checkReadyFlag);
+				}
 			}
 		}
 		return checkReadyFlag;
@@ -345,11 +369,11 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		if(unitGroup != null)
 		{
-			for(Unit unit: unitGroup)
+			for(int index = 0; index < unitGroup.size(); index++)
 			{
-				System.out.println("Military Manager: Attack Ordering to unit " + unit.getID());
-				bwapi.attack(unit.getID(), pixelPositionX, pixelPositionY);
-				System.out.println("Military Manager: Attack ordered to unit " + unit.getID());
+				//System.out.println("Military Manager: Attack Ordering to unit " + unit.getID());
+				bwapi.attack(unitGroup.get(index).getID(), pixelPositionX, pixelPositionY);
+				//System.out.println("Military Manager: Attack ordered to unit " + unit.getID());
 			}
 			//System.out.println("ATTACK TEST");
 		}
