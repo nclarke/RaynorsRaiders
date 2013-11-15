@@ -94,10 +94,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			masterUnitList.add(u);
 			
 			//testing on Matt's test map - not important
-			/*if(u.getTypeID() == UnitTypes.Terran_Vulture.ordinal())
-			{
-				managerMilitary.addMilitaryUnit(u, UnitTypes.Terran_Vulture);
-			}*/
+			managerMilitary.addCreatedMilitaryUnits(u, u.getTypeID());
 		}
 		//System.out.println("Size of master list is " + masterUnitList.size());
 		
