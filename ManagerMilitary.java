@@ -233,19 +233,19 @@ public class ManagerMilitary extends RRAITemplate
 			{
 				if(tmp.size() < numOfUnits)
 				{
-					//if(ut.isIdle())
-					//{
+					if(militaryUnits.get(unitTy).get(index).isIdle())
+					{
 						//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
 						tmp.add(militaryUnits.get(unitTy).get(index));
 						//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
-					//}
+					}
 				}
 			}
 		}
 		
 		if(tmp.size() == numOfUnits)
 		{
-			currUnitGroups.add(tmp);
+			//currUnitGroups.add(tmp);
 			unitOperationHelper(tmp, locationX, locationY);
 		}
 	}
@@ -258,12 +258,12 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			if(tmp.size() < numOfUnits)
 			{
-				//if(ut.isIdle())
-				//{
+				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle())
+				{
 					//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
 					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
 					//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
-				//}
+				}
 			}
 		}
 		
