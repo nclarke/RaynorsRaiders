@@ -2,7 +2,9 @@ package javabot.RaynorsRaiders;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Comparator;
 
 import javabot.JNIBWAPI;
 import javabot.model.BaseLocation;
@@ -36,7 +38,7 @@ public class ManagerBuild extends RRAITemplate
 	int completedBuildingsIndex;    //to last completed, How far down do the built units go?
 	int nextToBuildIndex; //Priority and the next to build
 	//bottom index is implied
-	
+	Comparator<BuildingRR> buildTime;
 	
 	int homePositionX;
 	int homePositionY;
@@ -48,7 +50,7 @@ public class ManagerBuild extends RRAITemplate
 		buildingBuildings = new LinkedList<Unit>();
 		
 		buildingsStack = new ArrayList<BuildingRR>();
-		completedBuildingsIndex = 0;
+		completedBuildingsIndex = -1;
 		nextToBuildIndex = 0;
 
 		ourBases = new LinkedList<BaseLocation>();
@@ -112,28 +114,54 @@ public class ManagerBuild extends RRAITemplate
 			}
 		}
 */
+		buildTime = new EarliestBuild();
+
 	}
 	
 	private void constructionStatus()
 	{
-		for(int i = completedBuildingsIndex; i < nextToBuildIndex; i++)
+		for(int i = completedBuildingsIndex + 1 ; i < nextToBuildIndex; i++)
 		{
-			Unit bldg = buildingsStack.get(i).unit;
+			if(buildingsStack.get(i) != null && buildingsStack.get(i).unit != null)
+			{
+				Unit bldg = buildingsStack.get(i).unit;
 //System.out.println(bwapi.getUnitType(bldg.getTypeID()).getName() + " ready in " + bldg.getRemainingBuildTimer());
 
-			if(bldg.isCompleted())
-			{
-				completedBuildingsIndex++;
+				if(bldg.isCompleted())
+				{
+					completedBuildingsIndex++;
+				}
 			}
 		}
+		
+		// checks for creation of refineries
+		for (Unit n : bwapi.getMyUnits()) {
+			if ((n.getTypeID() == UnitTypes.Terran_Refinery.ordinal()) && n.getRemainingBuildTimer() > 0)
+			{
+				// refinery was created
+			}
+		}
+				
 	}
 	// looks for a building to construct according to the build mode
 	// calls build() method if it finds something to construct
 	public void checkUp() 
 	{
-//System.out.println("completed buildings index = " + completedBuildingsIndex);
-//System.out.println("next to build index = " + nextToBuildIndex);
-//System.out.println(buildingsStack.toString());
+		/*
+System.out.println("completed buildings index = " + completedBuildingsIndex);
+System.out.println("next to build index = " + nextToBuildIndex);
+for(BuildingRR bldg: buildingsStack)
+{
+	String blueprint = bwapi.getUnitType(bldg.blueprint.ordinal()).getName();
+	String unit;
+	if(bldg.unit == null)
+		unit = "null";
+	else
+		unit = bwapi.getUnitType(bldg.unit.getTypeID()).getName();
+	
+System.out.println(blueprint + " maps to " + unit);
+}
+*/
         // building construction
 		switch(bldgMode) {
 			case FIRST_POSSIBLE:
@@ -261,7 +289,6 @@ public class ManagerBuild extends RRAITemplate
 					bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
 			{
 				train(c);
-				roster.pop();
 				// add units to military list
 			}
 			break;
@@ -566,6 +593,7 @@ public class ManagerBuild extends RRAITemplate
 						if(unit.getTrainingQueueSize() < 5) 
 						{
 							bwapi.train(unit.getID(), soldier.getID());
+							roster.pop();
 						}
 					}
 				}
@@ -636,6 +664,10 @@ public class ManagerBuild extends RRAITemplate
 							{
 								tilesize = 6;
 							}
+							else if(buildingTypeID == UnitTypes.Terran_Supply_Depot.ordinal() && u.getTypeID() == UnitTypes.Terran_Supply_Depot.ordinal())
+							{
+								tilesize = 2;
+							}
 							else
 							{
 								tilesize = 4;
@@ -677,6 +709,26 @@ public class ManagerBuild extends RRAITemplate
 			if (bwapi.getUnitType(unit.getTypeID()).isWorker() && unit.getConstructingTypeID() == buildingTypeID) return true;
 		}
 		return false;
+	}
+	
+	private class EarliestBuild implements Comparator<BuildingRR>
+	{
+		public int compare(BuildingRR bldg1, BuildingRR bldg2)
+		{
+			if(bldg1.unit.getRemainingBuildTimer() < bldg2.unit.getRemainingBuildTimer())
+			{
+				return -1;
+			}
+			else
+			{
+				return 1;
+			}
+		}
+	}
+	
+	public void scheduleBuildTime()
+	{
+		Collections.sort(buildingsStack.subList(completedBuildingsIndex + 1, nextToBuildIndex), buildTime);
 	}
 }
 

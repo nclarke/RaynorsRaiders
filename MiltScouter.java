@@ -20,9 +20,9 @@ public class MiltScouter
 	LinkedList<ManagerMilitary.Tile> scoutingPositions;
 	ManagerMilitary MM;
 	
-	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
+	LinkedList<Unit> hostilUnits;
 	
-
+	/*store-enemy-base?*/
 	
 	public MiltScouter(ManagerMilitary MM)
 	{
@@ -75,7 +75,20 @@ public class MiltScouter
 	}
 	
 
+	/*scout to a specific position immediately*/
+	public void scout(int X, int Y)
+	{
+		this.scoutingPositions.addFirst(MM.new Tile(X, Y));
+		scout();
+	}
 
+
+	/*scout to a specific position after other positions have been seen*/
+	public void scoutEventually(int X, int Y)
+	{
+		this.scoutingPositions.add(MM.new Tile(X, Y));
+		scout();
+	}
 	
 	
 	/*makes scouting more generic
@@ -88,6 +101,7 @@ public class MiltScouter
 			System.out.println("new scout is: "+this.scout);
 			addEnemyBases();
 		}
+		addEmenyUnits();
 		if(scoutHasArrived() && !this.scoutingPositions.isEmpty()){
 			System.out.print("\nnew scouting location");
 			ManagerMilitary.Tile next=this.scoutingPositions.peek();
@@ -97,6 +111,13 @@ public class MiltScouter
 			System.out.println("no more scouting locations");
 		}
 	}
+	
+	private void addEmenyUnits()
+	{
+		//		this.scout.getUnitsInRadius();
+		
+	}
+	
 	
 	public boolean scoutHasArrived()
 	{
