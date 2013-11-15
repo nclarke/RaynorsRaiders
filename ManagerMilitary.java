@@ -58,13 +58,13 @@ public class ManagerMilitary extends RRAITemplate
 		this.scouter.scout();
 		
 		//for testing purposes - tries to send 5 marines to an enemy base atm
-		/*for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
+		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
 		{
 			if (b.isStartLocation() )
 			{
 				unitOperation(b.getX(), b.getY()); 
 			}
-		}*/
+		}
 	}
 	
     public void debug()
@@ -114,12 +114,8 @@ public class ManagerMilitary extends RRAITemplate
 	public void addMilitaryUnit(Unit unitObj, UnitTypes unitType)
 	{
 		//System.out.println("Military Manager: Adding unit " + unitObj.getID() + " to militaryUnit");
-		System.out.println("Remaining Time: " + unitObj.getRemainingTrainTime());
-		if(unitObj.getRemainingTrainTime() == 0)
-		{
-			militaryUnits.get(unitType).add(unitObj);
-			System.out.println("Military Manager: Added. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
-		}
+		militaryUnits.get(unitType).add(unitObj);
+		System.out.println("Military Manager: Added. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
 		//System.out.println("Military Manager: Added unit " + unitObj.getID() + " to militaryUnit");
 	}
 	
@@ -234,7 +230,8 @@ public class ManagerMilitary extends RRAITemplate
 			{
 				if(tmp.size() < numOfUnits)
 				{
-					if(militaryUnits.get(unitTy).get(index).isIdle())
+					if(militaryUnits.get(unitTy).get(index).isIdle() && 
+							militaryUnits.get(UnitTypes.Terran_Marine).get(index).isCompleted())
 					{
 						//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
 						tmp.add(militaryUnits.get(unitTy).get(index));
@@ -259,7 +256,8 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			if(tmp.size() < numOfUnits)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle())
+				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
+						militaryUnits.get(UnitTypes.Terran_Marine).get(index).isCompleted())
 				{
 					//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
 					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
@@ -278,15 +276,16 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Siege_Tank_Tank_Mode).size(); index++)
+		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Marine).size(); index++)
 		{
 			//System.out.println("Military Manager: INDEX " + index + " Size of group is " + tmp.size());
 			if(tmp.size() < 5)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Siege_Tank_Tank_Mode).get(index).isIdle())
+				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
+						militaryUnits.get(UnitTypes.Terran_Marine).get(index).isCompleted())
 				{
 					//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Siege_Tank_Tank_Mode).get(index));
+					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
 					//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
 				}
 			}
@@ -294,6 +293,7 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(tmp.size() == 5)
 		{
+			currUnitGroups.add(tmp);
 			unitOperationHelper(tmp, locationX, locationY);
 		}
 	}
