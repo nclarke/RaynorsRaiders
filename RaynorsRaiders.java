@@ -282,6 +282,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 				managerBuild.nextToBuildIndex++;
 				
 				// sort under construction according to build time
+				managerBuild.scheduleBuildTime();
 
 			}
 		}
