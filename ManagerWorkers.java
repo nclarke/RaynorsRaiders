@@ -32,6 +32,95 @@ public class ManagerWorkers extends RRAITemplate
 	Unit tempUnit;
 	
 
+	
+	@Override
+	public void checkUp() 
+	{
+		System.out.println("In workers checkup");
+		Unit curWorker;
+		for (Worker w : allWorkers)
+		{
+			
+			curWorker = bwapi.getUnit(w.unitID);
+			if (curWorker.isUnderAttack())
+			{
+				workerUnderAttack(curWorker);
+			}
+		}
+		handleIdle();
+	}
+	
+	/*
+	 * Nick call this function like
+	 * ManagerWorkers.checkOutWorker(ManagerWorkers.workerOrders.SCOUT, 0)
+	 * will grab you a worker from base 0 to scout
+	 * 
+	 * Ben call this function like
+	 * ManagerWorkers.checkOutWorker(ManagerWorkers.workerOrders.BUILD, 0)
+	 */
+	
+	public int checkOutWorker(workerOrders todo, int baseNum)
+	{
+		int ndx;
+		Worker toRtn = null, curWorker;
+		for (ndx = 0; ndx < baseWorkers.get(baseNum).size(); ndx++)
+		{
+			curWorker = baseWorkers.get(baseNum).get(ndx);
+			if (curWorker.curOrder == workerOrders.MINE)
+			{
+				curWorker.lastOrder = curWorker.curOrder; 
+				curWorker.curOrder = todo;
+				toRtn = curWorker;
+				return toRtn.unitID;				
+			}
+		}
+		System.out.println("Unable to checkout worker for: " + todo);
+		return -1;
+	}
+	public void checkInWorker(int unitID)
+	{
+		Worker curWorker;
+		workerOrders temp;
+		
+		curWorker = getWorkerByID(unitID);
+		if (curWorker != null)
+		{
+			temp = curWorker.curOrder;
+			curWorker.curOrder = curWorker.lastOrder;
+			curWorker.lastOrder = temp;
+			bwapi.stop(unitID);
+		}
+		else
+			System.out.println("checkInWorker failed, could not find worker by unitID");
+	}
+	/*
+	 * Pass in the unit that is under attack
+	 */
+	public void workerUnderAttack(Unit underAttack)
+	{
+		Unit helperSCV;
+		Worker underAttackWorker, helperWorker;
+		int nearestSCV, x, y;
+		underAttackWorker = getWorkerByID(underAttack.getID());
+		x = underAttack.getX();
+		y = underAttack.getY();
+		//if (attacker.getTypeID() == UnitTypes.Protoss_Probe.ordinal())
+		if (underAttackWorker.curOrder != workerOrders.UNDERATTACK)
+		{
+			nearestSCV = getNearestUnit(UnitTypes.Terran_SCV.ordinal(), x, y);
+			System.out.println("Nearest SCV is " + nearestSCV);
+			helperSCV = bwapi.getUnit(nearestSCV);
+			helperWorker = getWorkerByID(helperSCV.getID());
+			underAttackWorker.lastOrder = underAttackWorker.curOrder;
+			
+			helperWorker.lastOrder = helperWorker.curOrder;
+			underAttackWorker.curOrder = workerOrders.UNDERATTACK;
+			helperWorker.curOrder = workerOrders.UNDERATTACK;
+			bwapi.attack(helperSCV.getID(), x, y);
+			bwapi.attack(underAttack.getID(), x, y);
+		}
+	}
+	
 	public void trainWorker()
 	{
 		
@@ -78,7 +167,7 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public enum workerOrders
 	{
-		MINE, GAS, ATTACK, SCOUT
+		MINE, GAS, ATTACK, SCOUT, UNDERATTACK, BUILD
 	}
 	
 	private class Worker
@@ -86,6 +175,7 @@ public class ManagerWorkers extends RRAITemplate
 		private int unitID;
 		private int asgnedBase; //what base it should be mining from 0 = Main, 1 = Natural...
 		private workerOrders curOrder; //mine, attack, defend etc... thinking of doing an enum
+		private workerOrders lastOrder;
 		private double asgnedBaseX, asgnedBaseY; // X and Y coords of the current base location
 		
 		private Worker() 
@@ -320,7 +410,8 @@ public class ManagerWorkers extends RRAITemplate
 					if (closestId != -1) 
 						bwapi.rightClick(curUnit.getID(), closestId);
 					break;
-				case ATTACK :
+				case UNDERATTACK :
+					w.curOrder = w.lastOrder;
 					break;
 				default :
 					break;
@@ -417,10 +508,13 @@ public class ManagerWorkers extends RRAITemplate
 	{
 		int nearestID = -1;
 		double nearestDist = 9999999;
-		for (Unit unit : bwapi.getMyUnits()) {
+		for (Unit unit : bwapi.getMyUnits())
+		{
 			if ((unit.getTypeID() != unitTypeID) || (!unit.isCompleted())) continue;
 			double dist = Math.sqrt(Math.pow(unit.getX() - x, 2) + Math.pow(unit.getY() - y, 2));
-			if (nearestID == -1 || dist < nearestDist) {
+			if (nearestID == -1 || dist < nearestDist) 
+			{
+				System.out.println("Found nearest unit");
 				nearestID = unit.getID();
 				nearestDist = dist;
  			}
@@ -434,6 +528,18 @@ public class ManagerWorkers extends RRAITemplate
 	public void debug() 
 	{
 		int baseNdx = 0;
+		Unit curWorker;
+		
+		for (Worker w : allWorkers)
+		{
+			if (w.curOrder == workerOrders.UNDERATTACK) 
+			{
+				curWorker = bwapi.getUnit(w.unitID);
+				bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.PURPLE, false, false);
+			}
+		}
+		
+		/*
 		for (BaseLocation b : bwapi.getMap().getBaseLocations())//builder.ourBases 
 		{
 			int tempMins = getNumMinerals(b.getX(), b.getY());
@@ -452,6 +558,7 @@ public class ManagerWorkers extends RRAITemplate
 		{
 			bwapi.drawText(0, 10 + (10 * (ndx + 1)), ndx + " " + allWorkers.get(ndx).unitID, true);	
 		}
+		*/
 	}
 
 }

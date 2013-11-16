@@ -139,7 +139,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 		// Call actions every 30 frames
 		if (frameCount % 30 == 0) 
 		{
-			managerWorkers.handleIdle();
+			//managerWorkers.handleIdle();
+			managerWorkers.checkUp();
 			coreBaby.checkUp();
 			//coreReactive.checkUp();
 			managerBuild.checkUp();
@@ -167,7 +168,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			
 			bwapi.drawLine(u.getX(), u.getY(), u.getTargetX(), u.getTargetY(), BWColor.WHITE, false);
 		}
-		//managerWorkers.debug();
+		managerWorkers.debug();
 		
 		int buildOrderNdx = 100;
 		for (CoreBaby.BuildOrder bo : coreBaby.buildingGoals)
@@ -316,7 +317,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 			}
 		}
 	}
-	public void unitDiscover(int unitID) { }
+	public void unitDiscover(int unitID) 
+	{ 
+	}
 	public void unitEvade(int unitID) { }
 	public void unitHide(int unitID) { }
 	public void unitMorph(int unitID) { }
