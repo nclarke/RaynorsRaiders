@@ -114,8 +114,21 @@ public class MiltScouter
 	
 	private void addEmenyUnits()
 	{
+		/*
 		//		this.scout.getUnitsInRadius();
-		
+		System.out.println("ENEMY UNITS:");
+		for (Unit unit : MM.bwapi.getEnemyUnits())
+		{
+			System.out.println("the unit "+unit.getTypeID()+ " ID is: "+unit.getID());
+			System.out.println("class: "+unit.getClass()+ " buildtype: "+unit.getBuildTypeID());
+//			System.out.println("class: "+unit.getClass()+ " buildtype: "+unit.getBuildTypeID());
+
+			//ID 7 is scv
+			//ID 106 is command center
+			//hardcode everythign for protoss?
+		}
+		System.out.println("");
+		*/
 	}
 	
 	
@@ -126,7 +139,7 @@ public class MiltScouter
 			next=this.scoutingPositions.peek();
 
 			//			System.out.println("frameCoutn: "+MM.bwapi.getFrameCount());
-			if (scout.isIdle() || MM.bwapi.getFrameCount() < 1)
+			if (scout.isIdle() || MM.bwapi.getFrameCount() <= 1)
 			{
 				//scout is not doing anything, so he can go scout some more (or at start)
 				return true;

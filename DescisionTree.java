@@ -19,10 +19,16 @@ public class DescisionTree {
 		this.mBld = mBld;
 
 	}
+
 	
 	private boolean canIBuildThis(Unit unit)
 	{
-		if (unit.getID() == UnitTypes.Terran_Marine.ordinal())
+		return canIBuildThis(unit.getTypeID());
+	}
+	
+	private boolean canIBuildThis(int unitType)
+	{
+		if (unitType == UnitTypes.Terran_Marine.ordinal())
 			for (Unit building : this.mBld.builtBuildings)		
 				if (building.getID() == UnitTypes.Terran_Barracks.ordinal())
 					return true;

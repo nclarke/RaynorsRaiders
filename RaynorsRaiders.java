@@ -34,6 +34,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 	ManagerBuild 		managerBuild;
 	ManagerWorkers		managerWorkers;
 	ManagerMilitary     managerMilitary;
+	ManagerInfo         managerInfo; 
 
 	public static void main(String[] args) 
 	{
@@ -50,14 +51,16 @@ public class RaynorsRaiders implements BWAPIEventListener
 		managerBuild = new ManagerBuild();
 		managerWorkers = new ManagerWorkers();
 		managerMilitary = new ManagerMilitary();
+		managerInfo = new ManagerInfo();
 		coreBaby = new CoreBaby();
 		
 		/* Send AI Pointers to all the AIs (this is the "second" constructor */
-		coreReactive.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		coreBaby.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		managerBuild.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		managerMilitary.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		managerWorkers.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
+		coreReactive.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
+		coreBaby.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
+		managerBuild.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
+		managerMilitary.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
+		managerWorkers.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
+		managerInfo.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
 		
 		bwapi.start();
 	} 
