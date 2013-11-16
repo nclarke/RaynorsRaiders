@@ -58,13 +58,13 @@ public class ManagerMilitary extends RRAITemplate
 		this.scouter.scout();
 		
 		//for testing purposes - tries to send 5 marines to an enemy base atm
-		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
+		/*for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
 		{
 			if (b.isStartLocation() )
 			{
 				unitOperation(b.getX(), b.getY()); 
 			}
-		}
+		}*/
 	}
 	
     public void debug()
@@ -128,7 +128,23 @@ public class ManagerMilitary extends RRAITemplate
 			{
 				militaryUnits.get(unitType).remove(index);
 				System.out.println("Military Manager: Removed. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
-				//break;
+			}
+		}
+		//System.out.println("Military Manager: Removd unit " + unitObj.getID() + " in militaryUnit");
+	}
+	
+	public void removeUnitInUnitGroup(int unitObj, UnitTypes unitType)
+	{
+		//System.out.println("Military Manager: Removing unit " + unitObj.getID() + " in militaryUnit");
+		for(int index = 0; index < currUnitGroups.size(); index++)
+		{
+			for(int index2 = 0; index2 < currUnitGroups.get(index).size(); index2++)
+			{
+				if(unitObj == (currUnitGroups.get(index).get(index2).getID()))
+				{
+					currUnitGroups.get(index).remove(index2);
+					System.out.println("Military Manager: removeUnitInUnitGroup " + index +". New size is " + currUnitGroups.get(index).size());
+				}
 			}
 		}
 		//System.out.println("Military Manager: Removd unit " + unitObj.getID() + " in militaryUnit");
@@ -176,40 +192,76 @@ public class ManagerMilitary extends RRAITemplate
 	public void removeDestroyedMilitaryUnits(int destroyedUnit, int unitTypeID)
 	{
 		if(unitTypeID == UnitTypes.Terran_Marine.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Marine);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Marine);
+		}
 		
 		if(unitTypeID == UnitTypes.Terran_Firebat.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Firebat);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Marine);
+		}
 		
 		if(unitTypeID == UnitTypes.Terran_Ghost.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Ghost);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Ghost);
+		}
 			
 		if(unitTypeID == UnitTypes.Terran_Goliath.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Goliath);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Goliath);
+		}
 			
 		if(unitTypeID == UnitTypes.Terran_Medic.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Medic);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Medic);
+		}
 			
 		if(unitTypeID == UnitTypes.Terran_Valkyrie.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Valkyrie);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Valkyrie);
+		}
 			
 		if(unitTypeID == UnitTypes.Terran_Vulture.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Vulture);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Vulture);
+		}
 			
 		if(unitTypeID == UnitTypes.Terran_Vulture_Spider_Mine.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Vulture_Spider_Mine);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Vulture_Spider_Mine);
+		}
 			
 		if(unitTypeID == UnitTypes.Terran_Dropship.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Dropship);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Dropship);
+		}
 			
 		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
+		}
 			
 		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Siege_Mode.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
+		}
 			
 		if(unitTypeID == UnitTypes.Terran_Wraith.ordinal())
+		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Wraith);
+			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Wraith);
+		}
 	}
 	
 	/*
@@ -294,7 +346,69 @@ public class ManagerMilitary extends RRAITemplate
 		if(tmp.size() == 5)
 		{
 			currUnitGroups.add(tmp);
+			removeUsedUnits(tmp);
 			unitOperationHelper(tmp, locationX, locationY);
+		}
+	}
+	
+	public UnitTypes getUnitType(int unitTypeID)
+	{
+		if(unitTypeID == UnitTypes.Terran_Marine.ordinal())
+			return UnitTypes.Terran_Marine;
+		
+		if(unitTypeID == UnitTypes.Terran_Firebat.ordinal())
+			return UnitTypes.Terran_Firebat;
+		
+		if(unitTypeID == UnitTypes.Terran_Ghost.ordinal())
+			return UnitTypes.Terran_Ghost;
+			
+		if(unitTypeID == UnitTypes.Terran_Goliath.ordinal())
+			return UnitTypes.Terran_Goliath;
+			
+		if(unitTypeID == UnitTypes.Terran_Medic.ordinal())
+			return UnitTypes.Terran_Medic;
+			
+		if(unitTypeID == UnitTypes.Terran_Valkyrie.ordinal())
+			return UnitTypes.Terran_Valkyrie;
+			
+		if(unitTypeID == UnitTypes.Terran_Vulture.ordinal())
+			return UnitTypes.Terran_Vulture;
+			
+		if(unitTypeID == UnitTypes.Terran_Vulture_Spider_Mine.ordinal())
+			return UnitTypes.Terran_Vulture_Spider_Mine;
+			
+		if(unitTypeID == UnitTypes.Terran_Dropship.ordinal())
+			return UnitTypes.Terran_Dropship;
+			
+		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
+			return UnitTypes.Terran_Siege_Tank_Tank_Mode;
+			
+		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Siege_Mode.ordinal())
+			return UnitTypes.Terran_Siege_Tank_Siege_Mode;
+			
+		if(unitTypeID == UnitTypes.Terran_Wraith.ordinal())
+			return UnitTypes.Terran_Wraith;
+		
+		return null;
+	}
+	
+	private void removeUsedUnits(LinkedList<Unit> usedUnits)
+	{	
+		if(usedUnits != null)
+		{
+			for(int index = 0; index < usedUnits.size(); index++)
+			{
+				UnitTypes tmp = getUnitType(usedUnits.get(index).getTypeID());
+				
+				for(int index2 = 0; index2 < militaryUnits.get(tmp).size(); index2++)
+				{
+					if(usedUnits.get(index).getID() == (militaryUnits.get(tmp).get(index2).getID()))
+					{
+						militaryUnits.get(tmp).remove(index2);
+						System.out.println("Military Manager: removeUsedUnits. New size is " + militaryUnits.get(tmp).size());
+					}
+				}
+			}
 		}
 	}
 	
