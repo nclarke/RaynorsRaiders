@@ -6,6 +6,7 @@ package javabot.RaynorsRaiders;
 import java.awt.Point;
 import java.util.LinkedList;
 
+import javabot.RaynorsRaiders.ManagerBuild.BuildStatus;
 import javabot.RaynorsRaiders.ManagerBuild.BuildingRR;
 import javabot.model.*;
 import javabot.types.*;
@@ -137,7 +138,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 		
 		// Call actions every 30 frames
-		if (frameCount % 30 == 0) 
+		if (frameCount % 15 == 0) 
 		{
 			managerWorkers.handleIdle();
 			coreBaby.checkUp();
@@ -170,9 +171,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 		//managerWorkers.debug();
 		
 		int buildOrderNdx = 100;
-		for (CoreBaby.BuildOrder bo : coreBaby.buildingGoals)
+		for (ManagerBuild.BuildingRR bo : coreBaby.buildingGoals)
 		{
-			bwapi.drawText(0, buildOrderNdx, bo.unitToMake.toString(), true);
+			bwapi.drawText(0, buildOrderNdx, bo.blueprint.toString() + " " + bo.status.toString(), true);
 			buildOrderNdx += 10;
 		}
 		buildOrderNdx = 100;
@@ -280,6 +281,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			{
 				managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).unit = createdUnit;
 				managerBuild.nextToBuildIndex++;
+				
 				
 				// sort under construction according to build time
 				managerBuild.scheduleBuildTime();

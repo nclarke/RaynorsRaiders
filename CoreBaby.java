@@ -4,6 +4,8 @@ import java.util.*;
 
 import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.*;
+import javabot.RaynorsRaiders.ManagerBuild.BuildStatus;
+import javabot.RaynorsRaiders.ManagerBuild.BuildingRR;
 import javabot.model.ChokePoint;
 import javabot.model.Region;
 import javabot.types.UnitType;
@@ -11,27 +13,9 @@ import javabot.types.UnitType.UnitTypes;
 
 public class CoreBaby extends RRAITemplate 
 {
-	LinkedList<BuildOrder> buildingGoals;
+	ArrayList<BuildingRR> buildingGoals;
 	LinkedList<MilitaryOrder> militaryGoals;
 	LinkedList<UnitTypes> unitMixtures;
-	
-	public class BuildOrder {
-		Integer supplyNeeded;
-		Integer workersNeeded;
-		UnitTypes unitToMake;
-		Integer baseID;
-		
-		public BuildOrder(
-		 Integer d_workers, 
-		 Integer d_supply,
-	     UnitTypes d_unit,
-	     Integer d_base) {
-			supplyNeeded = d_supply;
-			workersNeeded = d_workers;
-			unitToMake = d_unit;
-			baseID = d_base;		
-		}
-	}
 	
 	public enum BattleMode
 	{
@@ -51,7 +35,7 @@ public class CoreBaby extends RRAITemplate
 		BattleTargets target;
 		LinkedList<UnitTypes> units;
 		
-		public MilitaryOrder(
+	public MilitaryOrder(
 		 Integer d_strength,
 		 Integer d_xLoc,
 		 Integer d_yLoc,
@@ -72,11 +56,13 @@ public class CoreBaby extends RRAITemplate
 	
 	public CoreBaby() 
 	{
-		buildingGoals = new LinkedList<BuildOrder>();
 		militaryGoals = new LinkedList<MilitaryOrder>();
 		unitMixtures = new LinkedList<UnitTypes>();
 	}
 	
+	public void AILinkData() {
+		buildingGoals = builder.buildingsStack;
+	}
 	public void setup() 
 	{
 		//Begin tactics path
@@ -92,59 +78,55 @@ public class CoreBaby extends RRAITemplate
 	
 	public void checkUp() 
 	{
+		int supplyTotal = bwapi.getSelf().getSupplyTotal()/2;
+		int supplyUsed = bwapi.getSelf().getSupplyUsed()/2;
 		/* --- Base Building --- */
-		BuildOrder order = buildingGoals.peek();
 		
-		if (order != null) {
+		if (buildingGoals.size() > 0 && builder.nextToBuildIndex != -1) {
+			int SCVsTotal = workers.getBaseWorkers(buildingGoals.get(builder.nextToBuildIndex).baseAssignment);
+			int supplyNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSupply;
+			int SCVsNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSCVs;
 			//System.out.println("Order on top: " + order.supplyNeeded + "/" + order.workersNeeded
 			// + " Comp: " + bwapi.getSelf().getSupplyTotal()/2 + "/" + workers.getBaseWorkers(0)
 			// + " U: " + bwapi.getSelf().getSupplyUsed()/2);
-			if (
-			 order.supplyNeeded <= bwapi.getSelf().getSupplyTotal()/2 &&
-			 order.workersNeeded <= workers.getBaseWorkers(0)
-			) 
+			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal) 
 			{
-				builder.orders.addLast(order.unitToMake);
-				////System.out.println("Adding order to make" + order.unitToMake.toString());
-				buildingGoals.remove(order);
+				buildingGoals.get(builder.nextToBuildIndex).status = BuildStatus.ATTEMPT_BUILD;
 			}
 			
-			if (order.workersNeeded > workers.getBaseWorkers(0)) 
+			if (SCVsNeeded > SCVsTotal) 
 			{	
 				workers.trainWorker();
 			}
 			
-			if (
-			 bwapi.getSelf().getSupplyUsed()/2 + 10 > bwapi.getSelf().getSupplyTotal()/2) 
+			if (supplyUsed + 4 > supplyTotal) 
 			{
-				////System.out.println("Supply depot needed");
-				if (builder.orders.peek() != UnitTypes.Terran_Supply_Depot) 
+				if (buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot) 
 				{
-					////System.out.println("Adding supply depot since supply is running out");
-					builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
+					buildingGoals.add(builder.nextToBuildIndex, new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
 				}
 			}
-			
 		}
 		else
 		{
-			if (bwapi.getSelf().getSupplyUsed()/2 + 4 > bwapi.getSelf().getSupplyTotal()/2) 
+			if (supplyUsed + 4 > supplyTotal) 
 			{
-				builder.orders.addFirst(UnitTypes.Terran_Supply_Depot);
+				buildingGoals.add(new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
+				builder.nextToBuildIndex = buildingGoals.size() - 1;
 			}
 		}
 		
 		/* Add units */
 		UnitTypes unit = unitMixtures.peek();
 		
-		if (unit != null)
-		{
-			//builder.roster.addLast(UnitTypes.Terran_Marine);
+		//if (unit != null)
+		//{
+			builder.roster.addLast(UnitTypes.Terran_Marine);
 			//builder.roster.addLast(UnitTypes.Terran_Vulture);
 			
-			builder.roster.addLast(unit);
-			unitMixtures.pop();
-		}
+			//builder.roster.addLast(unit);
+			//unitMixtures.pop();
+		//}
 		
 		/* Military Orders */
 		MilitaryOrder groundPound = militaryGoals.peek();
@@ -171,6 +153,8 @@ public class CoreBaby extends RRAITemplate
 			//System.out.println("Adding units");
 			unitMixtures.add(UnitTypes.Terran_Marine);
 			unitMixtures.add(UnitTypes.Terran_Vulture);
+			unitMixtures.add(UnitTypes.Terran_Medic);
+			unitMixtures.add(UnitTypes.Terran_Siege_Tank_Tank_Mode);
 		}
 		
 	}
@@ -209,19 +193,16 @@ public class CoreBaby extends RRAITemplate
 	
 	public void initBuildStyle_siegeExpand() 
 	{
-		//buildingGoals.addLast(new BuildOrder(9,10,UnitTypes.Terran_Supply_Depot,0));
-		//buildingGoals.addLast(new BuildOrder(9,10,UnitTypes.Terran_Supply_Depot,0));
-		//buildingGoals.addLast(new BuildOrder(9,10,UnitTypes.Terran_Supply_Depot,0)); // the "wall"
-		buildingGoals.addLast(new BuildOrder(12,18,UnitTypes.Terran_Barracks,0));
-		buildingGoals.addLast(new BuildOrder(12,18,UnitTypes.Terran_Refinery,0));
-		buildingGoals.addLast(new BuildOrder(12,18,UnitTypes.Terran_Barracks,0));
-		//buildingGoals.addLast(new BuildOrder(15,18,UnitTypes.Terran_Supply_Depot,0));
-		buildingGoals.addLast(new BuildOrder(16,26,UnitTypes.Terran_Factory,0));
-		buildingGoals.addLast(new BuildOrder(16,26,UnitTypes.Terran_Machine_Shop,0));
-		buildingGoals.addLast(new BuildOrder(21,26,UnitTypes.Terran_Command_Center,1));
-		//buildingGoals.addLast(new BuildOrder(24,26,UnitTypes.Terran_Supply_Depot,0));
-		//buildingGoals.addLast(new BuildOrder(25,34,UnitTypes.Terran_Siege_Tank_Siege_Mode,0)); // this might be wrong
-		buildingGoals.addLast(new BuildOrder(28,34,UnitTypes.Terran_Engineering_Bay,0));
+		//buildingGoals.add(new BuildingRR(5, 10, 0, UnitTypes.Terran_Bunker, BuildStatus.HOLD));
+		//buildingGoals.add(new BuildingRR(6, 10, 0, UnitTypes.Terran_Bunker, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(18, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(18, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
 	}
 	
 }

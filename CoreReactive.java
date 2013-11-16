@@ -6,7 +6,6 @@ import javabot.JNIBWAPI;
 import javabot.types.*;
 import javabot.types.UnitType.UnitTypes;
 import javabot.util.*;
-import javabot.RaynorsRaiders.CoreBaby.BuildOrder;
 import javabot.model.*;
 
 public class CoreReactive extends RRAITemplate 
