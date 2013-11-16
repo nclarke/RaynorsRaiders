@@ -23,10 +23,12 @@ import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 public class ManagerInfo extends RRAITemplate
 {
 
+	MiltScouter scouter;
 	
 	public ManagerInfo() {
 		//SET UP ALL INTERNAL VARIABLES HERE
 		super();
+		scouter = new MiltScouter(this);
 	}
 	
 	
@@ -37,6 +39,7 @@ public class ManagerInfo extends RRAITemplate
 
 	public void checkUp() 
 	{
+		this.scouter.scout();
 	
 	}
 	

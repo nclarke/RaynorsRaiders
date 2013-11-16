@@ -14,35 +14,42 @@ public class MiltScouter
 
 	/* EnumMap for us to know what UnitTypes to train per Level - Level is determined by how well AI is doing in the game 
 	 * (AI is very rich in the beginning, gets its level changed from ZERO to TWO) */
-	int homePositionX, homePositionY;
+//	int homePositionX, homePositionY;
 	BaseLocation homeBase;
 	Unit scout;
-	LinkedList<ManagerMilitary.Tile> scoutingPositions;
-	ManagerMilitary MM;
+	LinkedList<Tile> scoutingPositions;
+	ManagerInfo mInfo;
 	
 	LinkedList<Unit> hostilUnits;
 	
 	/*store-enemy-base?*/
 	
-	public MiltScouter(ManagerMilitary MM)
+
+	public class Tile {
+		int x;
+		int y;
+		public Tile(int x,int y){
+			this.x=x;
+			this.y=y;
+		}
+		public int getX(){
+			return this.x;
+		}
+		public int getY(){
+			return this.y;
+		}
+	}
+	
+	
+	
+	public MiltScouter(ManagerInfo mInfo)
 	{
-		this.MM = MM;
+		this.mInfo = mInfo;
 		System.out.println("Scouter online");
-		this.scoutingPositions = new LinkedList<ManagerMilitary.Tile>();
+		this.scoutingPositions = new LinkedList<Tile>();
 	}
 	
-	
-	public void setup() {
-		System.out.println("Setup scouter online");
-	}
-	
-	public void startUp()
-	{
-		System.out.println("scouter!");
-		this.scoutingPositions = new LinkedList<ManagerMilitary.Tile>();
-		this.scout = getNewScoutUnit();
-		scout();
-	}
+
 	
 	public void checkUp() {
 		//Check up - FIXME - code needs to go here.
@@ -63,9 +70,9 @@ public class MiltScouter
 	
 	private Unit getNewScoutUnit(int typeID)
 	{
-		for (Unit unit : MM.bwapi.getMyUnits())
+		for (Unit unit : mInfo.bwapi.getMyUnits())
 		{
-			if (unit.getTypeID() == typeID && (unit.isIdle() || MM.bwapi.getFrameCount() == 1))//not sure about checking frame count
+			if (unit.getTypeID() == typeID && (unit.isIdle() || mInfo.bwapi.getFrameCount() == 1))//not sure about checking frame count
 			{
 				return new Unit(unit.getID());
 			}
@@ -78,7 +85,7 @@ public class MiltScouter
 	/*scout to a specific position immediately*/
 	public void scout(int X, int Y)
 	{
-		this.scoutingPositions.addFirst(MM.new Tile(X, Y));
+		this.scoutingPositions.addFirst(new Tile(X, Y));
 		scout();
 	}
 
@@ -86,7 +93,7 @@ public class MiltScouter
 	/*scout to a specific position after other positions have been seen*/
 	public void scoutEventually(int X, int Y)
 	{
-		this.scoutingPositions.add(MM.new Tile(X, Y));
+		this.scoutingPositions.add(new Tile(X, Y));
 		scout();
 	}
 	
@@ -104,8 +111,8 @@ public class MiltScouter
 		addEmenyUnits();
 		if(scoutHasArrived() && !this.scoutingPositions.isEmpty()){
 			System.out.print("\nnew scouting location");
-			ManagerMilitary.Tile next=this.scoutingPositions.peek();
-			MM.bwapi.move(scout.getID(), next.getX(),next.getY());
+			Tile next=this.scoutingPositions.peek();
+			mInfo.bwapi.move(scout.getID(), next.getX(),next.getY());
 		}
 		if(this.scoutingPositions.isEmpty()){
 			System.out.println("no more scouting locations");
@@ -134,12 +141,12 @@ public class MiltScouter
 	
 	public boolean scoutHasArrived()
 	{
-		ManagerMilitary.Tile next;
+		Tile next;
 		if(!this.scoutingPositions.isEmpty()){
 			next=this.scoutingPositions.peek();
 
 			//			System.out.println("frameCoutn: "+MM.bwapi.getFrameCount());
-			if (scout.isIdle() || MM.bwapi.getFrameCount() <= 1)
+			if (scout.isIdle() || mInfo.bwapi.getFrameCount() <= 1)
 			{
 				//scout is not doing anything, so he can go scout some more (or at start)
 				return true;
@@ -169,7 +176,7 @@ public class MiltScouter
     {
     	int nearestID = -1;
 	    double nearestDist = 9999999;
-	    for (Unit unit : MM.bwapi.getMyUnits()) 
+	    for (Unit unit : mInfo.bwapi.getMyUnits()) 
 	    {
 	    	if ((unit.getTypeID() != unitTypeID) || (!unit.isCompleted())) continue;
 	    	double dist = Math.sqrt(Math.pow(unit.getX() - x, 2) + Math.pow(unit.getY() - y, 2));
@@ -189,15 +196,15 @@ public class MiltScouter
 	 */
 	public void addEnemyBases()
 	{		
-		for (BaseLocation b : MM.bwapi.getMap().getBaseLocations()) 
+		for (BaseLocation b : mInfo.bwapi.getMap().getBaseLocations()) 
 		{
 			
-			if (b.isStartLocation() && (b.getX() != homePositionX) && (b.getY() != homePositionY)) 
+			if (b.isStartLocation() && (b.getX() != mInfo.military.homePositionX) && (b.getY() != mInfo.military.homePositionY)) 
 			{
-				this.scoutingPositions.add(MM.new Tile(b.getX(), b.getY()));//, y).Tile(b.getX(),b.getY()));
+				this.scoutingPositions.add(new Tile(b.getX(), b.getY()));//, y).Tile(b.getX(),b.getY()));
 			}
 		}
-		this.scoutingPositions.add(MM.new Tile(this.homePositionX, this.homePositionY));
+		this.scoutingPositions.add(new Tile(mInfo.military.homePositionX, mInfo.military.homePositionY));
 	}
 
 }

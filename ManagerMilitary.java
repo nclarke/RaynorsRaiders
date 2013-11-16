@@ -12,33 +12,16 @@ import javabot.util.*;
 public class ManagerMilitary extends RRAITemplate
 {
 	int homePositionX, homePositionY;
-	MiltScouter scouter;
 	BaseLocation homeBase;
 	
 	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
 	LinkedList<LinkedList<Unit>> currUnitGroups;
-	
-	public class Tile {
-		int x;
-		int y;
-		public Tile(int x,int y){
-			this.x=x;
-			this.y=y;
-		}
-		public int getX(){
-			return this.x;
-		}
-		public int getY(){
-			return this.y;
-		}
-	}
 	
 	public ManagerMilitary()
 	{		
 		militaryUnits = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
 		currUnitGroups = new LinkedList<LinkedList<Unit>>();
 		initMilitaryUnit();
-		scouter = new MiltScouter(this);
 	}
 	
 	public void AILinkData() {
@@ -55,7 +38,6 @@ public class ManagerMilitary extends RRAITemplate
 	}
 	
 	public void checkUp() {
-		this.scouter.scout();
 		
 		//for testing purposes - tries to send 5 marines to an enemy base atm
 		/*for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
