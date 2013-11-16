@@ -6,6 +6,7 @@ package javabot.RaynorsRaiders;
 import java.awt.Point;
 import java.util.LinkedList;
 
+import javabot.RaynorsRaiders.ManagerBuild.BuildStatus;
 import javabot.RaynorsRaiders.ManagerBuild.BuildingRR;
 import javabot.model.*;
 import javabot.types.*;
@@ -33,6 +34,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 	ManagerBuild 		managerBuild;
 	ManagerWorkers		managerWorkers;
 	ManagerMilitary     managerMilitary;
+	ManagerInfo         managerInfo; 
 
 	public static void main(String[] args) 
 	{
@@ -49,14 +51,16 @@ public class RaynorsRaiders implements BWAPIEventListener
 		managerBuild = new ManagerBuild();
 		managerWorkers = new ManagerWorkers();
 		managerMilitary = new ManagerMilitary();
+		managerInfo = new ManagerInfo();
 		coreBaby = new CoreBaby();
 		
 		/* Send AI Pointers to all the AIs (this is the "second" constructor */
-		coreReactive.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		coreBaby.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		managerBuild.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		managerMilitary.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
-		managerWorkers.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers);
+		coreReactive.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
+		coreBaby.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
+		managerBuild.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
+		managerMilitary.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
+		managerWorkers.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
+		managerInfo.AILink(bwapi, coreReactive, coreBaby, managerBuild, managerMilitary, managerWorkers, managerInfo);
 		
 		bwapi.start();
 	} 
@@ -137,7 +141,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 		
 		// Call actions every 30 frames
-		if (frameCount % 30 == 0) 
+		if (frameCount % 15 == 0) 
 		{
 			//managerWorkers.handleIdle();
 			managerWorkers.checkUp();
@@ -171,9 +175,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 		managerWorkers.debug();
 		
 		int buildOrderNdx = 100;
-		for (CoreBaby.BuildOrder bo : coreBaby.buildingGoals)
+		for (ManagerBuild.BuildingRR bo : coreBaby.buildingGoals)
 		{
-			bwapi.drawText(0, buildOrderNdx, bo.unitToMake.toString(), true);
+			bwapi.drawText(0, buildOrderNdx, bo.blueprint.toString() + " " + bo.status.toString(), true);
 			buildOrderNdx += 10;
 		}
 		buildOrderNdx = 100;
@@ -281,6 +285,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			{
 				managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).unit = createdUnit;
 				managerBuild.nextToBuildIndex++;
+				
 				
 				// sort under construction according to build time
 				managerBuild.scheduleBuildTime();

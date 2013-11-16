@@ -10,6 +10,7 @@ public class RRAITemplate
 	ManagerBuild builder;
 	ManagerMilitary military;
 	ManagerWorkers workers;
+	ManagerInfo info;
 	
 	public RRAITemplate() 
 	{
@@ -22,7 +23,8 @@ public class RRAITemplate
 	 CoreBaby d_baby,
 	 ManagerBuild d_builder,
 	 ManagerMilitary d_military,
-	 ManagerWorkers d_workers
+	 ManagerWorkers d_workers,
+	 ManagerInfo d_info
 	 )
 	{
 	    bwapi = d_bwapi;
@@ -31,6 +33,7 @@ public class RRAITemplate
 		builder = d_builder;
 		military = d_military;
 		workers = d_workers;
+		info = d_info;
 		AILinkData();
 	}
 	

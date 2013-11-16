@@ -70,14 +70,35 @@ public class ManagerBuild extends RRAITemplate
 	{
 		FIRST_POSSIBLE, BLOCKING_STACK, HOLD_ALL, RESET_BLOCKING_STACK
 	};
+	
+	public enum BuildStatus
+	{
+		ACCEPTTED, ATTEMPT_BUILD, HOLD
+	}
 
-	public class BuildingRR {
+	public static class BuildingRR {
 		int requiredSupply;
 		int requiredSCVs;
 		int baseAssignment;
 		UnitTypes blueprint;
 		Unit unit;
-		boolean attemptBuild;
+		BuildStatus status;
+		
+		BuildingRR(
+		 int d_reqSupply,
+		 int d_reqSCVs,
+		 int d_base,
+		 UnitTypes d_blue,
+		 BuildStatus d_stat
+		) 
+		{
+			requiredSupply = d_reqSupply;
+			requiredSCVs = d_reqSCVs;
+			baseAssignment = d_base;
+			blueprint = d_blue;
+			unit = null;
+			status = d_stat;
+		}
 	}
 	
 	private class BaseRR
@@ -176,7 +197,7 @@ System.out.println(blueprint + " maps to " + unit);
 					b = buildingsStack.get(i).blueprint;
 					bldg = bwapi.getUnitType(b.ordinal());
 		
-					if(weAreBuilding(b.ordinal()) || !buildingsStack.get(i).attemptBuild || bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
+					if(weAreBuilding(b.ordinal()) || buildingsStack.get(i).status != BuildStatus.ATTEMPT_BUILD || bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
 							bwapi.getSelf().getGas() - underConstructionG() < bldg.getGasPrice()) 
 					{
 						i++;
@@ -200,19 +221,19 @@ System.out.println(blueprint + " maps to " + unit);
 			case BLOCKING_STACK:
 				i = nextToBuildIndex;
 
-				if(i < buildingsStack.size())
+				if(i < buildingsStack.size() && i > -1)
 				{
 					b = buildingsStack.get(i).blueprint;
 					bldg = bwapi.getUnitType(b.ordinal());
 					
-					if(buildingsStack.get(i).attemptBuild && bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
+					if(buildingsStack.get(i).status == BuildStatus.ATTEMPT_BUILD && bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
 					bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
 					{
 						build(b);
 					}
 					else
 					{
-						// insufficient resources
+						// insufficient resourcesb
 					}
 				}
 				else
@@ -728,7 +749,8 @@ System.out.println(blueprint + " maps to " + unit);
 	
 	public void scheduleBuildTime()
 	{
-		Collections.sort(buildingsStack.subList(completedBuildingsIndex + 1, nextToBuildIndex), buildTime);
+		//Collections.sort(buildingsStack.subList(completedBuildingsIndex + 1, nextToBuildIndex), buildTime);
+		// FIXME - causing crashes
 	}
 }
 
