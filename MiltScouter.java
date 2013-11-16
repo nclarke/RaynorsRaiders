@@ -49,6 +49,9 @@ public class MiltScouter
 		this.scoutingPositions = new LinkedList<Tile>();
 	}
 	
+	public void startUp()
+	{
+	}
 
 	
 	public void checkUp() {
@@ -64,19 +67,28 @@ public class MiltScouter
 	 */
 	public Unit getNewScoutUnit()
 	{
-		return getNewScoutUnit(UnitTypes.Terran_SCV.ordinal());
+		int ID = this.mInfo.workers.checkOutWorker(ManagerWorkers.workerOrders.SCOUT, 0);
+		for (Unit unit : this.mInfo.bwapi.getMyUnits())
+		{
+			if (unit.getID() == ID)
+			{
+				addEnemyBases();
+				return unit;
+			}
+		}
+		
+		return null;
 		
 	}
 	
 	private Unit getNewScoutUnit(int typeID)
 	{
+		if (typeID == UnitTypes.Terran_SCV.ordinal())
+			return getNewScoutUnit();
+
 		for (Unit unit : mInfo.bwapi.getMyUnits())
-		{
-			if (unit.getTypeID() == typeID && (unit.isIdle() || mInfo.bwapi.getFrameCount() == 1))//not sure about checking frame count
-			{
+			if (unit.getTypeID() == typeID && (unit.isIdle()))
 				return new Unit(unit.getID());
-			}
-		}
 		
 		return new Unit(-1);
 	}
@@ -103,40 +115,23 @@ public class MiltScouter
 	 */
 	public void scout(){
 		if (this.scout == null){
-			System.out.println("this new scout is: "+this.scout);
 			this.scout = getNewScoutUnit();
 			System.out.println("new scout is: "+this.scout);
-			addEnemyBases();
+			if (this.scout == null)
+				return;
 		}
-		addEmenyUnits();
 		if(scoutHasArrived() && !this.scoutingPositions.isEmpty()){
-			System.out.print("\nnew scouting location");
 			Tile next=this.scoutingPositions.peek();
+			System.out.println("new scouting location at ("+next.getX()+","+next.getY()+")");
 			mInfo.bwapi.move(scout.getID(), next.getX(),next.getY());
 		}
-		if(this.scoutingPositions.isEmpty()){
+		else if(this.scoutingPositions.isEmpty()){
 			System.out.println("no more scouting locations");
+			mInfo.workers.checkInWorker(scout.getID());
+			this.scout = null;
 		}
 	}
 	
-	private void addEmenyUnits()
-	{
-		/*
-		//		this.scout.getUnitsInRadius();
-		System.out.println("ENEMY UNITS:");
-		for (Unit unit : MM.bwapi.getEnemyUnits())
-		{
-			System.out.println("the unit "+unit.getTypeID()+ " ID is: "+unit.getID());
-			System.out.println("class: "+unit.getClass()+ " buildtype: "+unit.getBuildTypeID());
-//			System.out.println("class: "+unit.getClass()+ " buildtype: "+unit.getBuildTypeID());
-
-			//ID 7 is scv
-			//ID 106 is command center
-			//hardcode everythign for protoss?
-		}
-		System.out.println("");
-		*/
-	}
 	
 	
 	public boolean scoutHasArrived()
@@ -144,21 +139,21 @@ public class MiltScouter
 		Tile next;
 		if(!this.scoutingPositions.isEmpty()){
 			next=this.scoutingPositions.peek();
-
+/*			System.out.println("scout going to: ("+next.getX()+","+next.getY()+")");
+			System.out.println("   and is now at: ("+scout.getX()+","+scout.getY()+")");
+			System.out.println("this is your home location: ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
+*/
 			//			System.out.println("frameCoutn: "+MM.bwapi.getFrameCount());
-			if (scout.isIdle() || mInfo.bwapi.getFrameCount() <= 1)
+			if(!((scout.getX() < (next.getX() + 100) && scout.getX() > (next.getX() - 100) ) 
+					&& (scout.getY() < (next.getY() + 100) && scout.getY() > (next.getY() - 100) )))
 			{
-				//scout is not doing anything, so he can go scout some more (or at start)
-				return true;
-			}
-			else if(((scout.getX() != next.getX()) || (scout.getX() != next.getY())))
-			{
-				//				System.out.println("here2");
+				mInfo.bwapi.move(scout.getID(), next.getX(),next.getY());
+				//				System.out.println("not there yet");
 				return false;
 			}	
 			else
 			{
-				//				System.out.println("here3");
+			//					System.out.println("here3");
 				//scout has reached the Tile, so he can go scout some more
 				this.scoutingPositions.pop();
 				return true;
@@ -201,6 +196,7 @@ public class MiltScouter
 			
 			if (b.isStartLocation() && (b.getX() != mInfo.military.homePositionX) && (b.getY() != mInfo.military.homePositionY)) 
 			{
+				System.out.println("this is your home location: ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
 				this.scoutingPositions.add(new Tile(b.getX(), b.getY()));//, y).Tile(b.getX(),b.getY()));
 			}
 		}

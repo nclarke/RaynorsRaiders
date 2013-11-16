@@ -300,6 +300,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 		//System.out.println("In unit destroyed");
 		bwapi.printText("Unit Destroyed " + String.valueOf(unitID));
 		Unit taggedForDeath = null;
+
+		this.managerInfo.unitDestoryed(unitID);
 		
 		for (Unit u : masterUnitList)
 		{
@@ -326,6 +328,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 	}
 	public void unitDiscover(int unitID) 
 	{ 
+		this.managerInfo.unitSeen(unitID);
 	}
 	public void unitEvade(int unitID) { }
 	public void unitHide(int unitID) { }
