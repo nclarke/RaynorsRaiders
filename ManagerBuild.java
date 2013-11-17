@@ -17,7 +17,7 @@ import javabot.types.UpgradeType;
 import javabot.types.UpgradeType.UpgradeTypes;
 import javabot.util.BWColor;
 import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
-
+import javabot.RaynorsRaiders.ManagerWorkers;
 // Cannot import core reactive, primary and secondary constructors will init the AI core communication
 
 public class ManagerBuild extends RRAITemplate
@@ -82,6 +82,7 @@ public class ManagerBuild extends RRAITemplate
 		int baseAssignment;
 		UnitTypes blueprint;
 		Unit unit;
+		Unit worker;
 		BuildStatus status;
 		
 		BuildingRR(
@@ -97,6 +98,7 @@ public class ManagerBuild extends RRAITemplate
 			baseAssignment = d_base;
 			blueprint = d_blue;
 			unit = null;
+			worker = null;
 			status = d_stat;
 		}
 	}
@@ -151,6 +153,8 @@ public class ManagerBuild extends RRAITemplate
 				if(bldg.isCompleted())
 				{
 					completedBuildingsIndex++;
+					workers.checkInWorker(buildingsStack.get(i).worker.getID());
+					buildingsStack.get(i).worker = null;
 				}
 			}
 		}
@@ -160,6 +164,11 @@ public class ManagerBuild extends RRAITemplate
 			if ((n.getTypeID() == UnitTypes.Terran_Refinery.ordinal()) && n.getRemainingBuildTimer() > 0)
 			{
 				// refinery was created
+				if(n.getTypeID() == buildingsStack.get(nextToBuildIndex).blueprint.ordinal() && buildingsStack.get(nextToBuildIndex).unit == null)
+				{
+					buildingsStack.get(nextToBuildIndex).unit = n;
+					nextToBuildIndex++;
+				}
 			}
 		}
 				
@@ -168,19 +177,24 @@ public class ManagerBuild extends RRAITemplate
 	// calls build() method if it finds something to construct
 	public void checkUp() 
 	{
-		/*
+/*		
 System.out.println("completed buildings index = " + completedBuildingsIndex);
 System.out.println("next to build index = " + nextToBuildIndex);
 for(BuildingRR bldg: buildingsStack)
 {
 	String blueprint = bwapi.getUnitType(bldg.blueprint.ordinal()).getName();
-	String unit;
+	String unit, worker;
 	if(bldg.unit == null)
 		unit = "null";
 	else
 		unit = bwapi.getUnitType(bldg.unit.getTypeID()).getName();
 	
-System.out.println(blueprint + " maps to " + unit);
+	if(bldg.worker == null)
+		worker = "no one";
+	else
+		worker = bldg.worker.toString();
+	
+System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 }
 */
         // building construction
@@ -233,7 +247,7 @@ System.out.println(blueprint + " maps to " + unit);
 					}
 					else
 					{
-						// insufficient resourcesb
+						// insufficient resources
 					}
 				}
 				else
@@ -489,7 +503,18 @@ System.out.println(blueprint + " maps to " + unit);
 				else 
 				{
 					// try to find the worker near our home position
-					int worker = getNearestUnit(UnitTypes.Terran_SCV.ordinal(), homePositionX, homePositionY);
+					int worker = -1;
+					
+					if(buildingsStack.get(nextToBuildIndex).worker != null)
+					{
+						worker = buildingsStack.get(nextToBuildIndex).worker.getID();
+					}
+					else
+					{
+						worker = workers.checkOutWorker(ManagerWorkers.workerOrders.BUILD, 0);
+						buildingsStack.get(nextToBuildIndex).worker = bwapi.getUnit(worker);
+					}
+					
 					if (worker != -1) 
 					{
 						// if we found him, try to select appropriate build tile position for bldg (near our home base)
