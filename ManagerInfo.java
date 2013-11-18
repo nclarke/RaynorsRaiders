@@ -42,7 +42,8 @@ public class ManagerInfo extends RRAITemplate
 
 	public void checkUp() 
 	{
-		this.scouter.scout();
+		if (this.bwapi.getFrameCount() % 1050 == 0)
+			this.scouter.scout();
 	
 	}
 	
@@ -81,8 +82,23 @@ public class ManagerInfo extends RRAITemplate
 	public void unitDestoryed(int unitID)
 	{		
 		Unit unit = bwapi.getUnit(unitID);
+		System.out.println("destroyed unitID: "+unitID);
+//		System.out.println("ID of: "+bwapi.getUnit(unitID).getPlayerID());
+		if (unitID == this.scouter.scout.getID())
+		{
+			System.out.println("scout destroyed of tyep:"+scouter.scout.getTypeID());
+			if (this.scouter.scout.getTypeID() == UnitTypes.Terran_SCV.ordinal())
+				workers.checkInWorker(scouter.scout.getID());
+			this.scouter.scout = null;
+			System.out.println("scout checked back in");
+
+			
+		}
+		System.out.println("here");
+/*		System.out.println("ID of: "+bwapi.getUnit(unitID).getPlayerID());
 		if(bwapi.getUnit(unitID).getPlayerID() == 0) //neutral Unit
 		{
+			System.out.println("here2");
 			if(this.neutralUnits.contains(unit))
 			{
 				neutralUnits.remove(unit);
@@ -90,6 +106,7 @@ public class ManagerInfo extends RRAITemplate
 		}
 		else if(bwapi.getUnit(unitID).getPlayerID() != selfID) //enemy Unit
 		{
+			System.out.println("here3");
 			if(this.enemyUnits.contains(unit))
 			{
 				enemyUnits.remove(unit);
@@ -99,8 +116,10 @@ public class ManagerInfo extends RRAITemplate
 		}
 		else
 		{
+			System.out.println("here4");
 			//our unit
-		}
+		}*/
+		System.out.println("done");
 		
 	}
 

@@ -72,7 +72,17 @@ public class CoreBaby extends RRAITemplate
 	
 	public void startUp()
 	{
+		int index;
 		initEntrenchBase();
+		for (index = 0; index < 100; index++)
+		{
+			builder.roster.addLast(UnitTypes.Terran_Marine);
+			builder.roster.addLast(UnitTypes.Terran_Vulture);
+		}
+		for (index = 0; index < 50; index++)
+		{
+			builder.roster.addLast(UnitTypes.Terran_Siege_Tank_Tank_Mode);
+		}
 	}
 	
 	
@@ -121,8 +131,6 @@ public class CoreBaby extends RRAITemplate
 		
 		//if (unit != null)
 		//{
-			builder.roster.addLast(UnitTypes.Terran_Marine);
-			//builder.roster.addLast(UnitTypes.Terran_Vulture);
 			
 			//builder.roster.addLast(unit);
 			//unitMixtures.pop();

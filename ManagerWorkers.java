@@ -36,7 +36,7 @@ public class ManagerWorkers extends RRAITemplate
 	@Override
 	public void checkUp() 
 	{
-		System.out.println("In workers checkup");
+//		System.out.println("In workers checkup");
 		Unit curWorker;
 		for (Worker w : allWorkers)
 		{
@@ -514,7 +514,7 @@ public class ManagerWorkers extends RRAITemplate
 			double dist = Math.sqrt(Math.pow(unit.getX() - x, 2) + Math.pow(unit.getY() - y, 2));
 			if (nearestID == -1 || dist < nearestDist) 
 			{
-				System.out.println("Found nearest unit");
+//				System.out.println("Found nearest unit");
 				nearestID = unit.getID();
 				nearestDist = dist;
  			}
