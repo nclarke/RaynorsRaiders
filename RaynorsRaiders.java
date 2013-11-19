@@ -288,7 +288,6 @@ public class RaynorsRaiders implements BWAPIEventListener
 				managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).unit = createdUnit;
 				managerBuild.nextToBuildIndex++;
 				
-				
 				// sort under construction according to build time
 				managerBuild.scheduleBuildTime();
 

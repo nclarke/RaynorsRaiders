@@ -177,7 +177,7 @@ public class ManagerBuild extends RRAITemplate
 	// calls build() method if it finds something to construct
 	public void checkUp() 
 	{
-/*		
+/*
 System.out.println("completed buildings index = " + completedBuildingsIndex);
 System.out.println("next to build index = " + nextToBuildIndex);
 for(BuildingRR bldg: buildingsStack)
@@ -224,7 +224,7 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 				
 				if(canBuild)
 				{
-				   build(b);
+				   build(b, buildingsStack.get(i).baseAssignment);
 				}
 				else 
 				{
@@ -243,7 +243,7 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 					if(buildingsStack.get(i).status == BuildStatus.ATTEMPT_BUILD && bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
 					bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
 					{
-						build(b);
+						build(b, buildingsStack.get(i).baseAssignment);
 					}
 					else
 					{
@@ -264,7 +264,7 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 
 		constructionStatus();
 		
-//System.out.println("roster: " + roster.toString());
+System.out.println("roster: " + roster.toString());
 		// unit training
 		switch(unitsMode) 
 		{
@@ -281,9 +281,10 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 				c = roster.get(i);
 				soldier = bwapi.getUnitType(c.ordinal());
 
-				for(Unit bldg : builtBuildings)
+				for(BuildingRR file : buildingsStack)
 				{
-					if(bldg.getTypeID() == soldier.getWhatBuildID())
+					
+					if(file.blueprint.ordinal() == soldier.getWhatBuildID())
 					{
 						trainingGroundsPresent = true;
 						break;
@@ -324,6 +325,7 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 					bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
 			{
 				train(c);
+				roster.pop();
 				// add units to military list
 			}
 			break;
@@ -467,7 +469,7 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
         // input: build(UnitTypes.xxxx) 
         // will build near similar building types
         // will also build add-ons (not sure if structure will attempt relocating if there's not enough room)
-	public boolean build(UnitTypes structure) {
+	public boolean build(UnitTypes structure, int baseNum) {
 		//System.out.println("Building " + structure.toString());
 		UnitType bldg;
 		
@@ -517,8 +519,14 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 					
 					if (worker != -1) 
 					{
-						// if we found him, try to select appropriate build tile position for bldg (near our home base)
+						// if we found him, try to select appropriate build tile position for bldg (near specified base number)
 						int xtile = homePositionX, ytile = homePositionY;
+						
+						if(ourBases.get(baseNum) != null)
+						{
+							xtile = ourBases.get(baseNum).getX();
+							ytile = ourBases.get(baseNum).getY();
+						}						
 				
 						for(Unit unit : bwapi.getMyUnits()) 
 						{
@@ -632,16 +640,30 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 		{
 			if(bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
 			{
-				for(Unit unit : builtBuildings) 
+				int queueSize = 6;
+				Unit grounds = null;
+				for(BuildingRR file : buildingsStack) 
 				{
-					if(unit.getTypeID() == soldier.getWhatBuildID()) 
+					if(file.blueprint.ordinal() == soldier.getWhatBuildID() && file.unit != null) 
 					{
-						if(unit.getTrainingQueueSize() < 5) 
+						Unit unit = file.unit;
+						
+						if(unit.isCompleted() && unit.getTrainingQueueSize() < queueSize) 
 						{
-							bwapi.train(unit.getID(), soldier.getID());
-							roster.pop();
+							grounds = unit;
+							queueSize = unit.getTrainingQueueSize();
 						}
 					}
+				}
+				
+				if(grounds != null)
+				{
+					bwapi.train(grounds.getID(), soldier.getID());
+					roster.pop();
+				}
+				else
+				{
+					// capacity full
 				}
 			}
 			else 
