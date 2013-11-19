@@ -23,10 +23,14 @@ public class ManagerInfo extends RRAITemplate
 	List<Unit> neutralUnits;
 	List<Unit> enemyUnits;
 	int selfID;
+	int hostileX;
+	int hostileY;
 	
 	public ManagerInfo() {
 		//SET UP ALL INTERNAL VARIABLES HERE
 		super();
+		hostileX = 0;
+		hostileY = 0;
 		scouter = new MiltScouter(this);
 		neutralUnits = new ArrayList<Unit>();
 		enemyUnits = new ArrayList<Unit>();

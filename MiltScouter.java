@@ -198,6 +198,9 @@ public class MiltScouter
 			{
 				System.out.println("this is your home location: ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
 				this.scoutingPositions.add(new Tile(b.getX(), b.getY()));//, y).Tile(b.getX(),b.getY()));
+				this.mInfo.baby.hostileX = b.getX();
+				this.mInfo.baby.hostileY = b.getY();
+				
 			}
 		}
 		this.scoutingPositions.add(new Tile(mInfo.military.homePositionX, mInfo.military.homePositionY));

@@ -16,6 +16,7 @@ public class CoreBaby extends RRAITemplate
 	ArrayList<BuildingRR> buildingGoals;
 	LinkedList<MilitaryOrder> militaryGoals;
 	LinkedList<UnitTypes> unitMixtures;
+	int hostileX,hostileY, countdown;
 	
 	public enum BattleMode
 	{
@@ -56,6 +57,9 @@ public class CoreBaby extends RRAITemplate
 	
 	public CoreBaby() 
 	{
+		hostileX = 0;
+		hostileY = 0;
+		countdown = 2000;
 		militaryGoals = new LinkedList<MilitaryOrder>();
 		unitMixtures = new LinkedList<UnitTypes>();
 	}
@@ -150,6 +154,14 @@ public class CoreBaby extends RRAITemplate
 				}
 				militaryGoals.pop();
 			}
+		}
+		if (countdown == 0)
+		{
+			military.unitOperation(hostileX, hostileY);
+		}
+		else
+		{
+			countdown--;
 		}
 	}
 	
