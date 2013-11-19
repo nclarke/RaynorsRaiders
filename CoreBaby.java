@@ -144,6 +144,10 @@ public class CoreBaby extends RRAITemplate
 			if (true)
 			{
 				military.unitOperation(groundPound.units, groundPound.strength, groundPound.x, groundPound.y);
+				for(int index = 0; index < military.currUnitGroups.size(); index++)
+				{
+					military.handleUnitsAttacking(military.currUnitGroups.get(index), groundPound.strength, groundPound.y);
+				}
 				militaryGoals.pop();
 			}
 		}

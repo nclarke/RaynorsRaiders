@@ -497,7 +497,7 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
-	private boolean handleUnitsAttacking(LinkedList<Unit> unitGroup, int pixelPositionX, int pixelPositionY)
+	public void handleUnitsAttacking(LinkedList<Unit> unitGroup, int pixelPositionX, int pixelPositionY)
 	{
 		for(int index = 0; index < unitGroup.size(); index++)
 		{			
@@ -535,7 +535,6 @@ public class ManagerMilitary extends RRAITemplate
 				}
 			}
 		}
-		return false;
 	}
 	
 	/*
