@@ -281,6 +281,13 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(tmp.size() == numOfUnits)
 		{
+			for(int index = 0; index < (militaryUnits.get(UnitTypes.Terran_Medic).size()/2); index++)
+			{
+				if(militaryUnits.get(UnitTypes.Terran_Medic).get(index).isIdle() 
+						&& militaryUnits.get(UnitTypes.Terran_Medic).get(index).isCompleted())
+					tmp.add(militaryUnits.get(UnitTypes.Terran_Medic).get(index));
+			}
+			
 			currUnitGroups.add(tmp);
 			removeUsedUnits(tmp);
 			unitOperationHelper(tmp, locationX, locationY);
@@ -317,16 +324,16 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Siege_Tank_Tank_Mode).size(); index++)
+		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Marine).size(); index++)
 		{
 			//System.out.println("Military Manager: INDEX " + index + " Size of group is " + tmp.size());
 			if(tmp.size() < 5)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Siege_Tank_Tank_Mode).get(index).isIdle() && 
-						militaryUnits.get(UnitTypes.Terran_Siege_Tank_Tank_Mode).get(index).isCompleted())
+				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
+						militaryUnits.get(UnitTypes.Terran_Marine).get(index).isCompleted())
 				{
 					//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Siege_Tank_Tank_Mode).get(index));
+					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
 					//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
 				}
 			}
@@ -334,6 +341,12 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(tmp.size() == 5)
 		{
+			for(int index = 0; index < (militaryUnits.get(UnitTypes.Terran_Medic).size()/2); index++)
+			{
+				if(militaryUnits.get(UnitTypes.Terran_Medic).get(index).isIdle() 
+						&& militaryUnits.get(UnitTypes.Terran_Medic).get(index).isCompleted())
+					tmp.add(militaryUnits.get(UnitTypes.Terran_Medic).get(index));
+			}
 			currUnitGroups.add(tmp);
 			removeUsedUnits(tmp);
 			unitOperationHelper(tmp, locationX, locationY);
