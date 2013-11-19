@@ -173,6 +173,7 @@ public class ManagerBuild extends RRAITemplate
 		}
 				
 	}
+	
 	// looks for a building to construct according to the build mode
 	// calls build() method if it finds something to construct
 	public void checkUp() 
@@ -264,7 +265,7 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 
 		constructionStatus();
 		
-System.out.println("roster: " + roster.toString());
+//System.out.println("roster: " + roster.toString());
 		// unit training
 		switch(unitsMode) 
 		{
@@ -284,7 +285,7 @@ System.out.println("roster: " + roster.toString());
 				for(BuildingRR file : buildingsStack)
 				{
 					
-					if(file.blueprint.ordinal() == soldier.getWhatBuildID())
+					if(file.blueprint.ordinal() == soldier.getWhatBuildID() && file.unit != null && file.unit.isCompleted())
 					{
 						trainingGroundsPresent = true;
 						break;
@@ -304,8 +305,7 @@ System.out.println("roster: " + roster.toString());
 			
 			if(canTrain)
 			{
-			   train(c);
-			   roster.remove(i);
+				train(c, i);
 			   // add unit to military list
 			}
 			else 
@@ -324,8 +324,7 @@ System.out.println("roster: " + roster.toString());
 			if(bwapi.getSelf().getMinerals() - underConstructionM() >= soldier.getMineralPrice() && 
 					bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
 			{
-				train(c);
-				roster.pop();
+				train(c, 0);
 				// add units to military list
 			}
 			break;
@@ -632,7 +631,8 @@ System.out.println("roster: " + roster.toString());
 
 	//input: train(UnitTypes.xxxx)
 	// method will do research check before attempting to train
-	public void train(UnitTypes cadet) 
+
+	public void train(UnitTypes cadet, int pos) 
 	{
 		UnitType soldier = bwapi.getUnitType(cadet.ordinal());
 		
@@ -640,30 +640,30 @@ System.out.println("roster: " + roster.toString());
 		{
 			if(bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
 			{
-				int queueSize = 6;
+				int queueSize = 5;
 				Unit grounds = null;
 				for(BuildingRR file : buildingsStack) 
 				{
-					if(file.blueprint.ordinal() == soldier.getWhatBuildID() && file.unit != null) 
-					{
-						Unit unit = file.unit;
-						
-						if(unit.isCompleted() && unit.getTrainingQueueSize() < queueSize) 
+					if(file.unit != null && file.unit.getTypeID() == soldier.getWhatBuildID() && file.unit.isCompleted()) 
+					{	
+						if(file.unit.getTrainingQueueSize() < queueSize) 
 						{
-							grounds = unit;
-							queueSize = unit.getTrainingQueueSize();
+							//grounds = bwapi.getUnit(file.unit.getID());
+							grounds = file.unit;
+							queueSize = file.unit.getTrainingQueueSize();
 						}
 					}
 				}
-				
+
 				if(grounds != null)
 				{
 					bwapi.train(grounds.getID(), soldier.getID());
-					roster.pop();
+					roster.remove(pos);
 				}
 				else
 				{
 					// capacity full
+					//System.out.println("did not train");
 				}
 			}
 			else 
