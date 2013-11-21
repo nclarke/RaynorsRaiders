@@ -6,6 +6,7 @@ import java.util.*;
 import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.Level;
 import javabot.model.*;
+import javabot.types.UnitType;
 import javabot.types.UnitType.UnitTypes;
 import javabot.util.*;
 
@@ -324,16 +325,16 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Marine).size(); index++)
+		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Ghost).size(); index++)
 		{
 			//System.out.println("Military Manager: INDEX " + index + " Size of group is " + tmp.size());
 			if(tmp.size() < 5)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
-						militaryUnits.get(UnitTypes.Terran_Marine).get(index).isCompleted())
+				if(militaryUnits.get(UnitTypes.Terran_Ghost).get(index).isIdle() && 
+						militaryUnits.get(UnitTypes.Terran_Ghost).get(index).isCompleted())
 				{
 					//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
+					tmp.add(militaryUnits.get(UnitTypes.Terran_Ghost).get(index));
 					//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
 				}
 			}
@@ -506,6 +507,24 @@ public class ManagerMilitary extends RRAITemplate
 				if(unitGroup.get(index).isStartingAttack())
 				{
 					bwapi.useTech(unitGroup.get(index).getID(), UnitTypes.Terran_Vulture_Spider_Mine.ordinal());
+				}
+			}
+			
+			if(unitGroup.get(index).getTypeID() == UnitTypes.Terran_Ghost.ordinal())
+			{
+				bwapi.cloak(unitGroup.get(index).getID());
+				if(unitGroup.get(index).isStartingAttack())
+				{
+					for(Unit un: bwapi.getMyUnits())
+					{
+						if(un.getTypeID() == UnitTypes.Terran_Command_Center.ordinal())
+						{
+							if(un.isNukeReady())
+							{
+								bwapi.useTech(unitGroup.get(index).getID(), UnitTypes.Terran_Nuclear_Missile.ordinal(), pixelPositionX, pixelPositionY);
+							}
+						}
+					}
 				}
 			}
 			
