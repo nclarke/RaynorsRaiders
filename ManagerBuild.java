@@ -18,6 +18,7 @@ import javabot.types.UpgradeType.UpgradeTypes;
 import javabot.util.BWColor;
 import javabot.RaynorsRaiders.CoreReactive.*; // Why do we need this line? -Matt
 import javabot.RaynorsRaiders.ManagerWorkers;
+import javabot.model.ChokePoint;
 // Cannot import core reactive, primary and secondary constructors will init the AI core communication
 
 public class ManagerBuild extends RRAITemplate
@@ -178,7 +179,7 @@ public class ManagerBuild extends RRAITemplate
 	// calls build() method if it finds something to construct
 	public void checkUp() 
 	{
-/*
+
 System.out.println("completed buildings index = " + completedBuildingsIndex);
 System.out.println("next to build index = " + nextToBuildIndex);
 for(BuildingRR bldg: buildingsStack)
@@ -197,7 +198,7 @@ for(BuildingRR bldg: buildingsStack)
 	
 System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 }
-*/
+
         // building construction
 		switch(bldgMode) {
 			case FIRST_POSSIBLE:
@@ -478,8 +479,8 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 		}
 		if (structure.ordinal() == UnitTypes.Terran_Command_Center.ordinal())
 		{
-			buildExpand();
-			return false;
+//			buildExpand();
+//			return false;
 		}
 		
 		bldg = bwapi.getUnitType(structure.ordinal());
@@ -496,6 +497,7 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 						if(unit.getTypeID() == bldg.getWhatBuildID()) 
 						{
 							bwapi.buildAddon(unit.getID(), bldg.getID());
+							buildingsStack.get(nextToBuildIndex).status = BuildStatus.ACCEPTTED;
 							break;
 						}
 					}
@@ -523,25 +525,57 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 						
 						if(ourBases.get(baseNum) != null)
 						{
-							xtile = ourBases.get(baseNum).getX();
-							ytile = ourBases.get(baseNum).getY();
-						}						
-				
-						for(Unit unit : bwapi.getMyUnits()) 
-						{
-							if(unit.getTypeID() == bldg.getID()) 
+							
+							for(Unit unit : bwapi.getMyUnits()) 
 							{
-								xtile = unit.getX();
-								ytile = unit.getY();
-								break;
+								if(unit.getTypeID() == bldg.getID()) 
+								{
+									xtile = unit.getX();
+									ytile = unit.getY();
+									break;
+								}
+							}
+							
+							if(structure.ordinal() == UnitTypes.Terran_Bunker.ordinal())
+							{
+								ChokePoint cp = getNearestChokePoint(homePositionX, homePositionY);
+								xtile = cp .getCenterX();
+								ytile = cp.getCenterY();	
+							}
+							else
+							{
+							   xtile = ourBases.get(baseNum).getX();
+							   ytile = ourBases.get(baseNum).getY();
 							}
 						}
+						
+						if(structure.ordinal() == UnitTypes.Terran_Command_Center.ordinal())
+						{
+							for(BaseLocation bl : bwapi.getMap().getBaseLocations())
+							{
+								for(BaseLocation ours : ourBases)
+								{
+									if(bl.getRegionID() == ours.getRegionID() || bl.isStartLocation())
+									{
+										// skip location
+									}
+									else
+									{
+										xtile = bl.getTx();
+										ytile = bl.getTy();
+									}
+								}
+							}
+						}
+				
+
 						Point buildTile = getBuildTile(worker, bldg.getID(), xtile, ytile);
 						// if we found a good build position, and we aren't already constructing a bldg 
 						// order our worker to build it
 						if ((buildTile.x != -1) && (!weAreBuilding(bldg.getID()))) 
 						{
 							bwapi.build(worker, buildTile.x, buildTile.y, bldg.getID());
+							buildingsStack.get(nextToBuildIndex).status = BuildStatus.ACCEPTTED;
 							return true;
 							//buildingBuildings.push(bldg);
 						}
@@ -686,7 +720,8 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 		for (Unit unit : bwapi.getMyUnits()) {
 			if ((unit.getTypeID() != unitTypeID) || (!unit.isCompleted())) continue;
 			double dist = Math.sqrt(Math.pow(unit.getX() - x, 2) + Math.pow(unit.getY() - y, 2));
-			if (nearestID == -1 || dist < nearestDist) {
+			if (nearestID == -1 || dist < nearestDist) 
+			{
 				nearestID = unit.getID();
 				nearestDist = dist;
  			}
@@ -694,6 +729,24 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
  		return nearestID;
 	}	
 	
+	private ChokePoint getNearestChokePoint(int x, int y)
+	{
+		ChokePoint cp = null;
+		double nearestDist = 9999999;
+		
+		for(ChokePoint point : bwapi.getMap().getChokePoints())
+		{
+			double dist = Math.sqrt(Math.pow(point.getCenterX() - x, 2) + Math.pow(point.getCenterY(), 2));
+			
+			if(cp != null || dist < nearestDist)
+			{
+				cp = point;
+				nearestDist = dist;
+			}
+		}
+		
+		return cp;
+	}
 	
 
 	//Returns the Point object representing the suitable build tile position
