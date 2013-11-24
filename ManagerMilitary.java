@@ -71,6 +71,17 @@ public class ManagerMilitary extends RRAITemplate
 		//bwapi.drawText(new Point(5,120), "Total Marines trained: " + String.valueOf(getCurrentUnitCount(UnitTypes.Terran_Marine)), true);
     }
     
+    public void testVult() 
+    {
+    	Unit vult = militaryUnits.get(UnitTypes.Terran_Vulture).get(0);
+    	if (vult.isIdle())
+    	{
+    		javabot.types.TechType techType = bwapi.getTechType(3);
+    		bwapi.useTech(vult.getID(), 3, 100, 100);
+    		//bwapi.getTechType(`)
+    	}
+    }
+    
 	public void setHomePosition()
 	{
 		int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);

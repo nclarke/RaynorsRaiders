@@ -155,6 +155,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		if (frameCount % 30 == 0)
 		{
 			managerMilitary.checkUp();
+			//managerMilitary.testVult();
 		}
 
 	}
@@ -164,8 +165,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 		////System.out.println("Start debug");
 		bwapi.drawText(0, 0, "Home base location is ( " + managerBuild.homePositionX + ", "
 				+ managerBuild.homePositionY + ")", true);
-		bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
-				+ managerBuild.getStartLocation().getY() + ")", true);
+		//bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
+				//+ managerBuild.getStartLocation().getY() + ")", true);
 
 		//bwapi.drawHealth(healthFlag);
 		for (Unit u : bwapi.getMyUnits())  
@@ -202,6 +203,14 @@ public class RaynorsRaiders implements BWAPIEventListener
 			buildOrderNdx += 10;
 		}
 		buildOrderNdx = buildOrderNdx + 30;
+		
+		int unitNdx = 0;
+		String msg;
+		msg = "Number of vultures " + managerMilitary.militaryUnits.get(UnitTypes.Terran_Vulture).size(); 
+		bwapi.drawText(300, unitNdx, msg, true);
+		
+		
+		
 		//if (managerBuild.buildingBuildings.size() != 0) 
 		//{
 			//for (UnitTypes ut2 : managerBuild.buildingBuildings)

@@ -180,8 +180,8 @@ public class ManagerBuild extends RRAITemplate
 	public void checkUp() 
 	{
 
-System.out.println("completed buildings index = " + completedBuildingsIndex);
-System.out.println("next to build index = " + nextToBuildIndex);
+//System.out.println("completed buildings index = " + completedBuildingsIndex);
+//System.out.println("next to build index = " + nextToBuildIndex);
 for(BuildingRR bldg: buildingsStack)
 {
 	String blueprint = bwapi.getUnitType(bldg.blueprint.ordinal()).getName();
@@ -196,7 +196,7 @@ for(BuildingRR bldg: buildingsStack)
 	else
 		worker = bldg.worker.toString();
 	
-System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
+//System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 }
 
         // building construction
@@ -345,7 +345,8 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 		System.out.println("built: " +builtBuildings.toString());
 	}
 	
-	public void captureBaseLocation() {
+	public void captureBaseLocation()
+	{
 		// Remember our homeTilePosition at the first frame
 //		if (bwapi.getFrameCount() == 1) {
 			int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
