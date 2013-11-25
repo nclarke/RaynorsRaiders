@@ -15,7 +15,10 @@ public class ManagerMilitary extends RRAITemplate
 	int homePositionX, homePositionY;
 	BaseLocation homeBase;
 	
+	// Unit pool: military units gets added to this map as they are created
 	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
+	
+	// Unit Groups: they are created in unitOperation each time an order is given from CoreBaby
 	LinkedList<LinkedList<Unit>> currUnitGroups;
 	
 	public ManagerMilitary()
@@ -107,7 +110,7 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
-	public void addMilitaryUnit(Unit unitObj, UnitTypes unitType)
+	private void addMilitaryUnit(Unit unitObj, UnitTypes unitType)
 	{
 		//System.out.println("Military Manager: Adding unit " + unitObj.getID() + " to militaryUnit");
 		militaryUnits.get(unitType).add(unitObj);
@@ -115,7 +118,7 @@ public class ManagerMilitary extends RRAITemplate
 		//System.out.println("Military Manager: Added unit " + unitObj.getID() + " to militaryUnit");
 	}
 	
-	public void removeMilitaryUnit(int unitObj, UnitTypes unitType)
+	private void removeMilitaryUnit(int unitObj, UnitTypes unitType)
 	{
 		for(int index = 0; index < militaryUnits.get(unitType).size(); index++)
 		{
@@ -127,7 +130,7 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
-	public void removeUnitInUnitGroup(int unitObj, UnitTypes unitType)
+	private void removeUnitInUnitGroup(int unitObj, UnitTypes unitType)
 	{
 		for(int index = 0; index < currUnitGroups.size(); index++)
 		{
@@ -142,6 +145,12 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
+	/*
+	 * Adds a created military unit to the militaryUnits pool.
+	 * 
+	 * createdUnit:   the unit created 
+	 * unitTypeID:    it's type for using as the key for militaryUnits to store the unit
+	 */
 	public void addCreatedMilitaryUnits(Unit createdUnit, int unitTypeID)
 	{
 		if(unitTypeID == UnitTypes.Terran_Marine.ordinal())
@@ -181,6 +190,9 @@ public class ManagerMilitary extends RRAITemplate
 			addMilitaryUnit(createdUnit, UnitTypes.Terran_Wraith);
 	}
 	
+	/*
+	 * If a unit gets destroyed in the militaryUnits pool or in currUnitGroups, remove it.
+	 */
 	public void removeDestroyedMilitaryUnits(int destroyedUnit, int unitTypeID)
 	{
 		if(unitTypeID == UnitTypes.Terran_Marine.ordinal())
@@ -257,10 +269,12 @@ public class ManagerMilitary extends RRAITemplate
 	}
 	
 	/*
-	 * Method used for gathering the specified UnitTypes and # of units to attack a location
+	 * Method used for gathering the specified UnitTypes and # of units to attack a location. After units are grouped,
+	 * they are sorted in currUnitGroups as a LinkedList for unit group bookkeeping.
 	 * 
 	 * unitTypes:	UnitTypes of units requested
-	 * numOfUnits:  number of units needed (don't know how many units you want each)
+	 * numOfUnits:  number of units needed (don't know how many units you want each). 
+	 *              It will take as much there is on the first UnitTypes before the next.
 	 * locationX:   Pixel X coordinate on the map
 	 * locationY:   Pixel X coordinate on the map
 	 */
@@ -354,6 +368,11 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
+	/*
+	 * Returns a UnitTypes enum
+	 * 
+	 * unitTypeID:   a unit type ID
+	 */
 	public UnitTypes getUnitType(int unitTypeID)
 	{
 		if(unitTypeID == UnitTypes.Terran_Marine.ordinal())
@@ -395,6 +414,10 @@ public class ManagerMilitary extends RRAITemplate
 		return null;
 	}
 	
+	/*
+	 * After storing a group of units that were sent out on an order in currUnitGroups, remove them from militaryUnits
+	 * so that units will not be double counted. 
+	 */
 	private void removeUsedUnits(LinkedList<Unit> usedUnits)
 	{	
 		if(usedUnits != null)
@@ -434,9 +457,9 @@ public class ManagerMilitary extends RRAITemplate
 	}
 	
 	/*
-	 * Commands the Units stored in an LinkedList to attack a location on the map
+	 * Commands the Units stored in an LinkedList to rally at a location on the map
 	 * 
-	 * unitFormation:   LinkedList of Units we wanted to rally
+	 * unitGroup:   LinkedList of Units we wanted to rally
 	 * pixelPositionX:  Rally position's X
 	 * pixelPositionY:  Rally position's Y
 	 * 
@@ -477,9 +500,9 @@ public class ManagerMilitary extends RRAITemplate
 	}
 	
 	/*
-	 * Rally the Units stored in an LinkedList to a location on the map
+	 * Order the Units stored in an LinkedList to attack a location on the map
 	 * 
-	 * unitFormation:   LinkedList of Units we wanted to rally
+	 * unitGroup:   LinkedList of Units we wanted to rally
 	 * pixelPositionX:  Attack position's X
 	 * pixelPositionY:  Attack position's Y
 	 * 
@@ -491,6 +514,20 @@ public class ManagerMilitary extends RRAITemplate
 			for(int index = 0; index < unitGroup.size(); index++)
 			{					
 				bwapi.attack(unitGroup.get(index).getID(), pixelPositionX, pixelPositionY);
+			}
+		}
+	}
+	
+	/*
+	 * Orders all unit groups to attack a location on the map
+	 */
+	public void orderAllUnitGroupsAtk(int pixelPositionX, int pixelPositionY)
+	{
+		for(int index = 0; index < currUnitGroups.size(); index++)
+		{
+			for(int index2 = 0; index2 < currUnitGroups.get(index).size(); index2++)
+			{
+				bwapi.attack(currUnitGroups.get(index).get(index2).getID(), pixelPositionX, pixelPositionY);
 			}
 		}
 	}
