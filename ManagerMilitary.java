@@ -57,7 +57,7 @@ public class ManagerMilitary extends RRAITemplate
 	
     public void debug()
     {
-    	/*int spacing = 10;
+    	int spacing = 10;
 		
 		bwapi.drawText(new Point(5,0), "Our home position: " + String.valueOf(homePositionX) + ", " + String.valueOf(homePositionY), true);
 		for (BaseLocation b : bwapi.getMap().getBaseLocations()) {
@@ -66,9 +66,7 @@ public class ManagerMilitary extends RRAITemplate
 				bwapi.drawText(new Point(5,spacing), "Base position " + index + ": " + String.valueOf(b.getX()) + ", " + String.valueOf(b.getY()), true);
 			}
 			spacing =+ 10;
-		}*/
-		
-		//bwapi.drawText(new Point(5,120), "Total Marines trained: " + String.valueOf(getCurrentUnitCount(UnitTypes.Terran_Marine)), true);
+		}
     }
     
     public void testVult() 
@@ -119,7 +117,6 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public void removeMilitaryUnit(int unitObj, UnitTypes unitType)
 	{
-		//System.out.println("Military Manager: Removing unit " + unitObj.getID() + " in militaryUnit");
 		for(int index = 0; index < militaryUnits.get(unitType).size(); index++)
 		{
 			if(unitObj == (militaryUnits.get(unitType).get(index).getID()))
@@ -128,12 +125,10 @@ public class ManagerMilitary extends RRAITemplate
 				System.out.println("Military Manager: Removed. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
 			}
 		}
-		//System.out.println("Military Manager: Removd unit " + unitObj.getID() + " in militaryUnit");
 	}
 	
 	public void removeUnitInUnitGroup(int unitObj, UnitTypes unitType)
 	{
-		//System.out.println("Military Manager: Removing unit " + unitObj.getID() + " in militaryUnit");
 		for(int index = 0; index < currUnitGroups.size(); index++)
 		{
 			for(int index2 = 0; index2 < currUnitGroups.get(index).size(); index2++)
@@ -145,7 +140,6 @@ public class ManagerMilitary extends RRAITemplate
 				}
 			}
 		}
-		//System.out.println("Military Manager: Removd unit " + unitObj.getID() + " in militaryUnit");
 	}
 	
 	public void addCreatedMilitaryUnits(Unit createdUnit, int unitTypeID)
@@ -317,9 +311,7 @@ public class ManagerMilitary extends RRAITemplate
 				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
 						militaryUnits.get(UnitTypes.Terran_Marine).get(index).isCompleted())
 				{
-					//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
 					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
-					//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
 				}
 			}
 		}
@@ -338,15 +330,12 @@ public class ManagerMilitary extends RRAITemplate
 		
 		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Ghost).size(); index++)
 		{
-			//System.out.println("Military Manager: INDEX " + index + " Size of group is " + tmp.size());
 			if(tmp.size() < 5)
 			{
 				if(militaryUnits.get(UnitTypes.Terran_Ghost).get(index).isIdle() && 
 						militaryUnits.get(UnitTypes.Terran_Ghost).get(index).isCompleted())
 				{
-					//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
 					tmp.add(militaryUnits.get(UnitTypes.Terran_Ghost).get(index));
-					//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
 				}
 			}
 		}
@@ -461,7 +450,6 @@ public class ManagerMilitary extends RRAITemplate
 				bwapi.move(unitGroup.get(index).getID(), pixelPositionX, pixelPositionY);
 			}
 		}
-		//System.out.println("RALLY TEST");
 	}
 	
 	/*
@@ -481,7 +469,6 @@ public class ManagerMilitary extends RRAITemplate
 					if(!unitGroup.get(index).isAccelerating())
 					{
 						checkReadyFlag = true;
-						//System.out.println(checkReadyFlag);
 					}
 				}
 			}
@@ -504,7 +491,6 @@ public class ManagerMilitary extends RRAITemplate
 			for(int index = 0; index < unitGroup.size(); index++)
 			{					
 				bwapi.attack(unitGroup.get(index).getID(), pixelPositionX, pixelPositionY);
-				//bwapi.useTech(unitGroup.get(index).getID(), UnitTypes.Terran_Vulture_Spider_Mine.ordinal());
 			}
 		}
 	}
@@ -573,20 +559,6 @@ public class ManagerMilitary extends RRAITemplate
 	private int getCurrentUnitCount(UnitTypes unitType)
 	{
 		return militaryUnits.get(unitType).size();
-	}
-	
-	private int getWorkersCount()
-	{
-		int unitsTotal = 0;
-		
-		for (Unit unit : bwapi.getMyUnits())
-		{
-			if(unit.getTypeID() == UnitTypes.Terran_SCV.ordinal())
-			{
-				unitsTotal++;
-			}
-		}
-		return unitsTotal;
 	}
 	
 	// Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
