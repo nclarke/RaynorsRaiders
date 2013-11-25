@@ -18,13 +18,47 @@ public class ManagerMilitary extends RRAITemplate
 	// Unit pool: military units gets added to this map as they are created
 	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
 	
-	// Unit Groups: they are created in unitOperation each time an order is given from CoreBaby
-	LinkedList<LinkedList<Unit>> currUnitGroups;
+	// Military Teams: they are created in unitOperation each time an order is given from CoreBaby
+	LinkedList<MilitaryTeam> militaryTeams;
+	
+	private class MilitaryTeam
+	{
+		LinkedList<Unit> militaryTeam;
+		int locX, locY;
+		
+		public MilitaryTeam(LinkedList<Unit> militaryTeam, int locX,  int locY)
+		{
+			this.militaryTeam = militaryTeam;
+			this.locX = locX;
+			this.locY = locY;
+		}
+		
+		public LinkedList<Unit> getMilitaryTeam()
+		{
+			return militaryTeam;
+		}
+		
+		public int getX()
+		{
+			return locX;
+		}
+		
+		public int getY()
+		{
+			return locY;
+		}
+		
+		public void setLocation(int x, int y)
+		{
+			this.locX = x;
+			this.locY = y;
+		}
+	}
 	
 	public ManagerMilitary()
 	{		
 		militaryUnits = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
-		currUnitGroups = new LinkedList<LinkedList<Unit>>();
+		militaryTeams = new LinkedList<MilitaryTeam>();
 		initMilitaryUnit();
 	}
 	
@@ -49,13 +83,9 @@ public class ManagerMilitary extends RRAITemplate
 			if (b.isStartLocation() )
 			{
 				unitOperation(b.getX(), b.getY()); 
-				
-				for(int index = 0; index < currUnitGroups.size(); index++)
-				{
-					handleUnitsAttacking(currUnitGroups.get(index), b.getX(), b.getY());
-				}
 			}
 		}*/
+		handleUnitsAttacking();
 	}
 	
     public void debug()
@@ -112,10 +142,8 @@ public class ManagerMilitary extends RRAITemplate
 	
 	private void addMilitaryUnit(Unit unitObj, UnitTypes unitType)
 	{
-		//System.out.println("Military Manager: Adding unit " + unitObj.getID() + " to militaryUnit");
 		militaryUnits.get(unitType).add(unitObj);
-		System.out.println("Military Manager: Added. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
-		//System.out.println("Military Manager: Added unit " + unitObj.getID() + " to militaryUnit");
+		//System.out.println("Military Manager: Added. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
 	}
 	
 	private void removeMilitaryUnit(int unitObj, UnitTypes unitType)
@@ -125,21 +153,22 @@ public class ManagerMilitary extends RRAITemplate
 			if(unitObj == (militaryUnits.get(unitType).get(index).getID()))
 			{
 				militaryUnits.get(unitType).remove(index);
-				System.out.println("Military Manager: Removed. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
+				//System.out.println("Military Manager: Removed. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
 			}
 		}
 	}
 	
-	private void removeUnitInUnitGroup(int unitObj, UnitTypes unitType)
+	private void removeUnitInMilitaryTeams(int unitObj, UnitTypes unitType)
 	{
-		for(int index = 0; index < currUnitGroups.size(); index++)
+		for(int index = 0; index < militaryTeams.size(); index++)
 		{
-			for(int index2 = 0; index2 < currUnitGroups.get(index).size(); index2++)
+			for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
 			{
-				if(unitObj == (currUnitGroups.get(index).get(index2).getID()))
+				Unit tmp = militaryTeams.get(index).getMilitaryTeam().get(index2);
+				if(unitObj == (tmp.getID()))
 				{
-					currUnitGroups.get(index).remove(index2);
-					System.out.println("Military Manager: removeUnitInUnitGroup " + index +". New size is " + currUnitGroups.get(index).size());
+					militaryTeams.get(index).getMilitaryTeam().remove(index2);
+					//System.out.println("Military Manager: removeUnitInMilitaryTeams " + index +". New size is " + militaryTeams.get(index).getMilitaryTeam().size());
 				}
 			}
 		}
@@ -198,73 +227,73 @@ public class ManagerMilitary extends RRAITemplate
 		if(unitTypeID == UnitTypes.Terran_Marine.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Marine);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Marine);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Marine);
 		}
 		
 		if(unitTypeID == UnitTypes.Terran_Firebat.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Firebat);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Marine);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Marine);
 		}
 		
 		if(unitTypeID == UnitTypes.Terran_Ghost.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Ghost);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Ghost);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Ghost);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Goliath.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Goliath);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Goliath);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Goliath);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Medic.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Medic);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Medic);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Medic);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Valkyrie.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Valkyrie);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Valkyrie);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Valkyrie);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Vulture.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Vulture);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Vulture);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Vulture);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Vulture_Spider_Mine.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Vulture_Spider_Mine);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Vulture_Spider_Mine);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Vulture_Spider_Mine);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Dropship.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Dropship);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Dropship);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Dropship);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Siege_Mode.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Wraith.ordinal())
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Wraith);
-			removeUnitInUnitGroup(destroyedUnit, UnitTypes.Terran_Wraith);
+			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Wraith);
 		}
 	}
 	
@@ -308,7 +337,7 @@ public class ManagerMilitary extends RRAITemplate
 					tmp.add(militaryUnits.get(UnitTypes.Terran_Medic).get(index));
 			}
 			
-			currUnitGroups.add(tmp);
+			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
 			removeUsedUnits(tmp);
 			unitOperationHelper(tmp, locationX, locationY);
 		}
@@ -332,7 +361,7 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(tmp.size() == numOfUnits)
 		{
-			currUnitGroups.add(tmp);
+			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
 			removeUsedUnits(tmp);
 			unitOperationHelper(tmp, locationX, locationY);
 		}
@@ -342,14 +371,14 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Ghost).size(); index++)
+		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Marine).size(); index++)
 		{
 			if(tmp.size() < 5)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Ghost).get(index).isIdle() && 
-						militaryUnits.get(UnitTypes.Terran_Ghost).get(index).isCompleted())
+				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
+						militaryUnits.get(UnitTypes.Terran_Marine).get(index).isCompleted())
 				{
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Ghost).get(index));
+					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
 				}
 			}
 		}
@@ -362,7 +391,7 @@ public class ManagerMilitary extends RRAITemplate
 						&& militaryUnits.get(UnitTypes.Terran_Medic).get(index).isCompleted())
 					tmp.add(militaryUnits.get(UnitTypes.Terran_Medic).get(index));
 			}
-			currUnitGroups.add(tmp);
+			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
 			removeUsedUnits(tmp);
 			unitOperationHelper(tmp, locationX, locationY);
 		}
@@ -523,68 +552,71 @@ public class ManagerMilitary extends RRAITemplate
 	 */
 	public void orderAllUnitGroupsAtk(int pixelPositionX, int pixelPositionY)
 	{
-		for(int index = 0; index < currUnitGroups.size(); index++)
+		for(int index = 0; index < militaryTeams.size(); index++)
 		{
-			for(int index2 = 0; index2 < currUnitGroups.get(index).size(); index2++)
+			for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
 			{
-				bwapi.attack(currUnitGroups.get(index).get(index2).getID(), pixelPositionX, pixelPositionY);
+				bwapi.attack(militaryTeams.get(index).getMilitaryTeam().get(index2).getID(), pixelPositionX, pixelPositionY);
 			}
 		}
 	}
 	
-	public void handleUnitsAttacking(LinkedList<Unit> unitGroup, int pixelPositionX, int pixelPositionY)
+	public void handleUnitsAttacking()
 	{
-		for(int index = 0; index < unitGroup.size(); index++)
-		{			
-			if(unitGroup.get(index).getTypeID() == UnitTypes.Terran_Vulture.ordinal())
+		for(int index = 0; index < militaryTeams.size(); index++)
+		{
+			for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
 			{
-				if(unitGroup.get(index).isStartingAttack())
+				Unit tmp = militaryTeams.get(index).getMilitaryTeam().get(index2);
+				
+				if(tmp.getTypeID() == UnitTypes.Terran_Vulture.ordinal())
 				{
-					bwapi.useTech(unitGroup.get(index).getID(), UnitTypes.Terran_Vulture_Spider_Mine.ordinal());
-				}
-			}
-			
-			if(unitGroup.get(index).getTypeID() == UnitTypes.Terran_Ghost.ordinal())
-			{
-				bwapi.cloak(unitGroup.get(index).getID());
-				if(unitGroup.get(index).isStartingAttack())
-				{
-					for(Unit un: bwapi.getMyUnits())
+					if(tmp.isStartingAttack())
 					{
-						if(un.getTypeID() == UnitTypes.Terran_Command_Center.ordinal())
+						bwapi.useTech(tmp.getID(), UnitTypes.Terran_Vulture_Spider_Mine.ordinal());
+					}
+				}
+				
+				if(tmp.getTypeID() == UnitTypes.Terran_Ghost.ordinal())
+				{
+					bwapi.cloak(tmp.getID());
+					if(tmp.isStartingAttack())
+					{
+						for(Unit un: bwapi.getMyUnits())
 						{
-							if(un.isNukeReady())
+							if(un.getTypeID() == UnitTypes.Terran_Command_Center.ordinal())
 							{
-								bwapi.useTech(unitGroup.get(index).getID(), UnitTypes.Terran_Nuclear_Missile.ordinal(), pixelPositionX, pixelPositionY);
+								if(un.isNukeReady())
+								{
+									bwapi.useTech(tmp.getID(), UnitTypes.Terran_Nuclear_Missile.ordinal(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
+								}
 							}
 						}
 					}
 				}
-			}
-			
-			if(unitGroup.get(index).getTypeID() == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
-			{
-				System.out.println(unitGroup.get(index).isIdle());
 				
-				if(unitGroup.get(index).isAttacking())
-				{
-					bwapi.siege(unitGroup.get(index).getID());
+				if(tmp.getTypeID() == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
+				{					
+					if(tmp.isAttacking())
+					{
+						bwapi.siege(tmp.getID());
+					}
+					else if(tmp.isStartingAttack())
+					{
+						bwapi.siege(tmp.getID());
+					}
+					else if(tmp.isIdle())
+					{
+						bwapi.attack(tmp.getID(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
+					}
 				}
-				else if(unitGroup.get(index).isStartingAttack())
+				
+				if(tmp.getTypeID() == UnitTypes.Terran_Siege_Tank_Siege_Mode.ordinal())
 				{
-					bwapi.siege(unitGroup.get(index).getID());
-				}
-				else if(unitGroup.get(index).isIdle())
-				{
-					bwapi.attack(unitGroup.get(index).getID(), pixelPositionX, pixelPositionY);
-				}
-			}
-			
-			if(unitGroup.get(index).getTypeID() == UnitTypes.Terran_Siege_Tank_Siege_Mode.ordinal())
-			{
-				if((unitGroup.get(index).isIdle()))
-				{
-					bwapi.unsiege(unitGroup.get(index).getID());
+					if((tmp.isIdle()))
+					{
+						bwapi.unsiege(tmp.getID());
+					}
 				}
 			}
 		}
