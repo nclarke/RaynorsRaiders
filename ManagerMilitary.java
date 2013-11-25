@@ -25,12 +25,14 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> militaryTeam;
 		int locX, locY;
+		int teamSize;
 		
 		public MilitaryTeam(LinkedList<Unit> militaryTeam, int locX,  int locY)
 		{
 			this.militaryTeam = militaryTeam;
 			this.locX = locX;
 			this.locY = locY;
+			this.teamSize = militaryTeam.size();
 		}
 		
 		public LinkedList<Unit> getMilitaryTeam()
@@ -52,6 +54,16 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			this.locX = x;
 			this.locY = y;
+		}
+		
+		public int getTeamSize()
+		{
+			return teamSize;
+		}
+		
+		public void setTeamSize(int newSize)
+		{
+			teamSize = newSize;
 		}
 	}
 	
@@ -85,6 +97,7 @@ public class ManagerMilitary extends RRAITemplate
 				unitOperation(b.getX(), b.getY()); 
 			}
 		}*/
+		removeEmptyMilitaryTeam();
 		handleUnitsAttacking();
 	}
 	
@@ -168,6 +181,7 @@ public class ManagerMilitary extends RRAITemplate
 				if(unitObj == (tmp.getID()))
 				{
 					militaryTeams.get(index).getMilitaryTeam().remove(index2);
+					militaryTeams.get(index).setTeamSize(militaryTeams.get(index).getMilitaryTeam().size());
 					//System.out.println("Military Manager: removeUnitInMilitaryTeams " + index +". New size is " + militaryTeams.get(index).getMilitaryTeam().size());
 				}
 			}
@@ -294,6 +308,19 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Wraith);
 			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Wraith);
+		}
+	}
+	
+	private void removeEmptyMilitaryTeam()
+	{
+		for(int index = 0; index < militaryTeams.size(); index++)
+		{
+			if(militaryTeams.get(index).getMilitaryTeam().size() == 0)
+			{
+				System.out.println("OLD SIZE: " + militaryTeams.size());
+				militaryTeams.remove(index);
+				System.out.println("NEW SIZE: " + militaryTeams.size());
+			}
 		}
 	}
 	
