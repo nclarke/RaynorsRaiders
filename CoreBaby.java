@@ -145,9 +145,9 @@ public class CoreBaby extends RRAITemplate
 		UnitTypes unit = unitMixtures.peek();
 		
 		/* Military Orders */
-		if (countdown == 0) {
+		if (countdown <= 0) {
 			genUnitsBasic();
-			if (genomeSetting.defensiveness > Math.random() % 100) {
+			if (genomeSetting.defensiveness > (int) (Math.random() * 100)) {
 				genDefendMilitaryGroup();
 				genDefensiveBasic();
 			}
@@ -155,7 +155,7 @@ public class CoreBaby extends RRAITemplate
 				genSpreadMilitaryGroup();
 				genOffensiveBasic();
 			}
-			countdown = genomeSetting.bloodFrequency;
+			countdown = genomeSetting.bloodFrequency * 5;
 		}
 		else {
 			genUnitsBasic();
@@ -171,13 +171,15 @@ public class CoreBaby extends RRAITemplate
 	public void genUnitsBasic()
 	{
 		int index;
-		for (index = 0; index < 2; index++)
+		for (index = 0; index < 4; index++)
 		{
 			builder.roster.addLast(UnitTypes.Terran_Marine);
-			builder.roster.addLast(UnitTypes.Terran_Vulture);
+	
 		}
+		builder.roster.addLast(UnitTypes.Terran_Medic);
 		for (index = 0; index < 1; index++)
 		{
+			builder.roster.addLast(UnitTypes.Terran_Vulture);
 			builder.roster.addLast(UnitTypes.Terran_Siege_Tank_Tank_Mode);
 		}
 		
