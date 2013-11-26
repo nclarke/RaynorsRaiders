@@ -590,7 +590,7 @@ System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 						if ((buildTile.x != -1) && (!weAreBuilding(bldg.getID()))) 
 						{
 							bwapi.build(worker, buildTile.x, buildTile.y, bldg.getID());
-							//buildingsStack.get(nextToBuildIndex).status = BuildStatus.ACCEPTTED;
+							buildingsStack.get(nextToBuildIndex).status = BuildStatus.ACCEPTTED;
 							return true;
 							//buildingBuildings.push(bldg);
 						}

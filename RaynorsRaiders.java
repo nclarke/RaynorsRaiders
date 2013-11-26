@@ -329,7 +329,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 					
 					for(BuildingRR bldg : managerBuild.buildingsStack)
 					{
-						if(bldg.worker.getID() == unitID)
+						if(bldg.worker != null && bldg.worker.getID() == unitID)
 						{
 							bldg.worker = null;
 							break;
