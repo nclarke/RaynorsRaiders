@@ -17,6 +17,29 @@ public class CoreBaby extends RRAITemplate
 	LinkedList<MilitaryOrder> militaryGoals;
 	LinkedList<UnitTypes> unitMixtures;
 	int hostileX,hostileY, countdown;
+	CoreSupportGenome genomeSetting;
+	
+	LinkedList<UnitTypes> genBasicUnitList;
+
+	
+	
+	public class CoreSupportGenome {
+		int bloodFrequency;
+		int mutation;
+		int responsePotential;
+		int spread;
+		int defensiveness;
+		
+		CoreSupportGenome(int mutation, int phase) {
+			bloodFrequency = Math.abs(mutation) % 100;
+			mutation += phase;
+			responsePotential = Math.abs(mutation) % 100;
+			mutation += phase;
+			spread = Math.abs(mutation) % 100;
+			mutation += phase;
+			defensiveness = Math.abs(mutation) % 100;
+		}
+	}
 	
 	public enum BattleMode
 	{
@@ -55,13 +78,21 @@ public class CoreBaby extends RRAITemplate
 		}
 	}
 	
+	
 	public CoreBaby() 
 	{
 		hostileX = 0;
 		hostileY = 0;
-		countdown = 2000;
+		countdown = 200;
 		militaryGoals = new LinkedList<MilitaryOrder>();
 		unitMixtures = new LinkedList<UnitTypes>();
+		genomeSetting = new CoreSupportGenome((int) (Math.random() * 100), (int) (Math.random() * 100));
+		System.out.println("Checking random " + (int) (Math.random() * 100));
+		genBasicUnitList = new LinkedList<UnitTypes>();
+		genBasicUnitList.add(UnitTypes.Terran_Marine);
+		genBasicUnitList.add(UnitTypes.Terran_Vulture);
+		genBasicUnitList.add(UnitTypes.Terran_Medic);
+		genBasicUnitList.add(UnitTypes.Terran_Siege_Tank_Tank_Mode);
 	}
 	
 	public void AILinkData() {
@@ -71,24 +102,7 @@ public class CoreBaby extends RRAITemplate
 	{
 		//Begin tactics path
 		initBuildStyle_siegeExpand();
-		initUnitStyle_basic();
 	}
-	
-	public void startUp()
-	{
-		int index;
-		initEntrenchBase();
-		for (index = 0; index < 100; index++)
-		{
-			builder.roster.addLast(UnitTypes.Terran_Marine);
-			builder.roster.addLast(UnitTypes.Terran_Vulture);
-		}
-		for (index = 0; index < 50; index++)
-		{
-			builder.roster.addLast(UnitTypes.Terran_Siege_Tank_Tank_Mode);
-		}
-	}
-	
 	
 	public void checkUp() 
 	{
@@ -100,9 +114,6 @@ public class CoreBaby extends RRAITemplate
 			int SCVsTotal = workers.getBaseWorkers(buildingGoals.get(builder.nextToBuildIndex).baseAssignment);
 			int supplyNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSupply;
 			int SCVsNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSCVs;
-			//System.out.println("Order on top: " + order.supplyNeeded + "/" + order.workersNeeded
-			// + " Comp: " + bwapi.getSelf().getSupplyTotal()/2 + "/" + workers.getBaseWorkers(0)
-			// + " U: " + bwapi.getSelf().getSupplyUsed()/2);
 			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal) 
 			{
 				buildingGoals.get(builder.nextToBuildIndex).status = BuildStatus.ATTEMPT_BUILD;
@@ -133,30 +144,21 @@ public class CoreBaby extends RRAITemplate
 		/* Add units */
 		UnitTypes unit = unitMixtures.peek();
 		
-		//if (unit != null)
-		//{
-			
-			//builder.roster.addLast(unit);
-			//unitMixtures.pop();
-		//}
-		
 		/* Military Orders */
-		MilitaryOrder groundPound = militaryGoals.peek();
-		
-		if (groundPound != null)
-		{
-			if (true)
-			{
-				military.unitOperation(groundPound.units, groundPound.strength, groundPound.x, groundPound.y);
-				militaryGoals.pop();
+		if (countdown == 0) {
+			genUnitsBasic();
+			if (genomeSetting.defensiveness > Math.random() % 100) {
+				genDefendMilitaryGroup();
+				genDefensiveBasic();
 			}
+			else {
+				genSpreadMilitaryGroup();
+				genOffensiveBasic();
+			}
+			countdown = genomeSetting.bloodFrequency;
 		}
-		if (countdown == 0)
-		{
-			military.unitOperation(hostileX, hostileY);
-		}
-		else
-		{
+		else {
+			genUnitsBasic();
 			countdown--;
 		}
 	}
@@ -166,55 +168,65 @@ public class CoreBaby extends RRAITemplate
 		//Put debug info here for the Baby
 	}
 	
-	public void initUnitStyle_basic()
+	public void genUnitsBasic()
 	{
-		for (int i = 0; i < 20; i++)
+		int index;
+		for (index = 0; index < 2; index++)
 		{
-			//System.out.println("Adding units");
-			unitMixtures.add(UnitTypes.Terran_Marine);
-			unitMixtures.add(UnitTypes.Terran_Vulture);
-			unitMixtures.add(UnitTypes.Terran_Medic);
-			unitMixtures.add(UnitTypes.Terran_Siege_Tank_Tank_Mode);
+			builder.roster.addLast(UnitTypes.Terran_Marine);
+			builder.roster.addLast(UnitTypes.Terran_Vulture);
+		}
+		for (index = 0; index < 1; index++)
+		{
+			builder.roster.addLast(UnitTypes.Terran_Siege_Tank_Tank_Mode);
 		}
 		
 	}
 	
-	public void initEntrenchBase() 
-	{
+	public void genDefensiveBasic() {
+		buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Bunker, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Missile_Turret, BuildStatus.HOLD));
+	}
+	
+	public void genOffensiveBasic() {
+		buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
+	}
+	
+	
+	public void genSpreadMilitaryGroup() {
+		ArrayList<Region> regions = bwapi.getMap().getRegions();
+		int totalRegions = regions.size();
+
+		for (int i = 0; i < totalRegions; i++) {
+			if (genomeSetting.spread >  (i/totalRegions) * 100) {
+				military.unitOperation(genBasicUnitList, 20, regions.get(i).getCenterX(), regions.get(i).getCenterY());
+			}
+			if (genomeSetting.spread <= 1/totalRegions) {
+				military.unitOperation(genBasicUnitList, 20, hostileX, hostileY);
+			}
+		}
+	}
+	
+	public void genDefendMilitaryGroup() {
 		ChokePoint entrance = null;
 		Region baseStart = react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY);
 		if (baseStart != null) 
 		{
 			if (react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY).getChokePoints().isEmpty())
 			{
-				//System.out.println("No chokepoint?");
 			}
 			else 
-			{
-			entrance = (react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY)).getChokePoints().get(0);
-			}
+				entrance = (react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY)).getChokePoints().get(0);
+
 		}
-		LinkedList<UnitTypes> unitList = new LinkedList<UnitTypes>();
-		unitList.add(UnitTypes.Terran_Marine);
-		unitList.add(UnitTypes.Terran_Vulture);
-		
-		militaryGoals.add(
-		 new MilitaryOrder(
-		  5,
-		  entrance.getFirstSideX(),
-		  entrance.getFirstSideY(),
-		  0,
-		  BattleMode.ENTRENCH,
-		  BattleTargets.ALL,
-		  unitList
-		 )
-		);
+		military.unitOperation(genBasicUnitList, 20, entrance.getFirstSideX(), entrance.getFirstSideY());
 	}
+
 	
 	public void initBuildStyle_siegeExpand() 
 	{
-		//buildingGoals.add(new BuildingRR(5, 10, 0, UnitTypes.Terran_Bunker, BuildStatus.HOLD));
-		//buildingGoals.add(new BuildingRR(6, 10, 0, UnitTypes.Terran_Bunker, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(18, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));

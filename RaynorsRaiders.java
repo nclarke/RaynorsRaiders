@@ -209,6 +209,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 		msg = "Number of vultures " + managerMilitary.militaryUnits.get(UnitTypes.Terran_Vulture).size(); 
 		bwapi.drawText(300, unitNdx, msg, true);
 		
+		msg = "Genome Status: Blood " + coreBaby.genomeSetting.bloodFrequency + " Def " + coreBaby.genomeSetting.defensiveness + " Spread " + coreBaby.genomeSetting.spread + " Count " + coreBaby.countdown;
+		bwapi.drawText(300, 20, msg, true);
 		
 		
 		//if (managerBuild.buildingBuildings.size() != 0) 
