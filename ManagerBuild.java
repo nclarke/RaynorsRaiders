@@ -8,6 +8,7 @@ import java.util.Comparator;
 
 import javabot.JNIBWAPI;
 import javabot.model.BaseLocation;
+import javabot.model.Region;
 import javabot.model.Unit;
 import javabot.types.TechType;
 import javabot.types.TechType.TechTypes;
@@ -151,7 +152,7 @@ public class ManagerBuild extends RRAITemplate
 				Unit bldg = buildingsStack.get(i).unit;
 //System.out.println(bwapi.getUnitType(bldg.getTypeID()).getName() + " ready in " + bldg.getRemainingBuildTimer());
 
-				if(bldg.isCompleted())
+				if(bldg.isCompleted() && buildingsStack.get(i).worker != null)
 				{
 					completedBuildingsIndex++;
 					workers.checkInWorker(buildingsStack.get(i).worker.getID());
@@ -196,7 +197,7 @@ for(BuildingRR bldg: buildingsStack)
 	else
 		worker = bldg.worker.toString();
 	
-//System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
+System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 }
 
         // building construction
@@ -478,12 +479,13 @@ for(BuildingRR bldg: buildingsStack)
 		{
 			return false;
 		}
+/*		
 		if (structure.ordinal() == UnitTypes.Terran_Command_Center.ordinal())
 		{
-//			buildExpand();
-//			return false;
+			buildExpand();
+			return false;
 		}
-		
+*/		
 		bldg = bwapi.getUnitType(structure.ordinal());
 		
 		if (bwapi.getSelf().getMinerals() >= bldg.getMineralPrice()) 
@@ -515,7 +517,7 @@ for(BuildingRR bldg: buildingsStack)
 					}
 					else
 					{
-						worker = workers.checkOutWorker(ManagerWorkers.workerOrders.BUILD, 0);
+						worker = workers.checkOutWorker(ManagerWorkers.workerOrders.BUILD, buildingsStack.get(nextToBuildIndex).baseAssignment);
 						buildingsStack.get(nextToBuildIndex).worker = bwapi.getUnit(worker);
 					}
 					
@@ -526,29 +528,41 @@ for(BuildingRR bldg: buildingsStack)
 						
 						if(ourBases.get(baseNum) != null)
 						{
-							
-							for(Unit unit : bwapi.getMyUnits()) 
+							// build near similar structures
+							for(int i = 0; i < completedBuildingsIndex; i++) 
 							{
-								if(unit.getTypeID() == bldg.getID()) 
+								BuildingRR bRR = buildingsStack.get(i);
+								if(bRR.baseAssignment == baseNum && bRR.unit.getTypeID() == structure.ordinal()) 
 								{
-									xtile = unit.getX();
-									ytile = unit.getY();
+									xtile = bRR.unit.getX();
+									ytile = bRR.unit.getY();
 									break;
 								}
 							}
-							
-							if(structure.ordinal() == UnitTypes.Terran_Bunker.ordinal())
-							{
-								ChokePoint cp = getNearestChokePoint(homePositionX, homePositionY);
-								xtile = cp .getCenterX();
-								ytile = cp.getCenterY();	
-							}
-							else
-							{
-							   xtile = ourBases.get(baseNum).getX();
-							   ytile = ourBases.get(baseNum).getY();
-							}
 						}
+						
+						
+						if(structure.ordinal() == UnitTypes.Terran_Bunker.ordinal())
+						{
+							Region r = react.gen_findClosestRegion(ourBases.get(baseNum).getX(), ourBases.get(baseNum).getY());
+							ChokePoint cp = null;
+
+							if (r != null) 
+							{
+								if (r.getChokePoints().isEmpty())
+								{
+									//System.out.println("No chokepoint?");
+								}
+								else 
+								{
+									cp = r.getChokePoints().get(0);
+								}
+							}
+							
+								xtile = cp.getFirstSideX();
+								ytile = cp.getFirstSideY();
+						}
+
 						
 						if(structure.ordinal() == UnitTypes.Terran_Command_Center.ordinal())
 						{
@@ -576,7 +590,7 @@ for(BuildingRR bldg: buildingsStack)
 						if ((buildTile.x != -1) && (!weAreBuilding(bldg.getID()))) 
 						{
 							bwapi.build(worker, buildTile.x, buildTile.y, bldg.getID());
-							buildingsStack.get(nextToBuildIndex).status = BuildStatus.ACCEPTTED;
+							//buildingsStack.get(nextToBuildIndex).status = BuildStatus.ACCEPTTED;
 							return true;
 							//buildingBuildings.push(bldg);
 						}
@@ -729,26 +743,6 @@ for(BuildingRR bldg: buildingsStack)
  		}
  		return nearestID;
 	}	
-	
-	private ChokePoint getNearestChokePoint(int x, int y)
-	{
-		ChokePoint cp = null;
-		double nearestDist = 9999999;
-		
-		for(ChokePoint point : bwapi.getMap().getChokePoints())
-		{
-			double dist = Math.sqrt(Math.pow(point.getCenterX() - x, 2) + Math.pow(point.getCenterY(), 2));
-			
-			if(cp != null || dist < nearestDist)
-			{
-				cp = point;
-				nearestDist = dist;
-			}
-		}
-		
-		return cp;
-	}
-	
 
 	//Returns the Point object representing the suitable build tile position
 	//for a given building type near specified pixel position (or Point(-1,-1) if not found)

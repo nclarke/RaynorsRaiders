@@ -299,6 +299,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 			if(createdUnitType == managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).blueprint.ordinal())
 			{
 				managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).unit = createdUnit;
+				managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).status = BuildStatus.ACCEPTTED;
+
 				managerBuild.nextToBuildIndex++;
 				
 				// sort under construction according to build time
@@ -320,8 +322,18 @@ public class RaynorsRaiders implements BWAPIEventListener
 			if (u.getID() == unitID)
 			{
 				if (u.getTypeID() == UnitTypes.Terran_SCV.ordinal())
+				{
 					managerWorkers.removeWorker(unitID);
-				
+					
+					for(BuildingRR bldg : managerBuild.buildingsStack)
+					{
+						if(bldg.worker.getID() == unitID)
+						{
+							bldg.worker = null;
+							break;
+						}
+					}
+				}
 				managerMilitary.removeDestroyedMilitaryUnits(unitID, u.getTypeID());
 				
 				taggedForDeath = u;
@@ -329,6 +341,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 		masterUnitList.remove(taggedForDeath);
 
+		/*
 		for(Unit bldg : managerBuild.builtBuildings)
 		{
 			if(bldg.getID() == unitID)
@@ -337,6 +350,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 				break;
 			}
 		}
+		*/
 	}
 	public void unitDiscover(int unitID) 
 	{ 
