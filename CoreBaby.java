@@ -124,7 +124,7 @@ public class CoreBaby extends RRAITemplate
 				workers.trainWorker();
 			}
 			
-			if (supplyUsed + 4 > supplyTotal) 
+			if (supplyUsed + 10 > supplyTotal) 
 			{
 				if (buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot) 
 				{
@@ -134,7 +134,7 @@ public class CoreBaby extends RRAITemplate
 		}
 		else
 		{
-			if (supplyUsed + 4 > supplyTotal) 
+			if (supplyUsed + 10 > supplyTotal) 
 			{
 				buildingGoals.add(new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
 				builder.nextToBuildIndex = buildingGoals.size() - 1;
@@ -146,19 +146,27 @@ public class CoreBaby extends RRAITemplate
 		
 		/* Military Orders */
 		if (countdown <= 0) {
-			genUnitsBasic();
+			if (builder.roster.size() < 20) {
+				genUnitsBasic();
+			}
 			if (genomeSetting.defensiveness > (int) (Math.random() * 100)) {
 				genDefendMilitaryGroup();
-				genDefensiveBasic();
+				if (buildingGoals.size() - builder.completedBuildingsIndex < 3) {
+					genDefensiveBasic();
+				}
 			}
 			else {
 				genSpreadMilitaryGroup();
-				genOffensiveBasic();
+				if (buildingGoals.size() - builder.completedBuildingsIndex < 3) {
+					genOffensiveBasic();
+				}
 			}
 			countdown = genomeSetting.bloodFrequency * 5;
 		}
 		else {
-			genUnitsBasic();
+			if (builder.roster.size() < 20) {
+				genUnitsBasic();
+			}
 			countdown--;
 		}
 	}
