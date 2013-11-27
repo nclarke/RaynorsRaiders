@@ -197,7 +197,7 @@ for(BuildingRR bldg: buildingsStack)
 	else
 		worker = bldg.worker.toString();
 	
-System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
+//System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 }
 
         // building construction
