@@ -42,9 +42,7 @@ public class CoreBaby extends RRAITemplate
 		hostileY = 0;
 		countdown = 200;
 		genomeSetting = new CoreSupportGenome((int) (Math.random() * 100), (int) (Math.random() * 100));
-		System.out.println("Checking random " + (int) (Math.random() * 100));
 		genBasicUnitList = new LinkedList<UnitTypes>();
-	
 	}
 	
 	public void AILinkData() {
@@ -119,12 +117,22 @@ public class CoreBaby extends RRAITemplate
 	public void genUnitsBasic()
 	{
 		int index;
+
 		for (index = 0; index < 4; index++)
 			builder.roster.addLast(UnitTypes.Terran_Marine);
 		builder.roster.addLast(UnitTypes.Terran_Medic);
 		for (index = 0; index < 2; index++)
 			builder.roster.addLast(UnitTypes.Terran_Siege_Tank_Tank_Mode);
 		builder.roster.addLast(UnitTypes.Terran_Vulture);
+		
+	}
+	
+	public void buildOrTrain(UnitTypes toTrain) {
+		UnitTypes toBuild;
+		if ((toBuild = builder.techTree.canIBuildThis(toTrain.ordinal())) == null)
+				builder.roster.addLast(toTrain);
+		else
+			buildingGoals.add(new BuildingRR(1, 1, 0, toBuild, BuildStatus.HOLD));
 		
 	}
 	
@@ -146,11 +154,14 @@ public class CoreBaby extends RRAITemplate
 		int totalRegions = regions.size();
 
 		for (int i = 0; i < totalRegions; i++) {
-			System.out.println("Going to region " + i);
-			if (genomeSetting.spread >  (i/totalRegions) * 100)
+			if (genomeSetting.spread >  (i/totalRegions) * 100) {
+				System.out.println("Going to region " + i);
 				military.unitOperation(genBasicUnitList, 20, regions.get(i).getCenterX(), regions.get(i).getCenterY());
-			if (genomeSetting.spread <= 1/totalRegions)
+			}
+			if (i == 0) {
 				military.unitOperation(genBasicUnitList, 20, hostileX, hostileY);
+				System.out.println("Base Attack " + i);
+			}
 		}
 	}
 	
