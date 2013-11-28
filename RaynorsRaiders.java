@@ -343,8 +343,10 @@ public class RaynorsRaiders implements BWAPIEventListener
 						}
 					}
 				}
-				managerMilitary.removeDestroyedMilitaryUnits(unitID, u.getTypeID());
-				
+				else
+				{
+					managerMilitary.removeDestroyedMilitaryUnits(unitID, u.getTypeID());	
+				}
 				taggedForDeath = u;
 			}
 		}
