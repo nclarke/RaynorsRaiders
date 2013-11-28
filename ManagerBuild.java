@@ -32,6 +32,7 @@ public class ManagerBuild extends RRAITemplate
 	LinkedList<Unit> builtBuildings;
 	LinkedList<Unit> buildingBuildings;
 	LinkedList<BaseLocation> ourBases;
+	DescisionTree techTree;
 	
 	UnitTypes tempType;
 	Unit tempUnit;
@@ -59,7 +60,8 @@ public class ManagerBuild extends RRAITemplate
 		bldgMode = BuildMode.BLOCKING_STACK;
 		unitsMode = BuildMode.FIRST_POSSIBLE;
 		orders = new LinkedList<UnitTypes>();
-		roster = new LinkedList<UnitTypes>();	
+		roster = new LinkedList<UnitTypes>();
+		techTree = new DescisionTree(this);
 	}
 	
 	public enum baseStatus 
@@ -197,7 +199,7 @@ for(BuildingRR bldg: buildingsStack)
 	else
 		worker = bldg.worker.toString();
 	
-System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
+//System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 }
 
         // building construction

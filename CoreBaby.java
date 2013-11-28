@@ -14,15 +14,10 @@ import javabot.types.UnitType.UnitTypes;
 public class CoreBaby extends RRAITemplate 
 {
 	ArrayList<BuildingRR> buildingGoals;
-	LinkedList<MilitaryOrder> militaryGoals;
-	LinkedList<UnitTypes> unitMixtures;
 	int hostileX,hostileY, countdown;
 	CoreSupportGenome genomeSetting;
-	
 	LinkedList<UnitTypes> genBasicUnitList;
 
-	
-	
 	public class CoreSupportGenome {
 		int bloodFrequency;
 		int mutation;
@@ -41,100 +36,51 @@ public class CoreBaby extends RRAITemplate
 		}
 	}
 	
-	public enum BattleMode
-	{
-		ENTRENCH, MARAUD, RAZE
-	}
-	
-	public enum BattleTargets
-	{
-		MILITARY, INNOCENTS, ALL
-	}
-	
-	public class MilitaryOrder {
-		Integer strength;
-		Integer x,y;
-		Integer wobble;
-		BattleMode mode;
-		BattleTargets target;
-		LinkedList<UnitTypes> units;
-		
-	public MilitaryOrder(
-		 Integer d_strength,
-		 Integer d_xLoc,
-		 Integer d_yLoc,
-		 Integer d_wobble,
-		 BattleMode d_mode,
-		 BattleTargets d_target,
-		 LinkedList<UnitTypes> d_units)
-		{
-			strength = d_strength;
-			x = d_xLoc;
-			y = d_yLoc;
-			wobble = d_wobble;
-			mode = d_mode;
-			target = d_target;
-			units = d_units;
-		}
-	}
-	
-	
 	public CoreBaby() 
 	{
 		hostileX = 0;
 		hostileY = 0;
 		countdown = 200;
-		militaryGoals = new LinkedList<MilitaryOrder>();
-		unitMixtures = new LinkedList<UnitTypes>();
 		genomeSetting = new CoreSupportGenome((int) (Math.random() * 100), (int) (Math.random() * 100));
-		System.out.println("Checking random " + (int) (Math.random() * 100));
 		genBasicUnitList = new LinkedList<UnitTypes>();
+	}
+	
+	public void AILinkData() {
+		buildingGoals = builder.buildingsStack;
+	}
+	
+	public void setup() 
+	{
+		initBuildStyle_siegeExpand();
 		genBasicUnitList.add(UnitTypes.Terran_Marine);
 		genBasicUnitList.add(UnitTypes.Terran_Vulture);
 		genBasicUnitList.add(UnitTypes.Terran_Medic);
 		genBasicUnitList.add(UnitTypes.Terran_Siege_Tank_Tank_Mode);
 	}
 	
-	public void AILinkData() {
-		buildingGoals = builder.buildingsStack;
-	}
-	public void setup() 
-	{
-		//Begin tactics path
-		initBuildStyle_siegeExpand();
-	}
-	
 	public void checkUp() 
 	{
+		/* --- Base Building --- */
 		int supplyTotal = bwapi.getSelf().getSupplyTotal()/2;
 		int supplyUsed = bwapi.getSelf().getSupplyUsed()/2;
-		/* --- Base Building --- */
 		
 		if (buildingGoals.size() > 0 && builder.nextToBuildIndex != -1) {
 			int SCVsTotal = workers.getBaseWorkers(buildingGoals.get(builder.nextToBuildIndex).baseAssignment);
 			int supplyNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSupply;
 			int SCVsNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSCVs;
+			
 			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal) 
-			{
 				buildingGoals.get(builder.nextToBuildIndex).status = BuildStatus.ATTEMPT_BUILD;
-			}
 			
 			if (SCVsNeeded > SCVsTotal) 
-			{	
 				workers.trainWorker();
-			}
 			
-			if (supplyUsed + 4 > supplyTotal) 
-			{
-				if (buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot) 
-				{
+			if (supplyUsed + 10 > supplyTotal && buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot) 
 					buildingGoals.add(builder.nextToBuildIndex, new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
-				}
-			}
 		}
 		else
 		{
-			if (supplyUsed + 4 > supplyTotal) 
+			if (supplyUsed + 10 > supplyTotal) 
 			{
 				buildingGoals.add(new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
 				builder.nextToBuildIndex = buildingGoals.size() - 1;
@@ -142,25 +88,25 @@ public class CoreBaby extends RRAITemplate
 		}
 		
 		/* Add units */
-		UnitTypes unit = unitMixtures.peek();
+		if (builder.roster.size() < 20)
+			genUnitsBasic();
+		
 		
 		/* Military Orders */
-		if (countdown <= 0) {
-			genUnitsBasic();
+		if (countdown-- <= 0) {
 			if (genomeSetting.defensiveness > (int) (Math.random() * 100)) {
 				genDefendMilitaryGroup();
-				genDefensiveBasic();
+				if (buildingGoals.size() - builder.completedBuildingsIndex < 3)
+					genDefensiveBasic();
 			}
 			else {
 				genSpreadMilitaryGroup();
-				genOffensiveBasic();
+				if (buildingGoals.size() - builder.completedBuildingsIndex < 3)
+					genOffensiveBasic();
 			}
-			countdown = genomeSetting.bloodFrequency * 5;
+			countdown = genomeSetting.bloodFrequency;
 		}
-		else {
-			genUnitsBasic();
-			countdown--;
-		}
+		
 	}
 	
 	public void debug() 
@@ -171,17 +117,22 @@ public class CoreBaby extends RRAITemplate
 	public void genUnitsBasic()
 	{
 		int index;
+
 		for (index = 0; index < 4; index++)
-		{
 			builder.roster.addLast(UnitTypes.Terran_Marine);
-	
-		}
 		builder.roster.addLast(UnitTypes.Terran_Medic);
-		for (index = 0; index < 1; index++)
-		{
-			builder.roster.addLast(UnitTypes.Terran_Vulture);
+		for (index = 0; index < 2; index++)
 			builder.roster.addLast(UnitTypes.Terran_Siege_Tank_Tank_Mode);
-		}
+		builder.roster.addLast(UnitTypes.Terran_Vulture);
+		
+	}
+	
+	public void buildOrTrain(UnitTypes toTrain) {
+		UnitTypes toBuild;
+		if ((toBuild = builder.techTree.canIBuildThis(toTrain.ordinal())) == null)
+				builder.roster.addLast(toTrain);
+		else
+			buildingGoals.add(new BuildingRR(1, 1, 0, toBuild, BuildStatus.HOLD));
 		
 	}
 	
@@ -198,31 +149,28 @@ public class CoreBaby extends RRAITemplate
 	
 	
 	public void genSpreadMilitaryGroup() {
+		System.out.println("Offensive orders sent out");
 		ArrayList<Region> regions = bwapi.getMap().getRegions();
 		int totalRegions = regions.size();
 
 		for (int i = 0; i < totalRegions; i++) {
 			if (genomeSetting.spread >  (i/totalRegions) * 100) {
+				System.out.println("Going to region " + i);
 				military.unitOperation(genBasicUnitList, 20, regions.get(i).getCenterX(), regions.get(i).getCenterY());
 			}
-			if (genomeSetting.spread <= 1/totalRegions) {
+			if (i == 0) {
 				military.unitOperation(genBasicUnitList, 20, hostileX, hostileY);
+				System.out.println("Base Attack " + i);
 			}
 		}
 	}
 	
 	public void genDefendMilitaryGroup() {
+		System.out.println("Defensive orders sent out");
 		ChokePoint entrance = null;
 		Region baseStart = react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY);
-		if (baseStart != null) 
-		{
-			if (react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY).getChokePoints().isEmpty())
-			{
-			}
-			else 
+			if (baseStart != null && !react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY).getChokePoints().isEmpty())
 				entrance = (react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY)).getChokePoints().get(0);
-
-		}
 		military.unitOperation(genBasicUnitList, 20, entrance.getFirstSideX(), entrance.getFirstSideY());
 	}
 

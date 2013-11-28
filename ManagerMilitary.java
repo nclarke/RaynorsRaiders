@@ -6,6 +6,7 @@ import java.util.*;
 import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.Level;
 import javabot.model.*;
+import javabot.types.TechType.TechTypes;
 import javabot.types.UnitType;
 import javabot.types.UnitType.UnitTypes;
 import javabot.util.*;
@@ -15,8 +16,8 @@ public class ManagerMilitary extends RRAITemplate
 	int homePositionX, homePositionY;
 	BaseLocation homeBase;
 	
-	// Unit pool: military units gets added to this map as they are created
-	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
+	// Unit pool: military units gets added to this map as they are created 
+	EnumMap<UnitTypes, LinkedList<Unit>> unitPool;
 	
 	// Military Teams: they are created in unitOperation each time an order is given from CoreBaby
 	LinkedList<MilitaryTeam> militaryTeams;
@@ -69,7 +70,7 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public ManagerMilitary()
 	{		
-		militaryUnits = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
+		unitPool = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
 		militaryTeams = new LinkedList<MilitaryTeam>();
 		initMilitaryUnit();
 	}
@@ -90,15 +91,21 @@ public class ManagerMilitary extends RRAITemplate
 	public void checkUp() {
 		
 		//for testing purposes - sends units to attack and tries to handle attack logistics for different units
-		/*for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
+		//attackLocationsTest();
+		
+		removeEmptyMilitaryTeam();
+		handleUnitsAttacking();
+	}
+	
+	public void attackLocationsTest()
+	{
+		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
 		{
 			if (b.isStartLocation() )
 			{
 				unitOperation(b.getX(), b.getY()); 
 			}
-		}*/
-		removeEmptyMilitaryTeam();
-		handleUnitsAttacking();
+		}
 	}
 	
     public void debug()
@@ -117,7 +124,7 @@ public class ManagerMilitary extends RRAITemplate
     
     public void testVult() 
     {
-    	Unit vult = militaryUnits.get(UnitTypes.Terran_Vulture).get(0);
+    	Unit vult = unitPool.get(UnitTypes.Terran_Vulture).get(0);
     	if (vult.isIdle())
     	{
     		javabot.types.TechType techType = bwapi.getTechType(3);
@@ -213,35 +220,49 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
-	
+	/*
+	 * Initializes the Emun Map for store different Units
+	 */
 	private void initMilitaryUnit()
 	{
 		for(UnitTypes ut: UnitTypes.values())
 		{
 			LinkedList<Unit> tmp = new LinkedList<Unit>();
-			militaryUnits.put(ut, tmp);
+			unitPool.put(ut, tmp);
 		}
 	}
 	
-	private void addMilitaryUnit(Unit unitObj, UnitTypes unitType)
+	/*
+	 * Adds a unit to the Enum Map by its specified UnitTypes. Helper method for addCreatedMilitaryUnits.
+	 */
+	private void addCreatedMilitaryUnitsHelper(Unit unitObj, UnitTypes unitType)
 	{
-		militaryUnits.get(unitType).add(unitObj);
+		unitPool.get(unitType).add(unitObj);
 		//System.out.println("Military Manager: Added. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
 	}
 	
-	private void removeMilitaryUnit(int unitObj, UnitTypes unitType)
+	/*
+	 * Removes a unit from the Enum Map by its specified UnitTypes. Helper method for removeDestroyedMilitaryUnits.
+	 * 
+	 * unitID:   unitID of the unit to remove
+	 * unitType: unit's UnitTypes for the Enum map
+	 */
+	private void removeDestroyedMilitaryUnitsHelper(int unitID, UnitTypes unitType)
 	{
-		for(int index = 0; index < militaryUnits.get(unitType).size(); index++)
+		for(int index = 0; index < unitPool.get(unitType).size(); index++)
 		{
-			if(unitObj == (militaryUnits.get(unitType).get(index).getID()))
+			if(unitID == (unitPool.get(unitType).get(index).getID()))
 			{
-				militaryUnits.get(unitType).remove(index);
+				unitPool.get(unitType).remove(index);
 				//System.out.println("Military Manager: Removed. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
 			}
 		}
 	}
 	
-	private void removeUnitInMilitaryTeams(int unitObj, UnitTypes unitType)
+	/*
+	 * Removes a destroyed units in MilitaryTeams.
+	 */
+	private void removeUnitInMilitaryTeams(int unitObj)
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
 		{
@@ -259,7 +280,7 @@ public class ManagerMilitary extends RRAITemplate
 	}
 	
 	/*
-	 * Adds a created military unit to the militaryUnits pool.
+	 * Adds a created military unit to the militaryUnits pool. Created for using in RR.
 	 * 
 	 * createdUnit:   the unit created 
 	 * unitTypeID:    it's type for using as the key for militaryUnits to store the unit
@@ -267,40 +288,40 @@ public class ManagerMilitary extends RRAITemplate
 	public void addCreatedMilitaryUnits(Unit createdUnit, int unitTypeID)
 	{
 		if(unitTypeID == UnitTypes.Terran_Marine.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Marine);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Marine);
 		
 		if(unitTypeID == UnitTypes.Terran_Firebat.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Firebat);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Firebat);
 		
 		if(unitTypeID == UnitTypes.Terran_Ghost.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Ghost);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Ghost);
 			
 		if(unitTypeID == UnitTypes.Terran_Goliath.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Goliath);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Goliath);
 			
 		if(unitTypeID == UnitTypes.Terran_Medic.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Medic);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Medic);
 			
 		if(unitTypeID == UnitTypes.Terran_Valkyrie.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Valkyrie);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Valkyrie);
 			
 		if(unitTypeID == UnitTypes.Terran_Vulture.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Vulture);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Vulture);
 			
 		if(unitTypeID == UnitTypes.Terran_Vulture_Spider_Mine.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Vulture_Spider_Mine);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Vulture_Spider_Mine);
 			
 		if(unitTypeID == UnitTypes.Terran_Dropship.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Dropship);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Dropship);
 			
 		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
 			
 		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Siege_Mode.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
 			
 		if(unitTypeID == UnitTypes.Terran_Wraith.ordinal())
-			addMilitaryUnit(createdUnit, UnitTypes.Terran_Wraith);
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Wraith);
 	}
 	
 	/*
@@ -310,77 +331,80 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		if(unitTypeID == UnitTypes.Terran_Marine.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Marine);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Marine);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Marine);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 		
 		if(unitTypeID == UnitTypes.Terran_Firebat.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Firebat);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Marine);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Firebat);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 		
 		if(unitTypeID == UnitTypes.Terran_Ghost.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Ghost);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Ghost);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Ghost);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Goliath.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Goliath);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Goliath);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Goliath);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Medic.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Medic);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Medic);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Medic);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Valkyrie.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Valkyrie);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Valkyrie);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Valkyrie);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Vulture.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Vulture);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Vulture);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Vulture);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Vulture_Spider_Mine.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Vulture_Spider_Mine);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Vulture_Spider_Mine);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Vulture_Spider_Mine);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Dropship.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Dropship);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Dropship);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Dropship);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Siege_Tank_Tank_Mode);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Siege_Tank_Siege_Mode.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 			
 		if(unitTypeID == UnitTypes.Terran_Wraith.ordinal())
 		{
-			removeMilitaryUnit(destroyedUnit, UnitTypes.Terran_Wraith);
-			removeUnitInMilitaryTeams(destroyedUnit, UnitTypes.Terran_Wraith);
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Wraith);
+			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 	}
 	
+	/*
+	 * Removes destroyed MilitaryTeams (size of its team becomes 0)
+	 */
 	private void removeEmptyMilitaryTeam()
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
@@ -410,15 +434,15 @@ public class ManagerMilitary extends RRAITemplate
 		
 		for(UnitTypes unitTy: unitTypes)
 		{
-			for(int index = 0; index < militaryUnits.get(unitTy).size(); index++)
+			for(int index = 0; index < unitPool.get(unitTy).size(); index++)
 			{
 				if(tmp.size() < numOfUnits)
 				{
-					if(militaryUnits.get(unitTy).get(index).isIdle() && 
-							militaryUnits.get(unitTy).get(index).isCompleted())
+					if(unitPool.get(unitTy).get(index).isIdle() && 
+							unitPool.get(unitTy).get(index).isCompleted())
 					{
 						//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
-						tmp.add(militaryUnits.get(unitTy).get(index));
+						tmp.add(unitPool.get(unitTy).get(index));
 						//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
 					}
 				}
@@ -427,11 +451,11 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(tmp.size() == numOfUnits)
 		{
-			for(int index = 0; index < (militaryUnits.get(UnitTypes.Terran_Medic).size()/2); index++)
+			for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Medic).size()/2); index++)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Medic).get(index).isIdle() 
-						&& militaryUnits.get(UnitTypes.Terran_Medic).get(index).isCompleted())
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Medic).get(index));
+				if(unitPool.get(UnitTypes.Terran_Medic).get(index).isIdle() 
+						&& unitPool.get(UnitTypes.Terran_Medic).get(index).isCompleted())
+					tmp.add(unitPool.get(UnitTypes.Terran_Medic).get(index));
 			}
 			
 			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
@@ -440,18 +464,22 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
+	/*
+	 * Similar to the above unitOperation, except it only requires a team size and a location. 
+	 * Put Marines in a team to attack by default.
+	 */
 	public void unitOperation(int numOfUnits, int locationX, int locationY)
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Marine).size(); index++)
+		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Marine).size(); index++)
 		{
 			if(tmp.size() < numOfUnits)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
-						militaryUnits.get(UnitTypes.Terran_Marine).get(index).isCompleted())
+				if(unitPool.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
+						unitPool.get(UnitTypes.Terran_Marine).get(index).isCompleted())
 				{
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
+					tmp.add(unitPool.get(UnitTypes.Terran_Marine).get(index));
 				}
 			}
 		}
@@ -464,29 +492,32 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
+	/*
+	 * Similar to the above, except team sizes are 5. Put Marines in a team to attack by default.
+	 */
 	public void unitOperation(int locationX, int locationY)
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Marine).size(); index++)
+		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Vulture).size(); index++)
 		{
 			if(tmp.size() < 5)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
-						militaryUnits.get(UnitTypes.Terran_Marine).get(index).isCompleted())
+				if(unitPool.get(UnitTypes.Terran_Vulture).get(index).isIdle() && 
+						unitPool.get(UnitTypes.Terran_Vulture).get(index).isCompleted())
 				{
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
+					tmp.add(unitPool.get(UnitTypes.Terran_Vulture).get(index));
 				}
 			}
 		}
 		
 		if(tmp.size() == 5)
 		{
-			for(int index = 0; index < (militaryUnits.get(UnitTypes.Terran_Medic).size()/2); index++)
+			for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Medic).size()/2); index++)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Medic).get(index).isIdle() 
-						&& militaryUnits.get(UnitTypes.Terran_Medic).get(index).isCompleted())
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Medic).get(index));
+				if(unitPool.get(UnitTypes.Terran_Medic).get(index).isIdle() 
+						&& unitPool.get(UnitTypes.Terran_Medic).get(index).isCompleted())
+					tmp.add(unitPool.get(UnitTypes.Terran_Medic).get(index));
 			}
 			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
 			removeUsedUnits(tmp);
@@ -497,7 +528,7 @@ public class ManagerMilitary extends RRAITemplate
 	/*
 	 * Returns a UnitTypes enum
 	 * 
-	 * unitTypeID:   a unit type ID
+	 * unitTypeID:   a unit type ID 
 	 */
 	public UnitTypes getUnitType(int unitTypeID)
 	{
@@ -552,12 +583,12 @@ public class ManagerMilitary extends RRAITemplate
 			{
 				UnitTypes tmp = getUnitType(usedUnits.get(index).getTypeID());
 				
-				for(int index2 = 0; index2 < militaryUnits.get(tmp).size(); index2++)
+				for(int index2 = 0; index2 < unitPool.get(tmp).size(); index2++)
 				{
-					if(usedUnits.get(index).getID() == (militaryUnits.get(tmp).get(index2).getID()))
+					if(usedUnits.get(index).getID() == (unitPool.get(tmp).get(index2).getID()))
 					{
-						militaryUnits.get(tmp).remove(index2);
-						System.out.println("Military Manager: removeUsedUnits. New size is " + militaryUnits.get(tmp).size());
+						unitPool.get(tmp).remove(index2);
+						System.out.println("Military Manager: removeUsedUnits. New size is " + unitPool.get(tmp).size());
 					}
 				}
 			}
@@ -647,7 +678,7 @@ public class ManagerMilitary extends RRAITemplate
 	/*
 	 * Orders all unit groups to attack a location on the map
 	 */
-	public void orderAllUnitGroupsAtk(int pixelPositionX, int pixelPositionY)
+	public void orderAllMilitaryTeamsToAtk(int pixelPositionX, int pixelPositionY)
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
 		{
@@ -658,6 +689,20 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
+	public void orderUnitPoolToAtk(int pixelPositionX, int pixelPositionY)
+	{
+		for(UnitTypes unitTy: UnitTypes.values())
+		{
+			for(int index = 0; index < unitPool.get(unitTy).size(); index++)
+			{
+				bwapi.attack(unitPool.get(unitTy).get(index).getID(), pixelPositionX, pixelPositionY);
+			}
+		}
+	}
+	
+	/*
+	 * Handles different unit mechanics. This needs to be in checkup to be checkedup every second.
+	 */
 	public void handleUnitsAttacking()
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
@@ -670,25 +715,16 @@ public class ManagerMilitary extends RRAITemplate
 				{
 					if(tmp.isStartingAttack())
 					{
-						bwapi.useTech(tmp.getID(), UnitTypes.Terran_Vulture_Spider_Mine.ordinal());
+						bwapi.useTech(tmp.getID(), TechTypes.Spider_Mines.ordinal(), tmp.getX(), tmp.getY());
 					}
 				}
 				
 				if(tmp.getTypeID() == UnitTypes.Terran_Ghost.ordinal())
 				{
 					bwapi.cloak(tmp.getID());
-					if(tmp.isStartingAttack())
-					{
-						for(Unit un: bwapi.getMyUnits())
-						{
-							if(un.getTypeID() == UnitTypes.Terran_Command_Center.ordinal())
-							{
-								if(un.isNukeReady())
-								{
-									bwapi.useTech(tmp.getID(), UnitTypes.Terran_Nuclear_Missile.ordinal(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
-								}
-							}
-						}
+					if(tmp.isCloaked())
+					{	
+						bwapi.useTech(tmp.getID(), TechTypes.Nuclear_Strike.ordinal(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
 					}
 				}
 				
@@ -724,7 +760,7 @@ public class ManagerMilitary extends RRAITemplate
 	 */
 	private int getCurrentUnitCount(UnitTypes unitType)
 	{
-		return militaryUnits.get(unitType).size();
+		return unitPool.get(unitType).size();
 	}
 	
 	// Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we

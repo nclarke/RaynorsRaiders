@@ -579,7 +579,12 @@ public class ManagerWorkers extends RRAITemplate
 			
 			if (w.curOrder == workerOrders.UNDERATTACK) 
 			{
+<<<<<<< HEAD
 				//bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.PURPLE, false, false);
+=======
+				curWorker = bwapi.getUnit(w.unitID);
+				//bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.PURPLE, false, false); - FIXME - crashed
+>>>>>>> aee310e9006f5a7fb3a3cf436024cb344004c0ff
 			}
 		}
 		
