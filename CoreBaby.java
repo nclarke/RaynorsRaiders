@@ -163,6 +163,7 @@ public class CoreBaby extends RRAITemplate
 				System.out.println("Base Attack " + i);
 			}
 		}
+		System.out.println("End group spread");
 	}
 	
 	public void genDefendMilitaryGroup() {

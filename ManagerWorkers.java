@@ -1,6 +1,7 @@
 package javabot.RaynorsRaiders;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javabot.JNIBWAPI;
@@ -37,15 +38,55 @@ public class ManagerWorkers extends RRAITemplate
 	public void checkUp() 
 	{
 //		System.out.println("In workers checkup");
-		Unit curWorker;
+		Worker curWorker;
+		Unit curWorkerUnit;
 		for (Worker w : allWorkers)
 		{
 			
-			curWorker = bwapi.getUnit(w.unitID);
-			if (curWorker.isUnderAttack())
+			curWorkerUnit = bwapi.getUnit(w.unitID);
+			if (curWorkerUnit.isUnderAttack())
 			{
-				workerUnderAttack(curWorker);
+				//workerUnderAttack(curWorkerUnit);
 			}
+		}
+		int baseNdx = 0;
+		int ndx;
+		for (BaseLocation b : builder.ourBases)
+		{
+			int gasID, curNumGasWorkers = 0;
+			int workerNdx = 0;
+			boolean gas;
+			Unit gasUnit;
+			
+			if (!b.isMineralOnly())
+			{
+				gasID = getNearestGas(b.getX(), b.getY());
+				gasUnit = bwapi.getUnit(gasID);
+				gas = !(gasUnit.isInvincible() | gasUnit.isBeingConstructed());
+				for (Worker gw : baseWorkers.get(baseNdx))
+				{
+					if (gw.curOrder == ManagerWorkers.workerOrders.GAS)
+						curNumGasWorkers++;
+				}
+				if (gas & (curNumGasWorkers < 3))
+				{
+					System.out.println("MW: assiging workers to gas");
+					for (ndx = 0; ndx < 3 - curNumGasWorkers; ndx++)
+					{
+						do
+						{
+						curWorker = baseWorkers.get(baseNdx).get(workerNdx++);
+						System.out.println("MW: curworker order is " + curWorker.curOrder);
+						System.out.println("MW: with ndx " + (workerNdx - 1));
+						} while (curWorker.curOrder != workerOrders.MINE);
+						System.out.println("Outside while with ndx " + ndx);
+						curWorker.curOrder = workerOrders.GAS;
+						bwapi.stop(curWorker.unitID);
+					}
+				}
+
+			}
+			baseNdx++;
 		}
 		handleIdle();
 	}
@@ -297,11 +338,12 @@ public class ManagerWorkers extends RRAITemplate
 		{
 			if (allWorkers.get(ndx).unitID == unitID)
 			{
-				//System.out.println("Found remove");
-				removeWorkerFromBase(allWorkers.get(ndx), allWorkers.get(ndx).asgnedBase);
+				System.out.println("MW: Found remove");
+				//removeWorkerFromBase(allWorkers.get(ndx), allWorkers.get(ndx).asgnedBase);
 				allWorkers.remove(ndx);
 			}
 		}
+		System.out.println("MW: end remove");
 	}
 	
 	public void assignWorkersToGas(int baseNdx, int howMany)
@@ -475,17 +517,21 @@ public class ManagerWorkers extends RRAITemplate
 	{
 		int rtnID = -1;
 		double closestDist = 99999999;
-		for (Unit neu : bwapi.getNeutralUnits()) 
+		ArrayList<Unit> unitsToSearch;
+		unitsToSearch = bwapi.getNeutralUnits();
+		unitsToSearch.addAll(bwapi.getMyUnits());
+		for (Unit u : unitsToSearch) 
 		{
-			if (neu.getTypeID() == UnitTypes.Resource_Vespene_Geyser.ordinal()) 
+			if (u.getTypeID() == UnitTypes.Resource_Vespene_Geyser.ordinal() || 
+					u.getTypeID() == UnitTypes.Terran_Refinery.ordinal()) 
 			{
-				double distance = Math.sqrt(Math.pow(neu.getX() - workerX, 2)
-						+ Math.pow(neu.getY() - workerY, 2));
+				double distance = Math.sqrt(Math.pow(u.getX() - workerX, 2)
+						+ Math.pow(u.getY() - workerY, 2));
 				if ((rtnID == -1) || (distance < closestDist)) 
 				{
 					closestDist = distance;
 					//bwapi.printText("Closet dist is" + String.valueOf(closestDist));
-					rtnID = neu.getID();
+					rtnID = u.getID();
 				}
 			}
 		}
@@ -591,6 +637,23 @@ public class ManagerWorkers extends RRAITemplate
 		for (BaseLocation b : builder.ourBases)
 		{
 			int baseWorkers, baseMins;
+			int gasID;
+			boolean gas;
+			Unit gasUnit;
+			
+			if (!b.isMineralOnly())
+			{
+				gasID = getNearestGas(b.getX(), b.getY());
+				gasUnit = bwapi.getUnit(gasID);
+				gas = !(gasUnit.isInvincible() | gasUnit.isBeingConstructed());
+				bwapi.drawText(b.getX()-64, b.getY()-(32*2)-20, "Gas built? " + gas, false);
+				if (!gas)
+					bwapi.drawCircle(gasUnit.getX(), gasUnit.getY(), 24, BWColor.GREY, false, false);
+				else
+					bwapi.drawCircle(gasUnit.getX(), gasUnit.getY(), 24, BWColor.GREEN, false, false);
+			}
+			
+			
 			
 			baseWorkers = getBaseWorkers(ndx++);
 			baseMins = b.getMinerals();

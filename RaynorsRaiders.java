@@ -173,6 +173,16 @@ public class RaynorsRaiders implements BWAPIEventListener
 		bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
 				+ managerBuild.getStartLocation().getY() + ")", true);
 
+		int undx = 0;
+		int screenNdx = 50;
+		bwapi.drawText(300, 40, "Master unit list is ", true);
+		for (Unit u : masterUnitList)
+		{
+			bwapi.drawText(300, screenNdx, bwapi.getUnitType(u.getTypeID()).getName(), true);
+			screenNdx += 10;
+		}
+		bwapi.drawText(300, screenNdx, "End master unit list", true);
+		
 		//bwapi.drawHealth(healthFlag);
 		for (Unit u : bwapi.getMyUnits())  
 		{
@@ -318,20 +328,25 @@ public class RaynorsRaiders implements BWAPIEventListener
 			}
 		}
 	}
+	
 	public void unitDestroy(int unitID)
 	{		
-		//System.out.println("In unit destroyed");
+	//	System.out.println("In unit destroyed");
 		bwapi.printText("Unit Destroyed " + String.valueOf(unitID));
 		Unit taggedForDeath = null;
 
 		this.managerInfo.unitDestoryed(unitID);
+		// This is an error, checking in a worker that does not exist anymore ^^^
 		
 		for (Unit u : masterUnitList)
 		{
+			//System.out.println("U is " + u.getID() + " vs " + unitID);
 			if (u.getID() == unitID)
 			{
+				//System.out.println("Found in master list");
 				if (u.getTypeID() == UnitTypes.Terran_SCV.ordinal())
 				{
+					//System.out.println("Trying to remove worker");
 					managerWorkers.removeWorker(unitID);
 					
 					for(BuildingRR bldg : managerBuild.buildingsStack)
@@ -342,6 +357,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 							break;
 						}
 					}
+					//System.out.println("RR: end of checking building queue");
 				}
 				else
 				{
@@ -350,19 +366,11 @@ public class RaynorsRaiders implements BWAPIEventListener
 				taggedForDeath = u;
 			}
 		}
+		//System.out.println("Tagged for death is " + taggedForDeath);
 		masterUnitList.remove(taggedForDeath);
-
-		/*
-		for(Unit bldg : managerBuild.builtBuildings)
-		{
-			if(bldg.getID() == unitID)
-			{
-				managerBuild.builtBuildings.remove(bldg);
-				break;
-			}
-		}
-		*/
+		//System.out.println("RR: End all remove");
 	}
+
 	public void unitDiscover(int unitID) 
 	{ 
 		this.managerInfo.unitSeen(unitID);

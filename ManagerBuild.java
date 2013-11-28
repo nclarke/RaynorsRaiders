@@ -183,24 +183,24 @@ public class ManagerBuild extends RRAITemplate
 	public void checkUp() 
 	{
 
-//System.out.println("completed buildings index = " + completedBuildingsIndex);
-//System.out.println("next to build index = " + nextToBuildIndex);
-for(BuildingRR bldg: buildingsStack)
-{
-	String blueprint = bwapi.getUnitType(bldg.blueprint.ordinal()).getName();
-	String unit, worker;
-	if(bldg.unit == null)
-		unit = "null";
-	else
-		unit = bwapi.getUnitType(bldg.unit.getTypeID()).getName();
+		//System.out.println("completed buildings index = " + completedBuildingsIndex);
+		//System.out.println("next to build index = " + nextToBuildIndex);
+		for(BuildingRR bldg: buildingsStack)
+		{
+			String blueprint = bwapi.getUnitType(bldg.blueprint.ordinal()).getName();
+			String unit, worker;
+			if(bldg.unit == null)
+				unit = "null";
+			else
+				unit = bwapi.getUnitType(bldg.unit.getTypeID()).getName();
+			
+			if(bldg.worker == null)
+				worker = "no one";
+			else
+				worker = bldg.worker.toString();
 	
-	if(bldg.worker == null)
-		worker = "no one";
-	else
-		worker = bldg.worker.toString();
-	
-//System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
-}
+			//System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
+		}
 
         // building construction
 		switch(bldgMode) {

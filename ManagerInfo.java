@@ -86,11 +86,11 @@ public class ManagerInfo extends RRAITemplate
 	public void unitDestoryed(int unitID)
 	{		
 		Unit unit = bwapi.getUnit(unitID);
-		//System.out.println("destroyed unitID: "+unitID);
+		System.out.println("destroyed unitID: "+unitID);
 //		System.out.println("ID of: "+bwapi.getUnit(unitID).getPlayerID());
 		if (unitID == this.scouter.scout.getID())
 		{
-			//System.out.println("scout destroyed of tyep:"+scouter.scout.getTypeID());
+			System.out.println("scout destroyed of tyep:"+scouter.scout.getTypeID());
 			if (this.scouter.scout.getTypeID() == UnitTypes.Terran_SCV.ordinal())
 				workers.checkInWorker(scouter.scout.getID());
 			this.scouter.scout = null;
