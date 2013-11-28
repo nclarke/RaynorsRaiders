@@ -6,6 +6,7 @@ import java.util.*;
 import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.Level;
 import javabot.model.*;
+import javabot.types.TechType.TechTypes;
 import javabot.types.UnitType;
 import javabot.types.UnitType.UnitTypes;
 import javabot.util.*;
@@ -15,7 +16,7 @@ public class ManagerMilitary extends RRAITemplate
 	int homePositionX, homePositionY;
 	BaseLocation homeBase;
 	
-	// Unit pool: military units gets added to this map as they are created
+	// Unit pool: military units gets added to this map as they are created 
 	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
 	
 	// Military Teams: they are created in unitOperation each time an order is given from CoreBaby
@@ -90,15 +91,21 @@ public class ManagerMilitary extends RRAITemplate
 	public void checkUp() {
 		
 		//for testing purposes - sends units to attack and tries to handle attack logistics for different units
-		/*for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
+		//attackLocationsTest();
+		
+		removeEmptyMilitaryTeam();
+		handleUnitsAttacking();
+	}
+	
+	public void attackLocationsTest()
+	{
+		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
 		{
 			if (b.isStartLocation() )
 			{
 				unitOperation(b.getX(), b.getY()); 
 			}
-		}*/
-		removeEmptyMilitaryTeam();
-		handleUnitsAttacking();
+		}
 	}
 	
     public void debug()
@@ -422,14 +429,14 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Marine).size(); index++)
+		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Vulture).size(); index++)
 		{
 			if(tmp.size() < 5)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
-						militaryUnits.get(UnitTypes.Terran_Marine).get(index).isCompleted())
+				if(militaryUnits.get(UnitTypes.Terran_Vulture).get(index).isIdle() && 
+						militaryUnits.get(UnitTypes.Terran_Vulture).get(index).isCompleted())
 				{
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
+					tmp.add(militaryUnits.get(UnitTypes.Terran_Vulture).get(index));
 				}
 			}
 		}
@@ -627,25 +634,16 @@ public class ManagerMilitary extends RRAITemplate
 				{
 					if(tmp.isStartingAttack())
 					{
-						bwapi.useTech(tmp.getID(), UnitTypes.Terran_Vulture_Spider_Mine.ordinal());
+						bwapi.useTech(tmp.getID(), TechTypes.Spider_Mines.ordinal(), tmp.getX(), tmp.getY());
 					}
 				}
 				
 				if(tmp.getTypeID() == UnitTypes.Terran_Ghost.ordinal())
 				{
 					bwapi.cloak(tmp.getID());
-					if(tmp.isStartingAttack())
-					{
-						for(Unit un: bwapi.getMyUnits())
-						{
-							if(un.getTypeID() == UnitTypes.Terran_Command_Center.ordinal())
-							{
-								if(un.isNukeReady())
-								{
-									bwapi.useTech(tmp.getID(), UnitTypes.Terran_Nuclear_Missile.ordinal(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
-								}
-							}
-						}
+					if(tmp.isCloaked())
+					{	
+						bwapi.useTech(tmp.getID(), TechTypes.Nuclear_Strike.ordinal(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
 					}
 				}
 				
