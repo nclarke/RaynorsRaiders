@@ -17,7 +17,7 @@ public class ManagerMilitary extends RRAITemplate
 	BaseLocation homeBase;
 	
 	// Unit pool: military units gets added to this map as they are created 
-	EnumMap<UnitTypes, LinkedList<Unit>> militaryUnits;
+	EnumMap<UnitTypes, LinkedList<Unit>> unitPool;
 	
 	// Military Teams: they are created in unitOperation each time an order is given from CoreBaby
 	LinkedList<MilitaryTeam> militaryTeams;
@@ -70,7 +70,7 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public ManagerMilitary()
 	{		
-		militaryUnits = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
+		unitPool = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
 		militaryTeams = new LinkedList<MilitaryTeam>();
 		initMilitaryUnit();
 	}
@@ -124,7 +124,7 @@ public class ManagerMilitary extends RRAITemplate
     
     public void testVult() 
     {
-    	Unit vult = militaryUnits.get(UnitTypes.Terran_Vulture).get(0);
+    	Unit vult = unitPool.get(UnitTypes.Terran_Vulture).get(0);
     	if (vult.isIdle())
     	{
     		javabot.types.TechType techType = bwapi.getTechType(3);
@@ -158,7 +158,7 @@ public class ManagerMilitary extends RRAITemplate
 		for(UnitTypes ut: UnitTypes.values())
 		{
 			LinkedList<Unit> tmp = new LinkedList<Unit>();
-			militaryUnits.put(ut, tmp);
+			unitPool.put(ut, tmp);
 		}
 	}
 	
@@ -167,7 +167,7 @@ public class ManagerMilitary extends RRAITemplate
 	 */
 	private void addCreatedMilitaryUnitsHelper(Unit unitObj, UnitTypes unitType)
 	{
-		militaryUnits.get(unitType).add(unitObj);
+		unitPool.get(unitType).add(unitObj);
 		//System.out.println("Military Manager: Added. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
 	}
 	
@@ -179,11 +179,11 @@ public class ManagerMilitary extends RRAITemplate
 	 */
 	private void removeDestroyedMilitaryUnitsHelper(int unitID, UnitTypes unitType)
 	{
-		for(int index = 0; index < militaryUnits.get(unitType).size(); index++)
+		for(int index = 0; index < unitPool.get(unitType).size(); index++)
 		{
-			if(unitID == (militaryUnits.get(unitType).get(index).getID()))
+			if(unitID == (unitPool.get(unitType).get(index).getID()))
 			{
-				militaryUnits.get(unitType).remove(index);
+				unitPool.get(unitType).remove(index);
 				//System.out.println("Military Manager: Removed. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
 			}
 		}
@@ -364,15 +364,15 @@ public class ManagerMilitary extends RRAITemplate
 		
 		for(UnitTypes unitTy: unitTypes)
 		{
-			for(int index = 0; index < militaryUnits.get(unitTy).size(); index++)
+			for(int index = 0; index < unitPool.get(unitTy).size(); index++)
 			{
 				if(tmp.size() < numOfUnits)
 				{
-					if(militaryUnits.get(unitTy).get(index).isIdle() && 
-							militaryUnits.get(unitTy).get(index).isCompleted())
+					if(unitPool.get(unitTy).get(index).isIdle() && 
+							unitPool.get(unitTy).get(index).isCompleted())
 					{
 						//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
-						tmp.add(militaryUnits.get(unitTy).get(index));
+						tmp.add(unitPool.get(unitTy).get(index));
 						//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
 					}
 				}
@@ -381,11 +381,11 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(tmp.size() == numOfUnits)
 		{
-			for(int index = 0; index < (militaryUnits.get(UnitTypes.Terran_Medic).size()/2); index++)
+			for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Medic).size()/2); index++)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Medic).get(index).isIdle() 
-						&& militaryUnits.get(UnitTypes.Terran_Medic).get(index).isCompleted())
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Medic).get(index));
+				if(unitPool.get(UnitTypes.Terran_Medic).get(index).isIdle() 
+						&& unitPool.get(UnitTypes.Terran_Medic).get(index).isCompleted())
+					tmp.add(unitPool.get(UnitTypes.Terran_Medic).get(index));
 			}
 			
 			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
@@ -402,14 +402,14 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Marine).size(); index++)
+		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Marine).size(); index++)
 		{
 			if(tmp.size() < numOfUnits)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
-						militaryUnits.get(UnitTypes.Terran_Marine).get(index).isCompleted())
+				if(unitPool.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
+						unitPool.get(UnitTypes.Terran_Marine).get(index).isCompleted())
 				{
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Marine).get(index));
+					tmp.add(unitPool.get(UnitTypes.Terran_Marine).get(index));
 				}
 			}
 		}
@@ -429,25 +429,25 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < militaryUnits.get(UnitTypes.Terran_Vulture).size(); index++)
+		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Vulture).size(); index++)
 		{
 			if(tmp.size() < 5)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Vulture).get(index).isIdle() && 
-						militaryUnits.get(UnitTypes.Terran_Vulture).get(index).isCompleted())
+				if(unitPool.get(UnitTypes.Terran_Vulture).get(index).isIdle() && 
+						unitPool.get(UnitTypes.Terran_Vulture).get(index).isCompleted())
 				{
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Vulture).get(index));
+					tmp.add(unitPool.get(UnitTypes.Terran_Vulture).get(index));
 				}
 			}
 		}
 		
 		if(tmp.size() == 5)
 		{
-			for(int index = 0; index < (militaryUnits.get(UnitTypes.Terran_Medic).size()/2); index++)
+			for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Medic).size()/2); index++)
 			{
-				if(militaryUnits.get(UnitTypes.Terran_Medic).get(index).isIdle() 
-						&& militaryUnits.get(UnitTypes.Terran_Medic).get(index).isCompleted())
-					tmp.add(militaryUnits.get(UnitTypes.Terran_Medic).get(index));
+				if(unitPool.get(UnitTypes.Terran_Medic).get(index).isIdle() 
+						&& unitPool.get(UnitTypes.Terran_Medic).get(index).isCompleted())
+					tmp.add(unitPool.get(UnitTypes.Terran_Medic).get(index));
 			}
 			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
 			removeUsedUnits(tmp);
@@ -513,12 +513,12 @@ public class ManagerMilitary extends RRAITemplate
 			{
 				UnitTypes tmp = getUnitType(usedUnits.get(index).getTypeID());
 				
-				for(int index2 = 0; index2 < militaryUnits.get(tmp).size(); index2++)
+				for(int index2 = 0; index2 < unitPool.get(tmp).size(); index2++)
 				{
-					if(usedUnits.get(index).getID() == (militaryUnits.get(tmp).get(index2).getID()))
+					if(usedUnits.get(index).getID() == (unitPool.get(tmp).get(index2).getID()))
 					{
-						militaryUnits.get(tmp).remove(index2);
-						System.out.println("Military Manager: removeUsedUnits. New size is " + militaryUnits.get(tmp).size());
+						unitPool.get(tmp).remove(index2);
+						System.out.println("Military Manager: removeUsedUnits. New size is " + unitPool.get(tmp).size());
 					}
 				}
 			}
@@ -608,13 +608,24 @@ public class ManagerMilitary extends RRAITemplate
 	/*
 	 * Orders all unit groups to attack a location on the map
 	 */
-	public void orderAllUnitGroupsAtk(int pixelPositionX, int pixelPositionY)
+	public void orderAllMilitaryTeamsToAtk(int pixelPositionX, int pixelPositionY)
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
 		{
 			for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
 			{
 				bwapi.attack(militaryTeams.get(index).getMilitaryTeam().get(index2).getID(), pixelPositionX, pixelPositionY);
+			}
+		}
+	}
+	
+	public void orderUnitPoolToAtk(int pixelPositionX, int pixelPositionY)
+	{
+		for(UnitTypes unitTy: UnitTypes.values())
+		{
+			for(int index = 0; index < unitPool.get(unitTy).size(); index++)
+			{
+				bwapi.attack(unitPool.get(unitTy).get(index).getID(), pixelPositionX, pixelPositionY);
 			}
 		}
 	}
@@ -679,7 +690,7 @@ public class ManagerMilitary extends RRAITemplate
 	 */
 	private int getCurrentUnitCount(UnitTypes unitType)
 	{
-		return militaryUnits.get(unitType).size();
+		return unitPool.get(unitType).size();
 	}
 	
 	// Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
