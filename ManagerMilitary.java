@@ -14,6 +14,7 @@ import javabot.util.*;
 public class ManagerMilitary extends RRAITemplate
 {
 	int homePositionX, homePositionY;
+	int commandCenterX, commandCenterY;
 	BaseLocation homeBase;
 	
 	// Unit pool: military units gets added to this map as they are created 
@@ -22,11 +23,23 @@ public class ManagerMilitary extends RRAITemplate
 	// Military Teams: they are created in unitOperation each time an order is given from CoreBaby
 	LinkedList<MilitaryTeam> militaryTeams;
 	
+	public enum RallyStatus
+	{
+		NOTRALLIED, RALLIED
+	};
+	
+	public enum DispatchStatus
+	{
+		NOTDISPATCHED, DISPATCHED
+	};
+	
 	private class MilitaryTeam
 	{
 		LinkedList<Unit> militaryTeam;
 		int locX, locY;
 		int teamSize;
+		RallyStatus rallystatus;
+		DispatchStatus dispatchstatus;
 		
 		public MilitaryTeam(LinkedList<Unit> militaryTeam, int locX,  int locY)
 		{
@@ -34,6 +47,8 @@ public class ManagerMilitary extends RRAITemplate
 			this.locX = locX;
 			this.locY = locY;
 			this.teamSize = militaryTeam.size();
+			this.rallystatus = RallyStatus.NOTRALLIED;
+			dispatchstatus = DispatchStatus.NOTDISPATCHED;
 		}
 		
 		public LinkedList<Unit> getMilitaryTeam()
@@ -66,6 +81,26 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			teamSize = newSize;
 		}
+		
+		public RallyStatus getRallyStatus()
+		{
+			return rallystatus;
+		}
+		
+		public void setRallyStatus(RallyStatus rs)
+		{
+			rallystatus = rs;
+		}
+		
+		public DispatchStatus getDispatchStatus()
+		{
+			return dispatchstatus;
+		}
+		
+		public void setDispatchStatus(DispatchStatus ds)
+		{
+			dispatchstatus = ds;
+		}
 	}
 	
 	public ManagerMilitary()
@@ -93,6 +128,7 @@ public class ManagerMilitary extends RRAITemplate
 		//for testing purposes - sends units to attack and tries to handle attack logistics for different units
 		//attackLocationsTest();
 		
+		rallyUnits();
 		removeEmptyMilitaryTeam();
 		handleUnitsAttacking();
 	}
@@ -103,7 +139,10 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			if (b.isStartLocation() )
 			{
-				unitOperation(b.getX(), b.getY()); 
+				if((b.getX() != homePositionX) && (b.getY() != homePositionY))
+				{
+					unitOperation(b.getX(), b.getY()); 
+				}
 			}
 		}
 	}
@@ -427,7 +466,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * numOfUnits:  number of units needed (don't know how many units you want each). 
 	 *              It will take as much there is on the first UnitTypes before the next.
 	 * locationX:   Pixel X coordinate on the map
-	 * locationY:   Pixel X coordinate on the map
+	 * locationY:   Pixel Y coordinate on the map
 	 */
 	public void unitOperation(LinkedList<UnitTypes> unitTypes, int numOfUnits,  int locationX, int locationY)
 	{
@@ -461,7 +500,6 @@ public class ManagerMilitary extends RRAITemplate
 			
 			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
 			removeUsedUnits(tmp);
-			unitOperationHelper(tmp, locationX, locationY);
 		}
 	}
 	
@@ -489,7 +527,6 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
 			removeUsedUnits(tmp);
-			unitOperationHelper(tmp, locationX, locationY);
 		}
 	}
 	
@@ -500,14 +537,14 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Vulture).size(); index++)
+		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Marine).size(); index++)
 		{
 			if(tmp.size() < 5)
 			{
-				if(unitPool.get(UnitTypes.Terran_Vulture).get(index).isIdle() && 
-						unitPool.get(UnitTypes.Terran_Vulture).get(index).isCompleted())
+				if(unitPool.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
+						unitPool.get(UnitTypes.Terran_Marine).get(index).isCompleted())
 				{
-					tmp.add(unitPool.get(UnitTypes.Terran_Vulture).get(index));
+					tmp.add(unitPool.get(UnitTypes.Terran_Marine).get(index));
 				}
 			}
 		}
@@ -522,7 +559,6 @@ public class ManagerMilitary extends RRAITemplate
 			}
 			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
 			removeUsedUnits(tmp);
-			unitOperationHelper(tmp, locationX, locationY);
 		}
 	}
 	
@@ -596,39 +632,25 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
-	/*
-	 * Helper function to execute unit attacks to a location 
-	 */
-	private void unitOperationHelper(LinkedList<Unit> unitGroup, int locationX, int locationY)
+	private void rallyUnits()
 	{
-		//rallyUnits(unitGroup, homePositionX, homePositionY);
-		//System.out.println("Rallied");
-		//boolean test = rallyReadyCheck(unitGroup, homePositionX, homePositionY);
-		//System.out.println(test);
-		//if(rallyReadyCheck(unitGroup, homePositionX, homePositionY))
-		//{
-			//System.out.println("Military Manager: In unitOperationHelper");
-			attackEnemyLocation(unitGroup, locationX, locationY);
-			System.out.println("Attacking");
-			//System.out.println("Military Manager: Exited unitOperationHelper");
-		//}
-	}
-	
-	/*
-	 * Commands the Units stored in an LinkedList to rally at a location on the map
-	 * 
-	 * unitGroup:   LinkedList of Units we wanted to rally
-	 * pixelPositionX:  Rally position's X
-	 * pixelPositionY:  Rally position's Y
-	 * 
-	 */
-	private void rallyUnits(LinkedList<Unit> unitGroup, int pixelPositionX, int pixelPositionY )
-	{
-		if(unitGroup != null)
+		for(int index = 0; index < militaryTeams.size(); index++)
 		{
-			for(int index = 0; index < unitGroup.size(); index++)
+			if(militaryTeams.get(index).getRallyStatus().equals(RallyStatus.NOTRALLIED) && 
+					(militaryTeams.get(index).getDispatchStatus().equals(DispatchStatus.NOTDISPATCHED)))
 			{
-				bwapi.move(unitGroup.get(index).getID(), pixelPositionX, pixelPositionY);
+				for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
+				{
+					bwapi.move(militaryTeams.get(index).getMilitaryTeam().get(index2).getID(), homePositionX, homePositionY);
+				}
+			}
+			
+			boolean st = rallyReadyCheck(militaryTeams.get(index).getMilitaryTeam(), homePositionX, homePositionY);
+			//System.out.println("Status Rallied: " + st);
+			if(st)
+			{
+				militaryTeams.get(index).setRallyStatus(RallyStatus.RALLIED);
+				attackEnemyLocation();
 			}
 		}
 	}
@@ -643,36 +665,35 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(unitGroup != null)
 		{
-			while(!checkReadyFlag)
+			for(int index = 0; index < unitGroup.size(); index++)
 			{
-				for(int index = 0; index < unitGroup.size(); index++)
+				double dist = Math.sqrt(Math.pow(unitGroup.get(index).getX() - pixelPositionX, 2) + Math.pow(unitGroup.get(index).getY() - pixelPositionY, 2));
+				System.out.println(dist);
+				
+				if(dist <= 120)
 				{
-					if(!unitGroup.get(index).isAccelerating())
-					{
-						checkReadyFlag = true;
-					}
+					checkReadyFlag = true;
 				}
 			}
 		}
+		
 		return checkReadyFlag;
 	}
 	
-	/*
-	 * Order the Units stored in an LinkedList to attack a location on the map
-	 * 
-	 * unitGroup:   LinkedList of Units we wanted to rally
-	 * pixelPositionX:  Attack position's X
-	 * pixelPositionY:  Attack position's Y
-	 * 
-	 */
-	private void attackEnemyLocation(LinkedList<Unit> unitGroup, int pixelPositionX, int pixelPositionY)
+	private void attackEnemyLocation()
 	{
-		if(unitGroup != null)
+		for(int index = 0; index < militaryTeams.size(); index++)
 		{
-			for(int index = 0; index < unitGroup.size(); index++)
-			{					
-				bwapi.attack(unitGroup.get(index).getID(), pixelPositionX, pixelPositionY);
+			if(militaryTeams.get(index).getDispatchStatus().equals(DispatchStatus.NOTDISPATCHED) && 
+					(militaryTeams.get(index).getRallyStatus().equals(RallyStatus.RALLIED)))
+			{
+				for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
+				{
+					bwapi.attack(militaryTeams.get(index).getMilitaryTeam().get(index2).getID(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
+				}
 			}
+			
+			militaryTeams.get(index).setDispatchStatus(DispatchStatus.DISPATCHED);
 		}
 	}
 	
@@ -689,6 +710,7 @@ public class ManagerMilitary extends RRAITemplate
 			}
 		}
 	}
+	
 	
 	public void orderUnitPoolToAtk(int pixelPositionX, int pixelPositionY)
 	{
@@ -763,6 +785,8 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		return unitPool.get(unitType).size();
 	}
+	
+	
 	
 	// Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
     // don't have a unit of this type
