@@ -155,8 +155,13 @@ public class RaynorsRaiders implements BWAPIEventListener
 		if (frameCount % 30 == 0)
 		{
 			managerMilitary.checkUp();
-			//managerMilitary.testVult();
+			managerMilitary.testVult();
 		}
+		if (frameCount == 200)
+		{
+			managerMilitary.scanLocation(500, 1000);
+		}
+		managerMilitary.testStutter();
 
 	}
 	
@@ -165,16 +170,16 @@ public class RaynorsRaiders implements BWAPIEventListener
 		////System.out.println("Start debug");
 		bwapi.drawText(0, 0, "Home base location is ( " + managerBuild.homePositionX + ", "
 				+ managerBuild.homePositionY + ")", true);
-		//bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
-				//+ managerBuild.getStartLocation().getY() + ")", true);
+		bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
+				+ managerBuild.getStartLocation().getY() + ")", true);
 
 		//bwapi.drawHealth(healthFlag);
 		for (Unit u : bwapi.getMyUnits())  
 		{
-			if (u.isUnderAttack()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.RED, false, false);
-			else if (u.isGatheringMinerals()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.BLUE, false, false);
-			else if (u.isGatheringGas()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.GREEN, false, false);
-			else if (u.isAttacking()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.ORANGE, false, false);
+			//if (u.isUnderAttack()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.RED, false, false);
+			//else if (u.isGatheringMinerals()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.BLUE, false, false);
+			//else if (u.isGatheringGas()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.GREEN, false, false);
+			//else if (u.isAttacking()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.ORANGE, false, false);
 			
 			
 			bwapi.drawLine(u.getX(), u.getY(), u.getTargetX(), u.getTargetY(), BWColor.WHITE, false);

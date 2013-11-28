@@ -126,6 +126,76 @@ public class ManagerMilitary extends RRAITemplate
     	}
     }
     
+    /*
+     * Gets and returns the enemy unit (not building) that currently visible
+     * and closet the the passed in location
+     * public int getNearestUnit(int unitTypeID, int x, int y) 
+     */
+    
+    
+    public Unit getNearestEnemyUnit(int x, int y)
+    {
+    	Unit toRtn = null;
+    	int nearestID = -1;
+	    double nearestDist = 9999999;
+	    for (Unit unit : bwapi.getEnemyUnits()) 
+	    {
+	    	
+	    	if ((!unit.isCompleted()) || bwapi.getUnitType(unit.getTypeID()).isBuilding()) continue;
+	    	double dist = Math.sqrt(Math.pow(unit.getX() - x, 2) + Math.pow(unit.getY() - y, 2));
+	    	if (nearestID == -1 || dist < nearestDist) 
+	    	{
+	    		toRtn = unit;
+	    		nearestDist = dist;
+	    	}
+	    }
+	    return toRtn;
+    }
+    
+    public void testStutter()
+    {
+    	Player p;
+    
+    	Unit toAttack;
+    	Unit vult = militaryUnits.get(UnitTypes.Terran_Vulture).get(0);
+    	//Unit marine = militaryUnits.get(UnitTypes.Terran_Marine).get(0);
+    	if (vult.getGroundWeaponCooldown() == 0)
+    	//if (marine.getGroundWeaponCooldown() == 0)
+    	{
+    		toAttack = getNearestEnemyUnit(vult.getX(), vult.getY());
+    		bwapi.attack(vult.getID(), toAttack.getID());
+    		//bwapi.attack(vult.getID(), 2000, 1000);
+    	}
+    	else
+    	{
+    		bwapi.move(vult.getID(), 0, 0);
+    	}
+    }
+    
+    public void scanLocation(int x, int y)
+    {
+    	double framesTillScan = 0; // returns a non-zero number if we didn't scan
+    	int energyPoints = 0;
+    	System.out.println("Scanning");
+    	for (Unit u : bwapi.getMyUnits())
+    	{
+    		if (u.getTypeID() == UnitTypes.Terran_Comsat_Station.ordinal())
+    		{
+    			if (u.getEnergy() >= 50)
+    			{
+    				bwapi.useTech(u.getID(), 4, x, y);
+    			}
+    			else
+    			{
+    				//0.03125 points per frame
+    				energyPoints = 50 - u.getEnergy();
+    				framesTillScan = ((double) energyPoints)/ .03125;
+    			}
+    			//return //succesfull
+    		}
+    	}
+    }
+    
 	public void setHomePosition()
 	{
 		int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);

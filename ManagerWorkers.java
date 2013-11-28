@@ -528,15 +528,72 @@ public class ManagerWorkers extends RRAITemplate
 	public void debug() 
 	{
 		int baseNdx = 0;
+		String workerString = "";
 		Unit curWorker;
+		
+		bwapi.drawText(200, 200, "Number workers is " + allWorkers.size(), true);
+		
 		
 		for (Worker w : allWorkers)
 		{
+			workerString = "";
+			curWorker = bwapi.getUnit(w.unitID);
+			if (curWorker.isGatheringMinerals()) 
+				bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.BLUE, false, false);
+			else if (curWorker.isGatheringGas()) 
+				bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.GREEN, false, false);
+			else
+				bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.ORANGE, false, false);
+			
+			
+			//MINE, GAS, ATTACK, SCOUT, UNDERATTACK, BUILD
+			switch (w.curOrder) 
+			{
+			case MINE:  
+				workerString += "M";
+				break;
+			case GAS: 
+				workerString += "G";
+				break;
+			case ATTACK:  
+				workerString += "A";
+				break;
+			case SCOUT:  
+				workerString += "S";
+				break;
+			case UNDERATTACK:
+				workerString += "U";
+				break;
+			case BUILD:  
+				workerString += "B";
+				break;
+            default:
+				workerString += "UNK";
+				break;
+			}
+			
+			workerString += " " + w.asgnedBase;
+			
+			bwapi.drawText(curWorker.getX(), curWorker.getY(), workerString, false);
+			
+			
 			if (w.curOrder == workerOrders.UNDERATTACK) 
 			{
-				curWorker = bwapi.getUnit(w.unitID);
-				bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.PURPLE, false, false);
+				//bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.PURPLE, false, false);
 			}
+		}
+		
+		
+		int ndx = 0;
+		for (BaseLocation b : builder.ourBases)
+		{
+			int baseWorkers, baseMins;
+			
+			baseWorkers = getBaseWorkers(ndx++);
+			baseMins = b.getMinerals();
+			
+			bwapi.drawText(b.getX()-64, b.getY()-(32*2)-10, "Num mins is " + baseMins, false);
+			bwapi.drawText(b.getX()-64, b.getY()-(32*2), "Num workers is " + baseWorkers, false);
 		}
 		
 		/*
