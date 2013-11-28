@@ -2,6 +2,7 @@ package javabot.RaynorsRaiders;
 
 import java.awt.Point;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.Level;
@@ -14,6 +15,7 @@ import javabot.util.*;
 public class ManagerMilitary extends RRAITemplate
 {
 	int homePositionX, homePositionY;
+	int commandCenterX, commandCenterY;
 	BaseLocation homeBase;
 	
 	// Unit pool: military units gets added to this map as they are created 
@@ -427,7 +429,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * numOfUnits:  number of units needed (don't know how many units you want each). 
 	 *              It will take as much there is on the first UnitTypes before the next.
 	 * locationX:   Pixel X coordinate on the map
-	 * locationY:   Pixel X coordinate on the map
+	 * locationY:   Pixel Y coordinate on the map
 	 */
 	public void unitOperation(LinkedList<UnitTypes> unitTypes, int numOfUnits,  int locationX, int locationY)
 	{
@@ -500,14 +502,14 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Vulture).size(); index++)
+		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Marine).size(); index++)
 		{
 			if(tmp.size() < 5)
 			{
-				if(unitPool.get(UnitTypes.Terran_Vulture).get(index).isIdle() && 
-						unitPool.get(UnitTypes.Terran_Vulture).get(index).isCompleted())
+				if(unitPool.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
+						unitPool.get(UnitTypes.Terran_Marine).get(index).isCompleted())
 				{
-					tmp.add(unitPool.get(UnitTypes.Terran_Vulture).get(index));
+					tmp.add(unitPool.get(UnitTypes.Terran_Marine).get(index));
 				}
 			}
 		}
@@ -604,7 +606,8 @@ public class ManagerMilitary extends RRAITemplate
 		//rallyUnits(unitGroup, homePositionX, homePositionY);
 		//System.out.println("Rallied");
 		//boolean test = rallyReadyCheck(unitGroup, homePositionX, homePositionY);
-		//System.out.println(test);
+		//System.out.println("Rally Check: " + test);
+		
 		//if(rallyReadyCheck(unitGroup, homePositionX, homePositionY))
 		//{
 			//System.out.println("Military Manager: In unitOperationHelper");
@@ -622,7 +625,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * pixelPositionY:  Rally position's Y
 	 * 
 	 */
-	private void rallyUnits(LinkedList<Unit> unitGroup, int pixelPositionX, int pixelPositionY )
+	private void rallyUnits(LinkedList<Unit> unitGroup, int pixelPositionX, int pixelPositionY)
 	{
 		if(unitGroup != null)
 		{
@@ -640,20 +643,26 @@ public class ManagerMilitary extends RRAITemplate
 	private boolean rallyReadyCheck(LinkedList<Unit> unitGroup, int pixelPositionX, int pixelPositionY)
 	{
 		boolean checkReadyFlag = false;
+		double avgDist = 0;
 		
 		if(unitGroup != null)
 		{
-			while(!checkReadyFlag)
+			for(int index = 0; index < unitGroup.size(); index++)
 			{
-				for(int index = 0; index < unitGroup.size(); index++)
-				{
-					if(!unitGroup.get(index).isAccelerating())
-					{
-						checkReadyFlag = true;
-					}
-				}
+				double dist = Math.sqrt(Math.pow(unitGroup.get(index).getX() - pixelPositionX, 2) + Math.pow(unitGroup.get(index).getY() - pixelPositionY, 2));
+				System.out.println(dist);
+				avgDist+=dist;
 			}
 		}
+		
+		avgDist = avgDist/unitGroup.size();
+		System.out.println("Avg Dist: " + avgDist);
+		
+		if(avgDist < 100.0)
+		{
+			checkReadyFlag = true;
+		}
+		
 		return checkReadyFlag;
 	}
 	
@@ -689,6 +698,7 @@ public class ManagerMilitary extends RRAITemplate
 			}
 		}
 	}
+	
 	
 	public void orderUnitPoolToAtk(int pixelPositionX, int pixelPositionY)
 	{
