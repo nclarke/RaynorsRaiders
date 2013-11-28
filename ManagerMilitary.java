@@ -164,7 +164,8 @@ public class ManagerMilitary extends RRAITemplate
     	Player p;
     
     	Unit toAttack;
-    	Unit vult = militaryUnits.get(UnitTypes.Terran_Vulture).get(0);
+    	Unit vult = null;
+    	//Unit vult = militaryTeams.get(UnitTypes.Terran_Vulture).get(0);
     	//Unit marine = militaryUnits.get(UnitTypes.Terran_Marine).get(0);
     	if (vult.getGroundWeaponCooldown() == 0)
     	//if (marine.getGroundWeaponCooldown() == 0)
