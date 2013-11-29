@@ -37,7 +37,7 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> militaryTeam;
 		int locX, locY;
-		int teamSize;
+		int currentTeamSize;
 		RallyStatus rallystatus;
 		DispatchStatus dispatchstatus;
 		
@@ -46,7 +46,7 @@ public class ManagerMilitary extends RRAITemplate
 			this.militaryTeam = militaryTeam;
 			this.locX = locX;
 			this.locY = locY;
-			this.teamSize = militaryTeam.size();
+			this.currentTeamSize = militaryTeam.size();
 			this.rallystatus = RallyStatus.NOT_RALLIED;
 			dispatchstatus = DispatchStatus.NOT_DISPATCHED;
 		}
@@ -74,12 +74,12 @@ public class ManagerMilitary extends RRAITemplate
 		
 		public int getTeamSize()
 		{
-			return teamSize;
+			return currentTeamSize;
 		}
 		
 		public void setTeamSize(int newSize)
 		{
-			teamSize = newSize;
+			currentTeamSize = newSize;
 		}
 		
 		public RallyStatus getRallyStatus()
@@ -126,7 +126,7 @@ public class ManagerMilitary extends RRAITemplate
 	public void checkUp() {
 		
 		//for testing purposes - sends units to attack and tries to handle attack logistics for different units
-		attackLocationsTest();
+		//attackLocationsTest();
 		
 		rallyUnits();
 		removeEmptyMilitaryTeam();
