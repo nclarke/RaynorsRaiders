@@ -588,6 +588,8 @@ public class ManagerWorkers extends RRAITemplate
 				bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.BLUE, false, false);
 			else if (curWorker.isGatheringGas()) 
 				bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.GREEN, false, false);
+			else if (curWorker.isIdle()) 
+				bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.WHITE, false, false);
 			else
 				bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.ORANGE, false, false);
 			

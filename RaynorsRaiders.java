@@ -335,7 +335,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		bwapi.printText("Unit Destroyed " + String.valueOf(unitID));
 		Unit taggedForDeath = null;
 
-		this.managerInfo.unitDestoryed(unitID);
+		//this.managerInfo.unitDestoryed(unitID);
 		// This is an error, checking in a worker that does not exist anymore ^^^
 		
 		for (Unit u : masterUnitList)
@@ -366,9 +366,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 				taggedForDeath = u;
 			}
 		}
-		//System.out.println("Tagged for death is " + taggedForDeath);
+		System.out.println("Tagged for death is " + taggedForDeath);
 		masterUnitList.remove(taggedForDeath);
-		//System.out.println("RR: End all remove");
+		System.out.println("RR: End all remove");
 	}
 
 	public void unitDiscover(int unitID) 
