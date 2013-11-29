@@ -14,41 +14,40 @@ import javabot.util.*;
 public class ManagerMilitary extends RRAITemplate
 {
 	int homePositionX, homePositionY;
-	int commandCenterX, commandCenterY;
-	BaseLocation homeBase;
+	private BaseLocation homeBase;
 	
 	// Unit pool: military units gets added to this map as they are created 
 	EnumMap<UnitTypes, LinkedList<Unit>> unitPool;
 	
 	// Military Teams: they are created in unitOperation each time an order is given from CoreBaby
-	LinkedList<MilitaryTeam> militaryTeams;
+	private LinkedList<MilitaryTeam> militaryTeams;
 	
-	public enum RallyStatus
+	private enum RallyStatus
 	{
-		NOTRALLIED, RALLIED
+		NOT_RALLIED, RALLIED
 	};
 	
-	public enum DispatchStatus
+	private enum DispatchStatus
 	{
-		NOTDISPATCHED, DISPATCHED
+		NOT_DISPATCHED, DISPATCHED
 	};
 	
 	private class MilitaryTeam
 	{
 		LinkedList<Unit> militaryTeam;
-		int locX, locY;
-		int teamSize;
-		RallyStatus rallystatus;
-		DispatchStatus dispatchstatus;
+		int attackLocationX, attackLocationY;
+		int currentTeamSize;
+		RallyStatus rallyStatus;
+		DispatchStatus dispatchStatus;
 		
-		public MilitaryTeam(LinkedList<Unit> militaryTeam, int locX,  int locY)
+		public MilitaryTeam(LinkedList<Unit> militaryTeam, int attackLocationX,  int attackLocationY)
 		{
 			this.militaryTeam = militaryTeam;
-			this.locX = locX;
-			this.locY = locY;
-			this.teamSize = militaryTeam.size();
-			this.rallystatus = RallyStatus.NOTRALLIED;
-			dispatchstatus = DispatchStatus.NOTDISPATCHED;
+			this.attackLocationX = attackLocationX;
+			this.attackLocationY = attackLocationY;
+			this.currentTeamSize = militaryTeam.size();
+			this.rallyStatus = RallyStatus.NOT_RALLIED;
+			this.dispatchStatus = DispatchStatus.NOT_DISPATCHED;
 		}
 		
 		public LinkedList<Unit> getMilitaryTeam()
@@ -58,48 +57,48 @@ public class ManagerMilitary extends RRAITemplate
 		
 		public int getX()
 		{
-			return locX;
+			return attackLocationX;
 		}
 		
 		public int getY()
 		{
-			return locY;
+			return attackLocationY;
 		}
 		
 		public void setLocation(int x, int y)
 		{
-			this.locX = x;
-			this.locY = y;
+			this.attackLocationX = x;
+			this.attackLocationY = y;
 		}
 		
 		public int getTeamSize()
 		{
-			return teamSize;
+			return currentTeamSize;
 		}
 		
 		public void setTeamSize(int newSize)
 		{
-			teamSize = newSize;
+			currentTeamSize = newSize;
 		}
 		
 		public RallyStatus getRallyStatus()
 		{
-			return rallystatus;
+			return rallyStatus;
 		}
 		
 		public void setRallyStatus(RallyStatus rs)
 		{
-			rallystatus = rs;
+			rallyStatus = rs;
 		}
 		
 		public DispatchStatus getDispatchStatus()
 		{
-			return dispatchstatus;
+			return dispatchStatus;
 		}
 		
 		public void setDispatchStatus(DispatchStatus ds)
 		{
-			dispatchstatus = ds;
+			dispatchStatus = ds;
 		}
 	}
 	
@@ -128,12 +127,15 @@ public class ManagerMilitary extends RRAITemplate
 		//for testing purposes - sends units to attack and tries to handle attack logistics for different units
 		//attackLocationsTest();
 		
-		rallyUnits();
+		rallyTeamToAttack();
 		removeEmptyMilitaryTeam();
 		handleUnitsAttacking();
 	}
 	
-	public void attackLocationsTest()
+	/*
+	 * Meant for testings in MM ONLY. 
+	 */
+	private void attackLocationsTest()
 	{
 		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
 		{
@@ -177,8 +179,6 @@ public class ManagerMilitary extends RRAITemplate
      * and closet the the passed in location
      * public int getNearestUnit(int unitTypeID, int x, int y) 
      */
-    
-    
     public Unit getNearestEnemyUnit(int x, int y)
     {
     	Unit toRtn = null;
@@ -243,7 +243,7 @@ public class ManagerMilitary extends RRAITemplate
     	}
     }
     
-	public void setHomePosition()
+	private void setHomePosition()
 	{
 		int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
 		if (cc == -1) cc = getNearestUnit(UnitTypes.Zerg_Hatchery.ordinal(), 0, 0);
@@ -532,8 +532,9 @@ public class ManagerMilitary extends RRAITemplate
 	
 	/*
 	 * Similar to the above, except team sizes are 5. Put Marines in a team to attack by default.
+	 * This method is mainly used for TESTING.
 	 */
-	public void unitOperation(int locationX, int locationY)
+	private void unitOperation(int locationX, int locationY)
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
@@ -567,7 +568,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * 
 	 * unitTypeID:   a unit type ID 
 	 */
-	public UnitTypes getUnitType(int unitTypeID)
+	private UnitTypes getUnitType(int unitTypeID)
 	{
 		if(unitTypeID == UnitTypes.Terran_Marine.ordinal())
 			return UnitTypes.Terran_Marine;
@@ -632,12 +633,15 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
-	private void rallyUnits()
+	/*
+	 * Rallies a newly created MilitaryTeam at the Command Center and then orders them to carry out the attack.
+	 */
+	private void rallyTeamToAttack()
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
 		{
-			if(militaryTeams.get(index).getRallyStatus().equals(RallyStatus.NOTRALLIED) && 
-					(militaryTeams.get(index).getDispatchStatus().equals(DispatchStatus.NOTDISPATCHED)))
+			if(militaryTeams.get(index).getRallyStatus().equals(RallyStatus.NOT_RALLIED) && 
+					(militaryTeams.get(index).getDispatchStatus().equals(DispatchStatus.NOT_DISPATCHED)))
 			{
 				for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
 				{
@@ -645,9 +649,7 @@ public class ManagerMilitary extends RRAITemplate
 				}
 			}
 			
-			boolean st = rallyReadyCheck(militaryTeams.get(index).getMilitaryTeam(), homePositionX, homePositionY);
-			//System.out.println("Status Rallied: " + st);
-			if(st)
+			if(rallyReadyCheck(militaryTeams.get(index).getMilitaryTeam(), homePositionX, homePositionY))
 			{
 				militaryTeams.get(index).setRallyStatus(RallyStatus.RALLIED);
 				attackEnemyLocation();
@@ -668,11 +670,14 @@ public class ManagerMilitary extends RRAITemplate
 			for(int index = 0; index < unitGroup.size(); index++)
 			{
 				double dist = Math.sqrt(Math.pow(unitGroup.get(index).getX() - pixelPositionX, 2) + Math.pow(unitGroup.get(index).getY() - pixelPositionY, 2));
-				System.out.println(dist);
 				
-				if(dist <= 120)
+				if(dist <= 110)
 				{
 					checkReadyFlag = true;
+				}
+				else
+				{
+					return false;
 				}
 			}
 		}
@@ -680,11 +685,14 @@ public class ManagerMilitary extends RRAITemplate
 		return checkReadyFlag;
 	}
 	
+	/*
+	 * Once a team is rallied and not attacking yet, ask them to go attack.
+	 */
 	private void attackEnemyLocation()
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
 		{
-			if(militaryTeams.get(index).getDispatchStatus().equals(DispatchStatus.NOTDISPATCHED) && 
+			if(militaryTeams.get(index).getDispatchStatus().equals(DispatchStatus.NOT_DISPATCHED) && 
 					(militaryTeams.get(index).getRallyStatus().equals(RallyStatus.RALLIED)))
 			{
 				for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
@@ -711,7 +719,9 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
-	
+	/*
+	 * Order the unit pool (unused units in the base) to attack a location.
+	 */
 	public void orderUnitPoolToAtk(int pixelPositionX, int pixelPositionY)
 	{
 		for(UnitTypes unitTy: UnitTypes.values())
@@ -726,7 +736,7 @@ public class ManagerMilitary extends RRAITemplate
 	/*
 	 * Handles different unit mechanics. This needs to be in checkup to be checkedup every second.
 	 */
-	public void handleUnitsAttacking()
+	private void handleUnitsAttacking()
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
 		{
@@ -786,11 +796,10 @@ public class ManagerMilitary extends RRAITemplate
 		return unitPool.get(unitType).size();
 	}
 	
-	
-	
-	// Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
-    // don't have a unit of this type
-    public int getNearestUnit(int unitTypeID, int x, int y) 
+	/* Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
+     * don't have a unit of this type
+     */
+    private int getNearestUnit(int unitTypeID, int x, int y) 
     {
     	int nearestID = -1;
 	    double nearestDist = 9999999;
