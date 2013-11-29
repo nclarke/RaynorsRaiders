@@ -128,7 +128,7 @@ public class ManagerMilitary extends RRAITemplate
 		//for testing purposes - sends units to attack and tries to handle attack logistics for different units
 		//attackLocationsTest();
 		
-		rallyUnits();
+		rallyTeamToAttack();
 		removeEmptyMilitaryTeam();
 		handleUnitsAttacking();
 	}
@@ -632,7 +632,7 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
-	private void rallyUnits()
+	private void rallyTeamToAttack()
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
 		{
@@ -645,9 +645,7 @@ public class ManagerMilitary extends RRAITemplate
 				}
 			}
 			
-			boolean st = rallyReadyCheck(militaryTeams.get(index).getMilitaryTeam(), homePositionX, homePositionY);
-			//System.out.println("Status Rallied: " + st);
-			if(st)
+			if(rallyReadyCheck(militaryTeams.get(index).getMilitaryTeam(), homePositionX, homePositionY))
 			{
 				militaryTeams.get(index).setRallyStatus(RallyStatus.RALLIED);
 				attackEnemyLocation();
