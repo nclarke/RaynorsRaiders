@@ -14,21 +14,20 @@ import javabot.util.*;
 public class ManagerMilitary extends RRAITemplate
 {
 	int homePositionX, homePositionY;
-	int commandCenterX, commandCenterY;
-	BaseLocation homeBase;
+	private BaseLocation homeBase;
 	
 	// Unit pool: military units gets added to this map as they are created 
 	EnumMap<UnitTypes, LinkedList<Unit>> unitPool;
 	
 	// Military Teams: they are created in unitOperation each time an order is given from CoreBaby
-	LinkedList<MilitaryTeam> militaryTeams;
+	private LinkedList<MilitaryTeam> militaryTeams;
 	
-	public enum RallyStatus
+	private enum RallyStatus
 	{
 		NOT_RALLIED, RALLIED
 	};
 	
-	public enum DispatchStatus
+	private enum DispatchStatus
 	{
 		NOT_DISPATCHED, DISPATCHED
 	};
@@ -133,7 +132,10 @@ public class ManagerMilitary extends RRAITemplate
 		handleUnitsAttacking();
 	}
 	
-	public void attackLocationsTest()
+	/*
+	 * Meant for testings in MM ONLY. 
+	 */
+	private void attackLocationsTest()
 	{
 		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
 		{
@@ -177,8 +179,6 @@ public class ManagerMilitary extends RRAITemplate
      * and closet the the passed in location
      * public int getNearestUnit(int unitTypeID, int x, int y) 
      */
-    
-    
     public Unit getNearestEnemyUnit(int x, int y)
     {
     	Unit toRtn = null;
@@ -243,7 +243,7 @@ public class ManagerMilitary extends RRAITemplate
     	}
     }
     
-	public void setHomePosition()
+	private void setHomePosition()
 	{
 		int cc = getNearestUnit(UnitTypes.Terran_Command_Center.ordinal(), 0, 0);
 		if (cc == -1) cc = getNearestUnit(UnitTypes.Zerg_Hatchery.ordinal(), 0, 0);
@@ -532,8 +532,9 @@ public class ManagerMilitary extends RRAITemplate
 	
 	/*
 	 * Similar to the above, except team sizes are 5. Put Marines in a team to attack by default.
+	 * This method is mainly used for TESTING.
 	 */
-	public void unitOperation(int locationX, int locationY)
+	private void unitOperation(int locationX, int locationY)
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
@@ -567,7 +568,7 @@ public class ManagerMilitary extends RRAITemplate
 	 * 
 	 * unitTypeID:   a unit type ID 
 	 */
-	public UnitTypes getUnitType(int unitTypeID)
+	private UnitTypes getUnitType(int unitTypeID)
 	{
 		if(unitTypeID == UnitTypes.Terran_Marine.ordinal())
 			return UnitTypes.Terran_Marine;
@@ -632,6 +633,9 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
+	/*
+	 * Rallies a newly created MilitaryTeam at the Command Center and then orders them to carry out the attack.
+	 */
 	private void rallyTeamToAttack()
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
@@ -681,6 +685,9 @@ public class ManagerMilitary extends RRAITemplate
 		return checkReadyFlag;
 	}
 	
+	/*
+	 * Once a team is rallied and not attacking yet, ask them to go attack.
+	 */
 	private void attackEnemyLocation()
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
@@ -712,7 +719,9 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
-	
+	/*
+	 * Order the unit pool (unused units in the base) to attack a location.
+	 */
 	public void orderUnitPoolToAtk(int pixelPositionX, int pixelPositionY)
 	{
 		for(UnitTypes unitTy: UnitTypes.values())
@@ -727,7 +736,7 @@ public class ManagerMilitary extends RRAITemplate
 	/*
 	 * Handles different unit mechanics. This needs to be in checkup to be checkedup every second.
 	 */
-	public void handleUnitsAttacking()
+	private void handleUnitsAttacking()
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
 		{
@@ -787,11 +796,10 @@ public class ManagerMilitary extends RRAITemplate
 		return unitPool.get(unitType).size();
 	}
 	
-	
-	
-	// Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
-    // don't have a unit of this type
-    public int getNearestUnit(int unitTypeID, int x, int y) 
+	/* Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
+     * don't have a unit of this type
+     */
+    private int getNearestUnit(int unitTypeID, int x, int y) 
     {
     	int nearestID = -1;
 	    double nearestDist = 9999999;
