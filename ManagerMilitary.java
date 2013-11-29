@@ -25,12 +25,12 @@ public class ManagerMilitary extends RRAITemplate
 	
 	public enum RallyStatus
 	{
-		NOTRALLIED, RALLIED
+		NOT_RALLIED, RALLIED
 	};
 	
 	public enum DispatchStatus
 	{
-		NOTDISPATCHED, DISPATCHED
+		NOT_DISPATCHED, DISPATCHED
 	};
 	
 	private class MilitaryTeam
@@ -47,8 +47,8 @@ public class ManagerMilitary extends RRAITemplate
 			this.locX = locX;
 			this.locY = locY;
 			this.teamSize = militaryTeam.size();
-			this.rallystatus = RallyStatus.NOTRALLIED;
-			dispatchstatus = DispatchStatus.NOTDISPATCHED;
+			this.rallystatus = RallyStatus.NOT_RALLIED;
+			dispatchstatus = DispatchStatus.NOT_DISPATCHED;
 		}
 		
 		public LinkedList<Unit> getMilitaryTeam()
@@ -126,7 +126,7 @@ public class ManagerMilitary extends RRAITemplate
 	public void checkUp() {
 		
 		//for testing purposes - sends units to attack and tries to handle attack logistics for different units
-		//attackLocationsTest();
+		attackLocationsTest();
 		
 		rallyUnits();
 		removeEmptyMilitaryTeam();
@@ -636,8 +636,8 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
 		{
-			if(militaryTeams.get(index).getRallyStatus().equals(RallyStatus.NOTRALLIED) && 
-					(militaryTeams.get(index).getDispatchStatus().equals(DispatchStatus.NOTDISPATCHED)))
+			if(militaryTeams.get(index).getRallyStatus().equals(RallyStatus.NOT_RALLIED) && 
+					(militaryTeams.get(index).getDispatchStatus().equals(DispatchStatus.NOT_DISPATCHED)))
 			{
 				for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
 				{
@@ -668,9 +668,8 @@ public class ManagerMilitary extends RRAITemplate
 			for(int index = 0; index < unitGroup.size(); index++)
 			{
 				double dist = Math.sqrt(Math.pow(unitGroup.get(index).getX() - pixelPositionX, 2) + Math.pow(unitGroup.get(index).getY() - pixelPositionY, 2));
-				System.out.println(dist);
 				
-				if(dist <= 120)
+				if(dist <= 110)
 				{
 					checkReadyFlag = true;
 				}
@@ -684,7 +683,7 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		for(int index = 0; index < militaryTeams.size(); index++)
 		{
-			if(militaryTeams.get(index).getDispatchStatus().equals(DispatchStatus.NOTDISPATCHED) && 
+			if(militaryTeams.get(index).getDispatchStatus().equals(DispatchStatus.NOT_DISPATCHED) && 
 					(militaryTeams.get(index).getRallyStatus().equals(RallyStatus.RALLIED)))
 			{
 				for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
