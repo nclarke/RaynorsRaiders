@@ -673,6 +673,10 @@ public class ManagerMilitary extends RRAITemplate
 				{
 					checkReadyFlag = true;
 				}
+				else
+				{
+					return false;
+				}
 			}
 		}
 		
