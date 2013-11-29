@@ -35,19 +35,19 @@ public class ManagerMilitary extends RRAITemplate
 	private class MilitaryTeam
 	{
 		LinkedList<Unit> militaryTeam;
-		int locX, locY;
+		int attackLocationX, attackLocationY;
 		int currentTeamSize;
-		RallyStatus rallystatus;
-		DispatchStatus dispatchstatus;
+		RallyStatus rallyStatus;
+		DispatchStatus dispatchStatus;
 		
-		public MilitaryTeam(LinkedList<Unit> militaryTeam, int locX,  int locY)
+		public MilitaryTeam(LinkedList<Unit> militaryTeam, int attackLocationX,  int attackLocationY)
 		{
 			this.militaryTeam = militaryTeam;
-			this.locX = locX;
-			this.locY = locY;
+			this.attackLocationX = attackLocationX;
+			this.attackLocationY = attackLocationY;
 			this.currentTeamSize = militaryTeam.size();
-			this.rallystatus = RallyStatus.NOT_RALLIED;
-			dispatchstatus = DispatchStatus.NOT_DISPATCHED;
+			this.rallyStatus = RallyStatus.NOT_RALLIED;
+			this.dispatchStatus = DispatchStatus.NOT_DISPATCHED;
 		}
 		
 		public LinkedList<Unit> getMilitaryTeam()
@@ -57,18 +57,18 @@ public class ManagerMilitary extends RRAITemplate
 		
 		public int getX()
 		{
-			return locX;
+			return attackLocationX;
 		}
 		
 		public int getY()
 		{
-			return locY;
+			return attackLocationY;
 		}
 		
 		public void setLocation(int x, int y)
 		{
-			this.locX = x;
-			this.locY = y;
+			this.attackLocationX = x;
+			this.attackLocationY = y;
 		}
 		
 		public int getTeamSize()
@@ -83,22 +83,22 @@ public class ManagerMilitary extends RRAITemplate
 		
 		public RallyStatus getRallyStatus()
 		{
-			return rallystatus;
+			return rallyStatus;
 		}
 		
 		public void setRallyStatus(RallyStatus rs)
 		{
-			rallystatus = rs;
+			rallyStatus = rs;
 		}
 		
 		public DispatchStatus getDispatchStatus()
 		{
-			return dispatchstatus;
+			return dispatchStatus;
 		}
 		
 		public void setDispatchStatus(DispatchStatus ds)
 		{
-			dispatchstatus = ds;
+			dispatchStatus = ds;
 		}
 	}
 	
