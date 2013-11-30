@@ -571,15 +571,15 @@ public class ManagerBuild extends RRAITemplate
 							for(BaseLocation bl : bwapi.getMap().getBaseLocations())
 							{
 								for(BaseLocation ours : ourBases)
-								{
-									if(bl.getRegionID() == ours.getRegionID() || bl.isStartLocation())
+								{	
+									if(bl.getX() == ours.getX() && bl.getY() == ours.getY())
 									{
 										// skip location
 									}
 									else
 									{
-										xtile = bl.getTx();
-										ytile = bl.getTy();
+										xtile = bl.getX();
+										ytile = bl.getY();
 									}
 								}
 							}
@@ -591,7 +591,18 @@ public class ManagerBuild extends RRAITemplate
 						// order our worker to build it
 						if ((buildTile.x != -1) && (!weAreBuilding(bldg.getID()))) 
 						{
-							bwapi.build(worker, buildTile.x, buildTile.y, bldg.getID());
+							int mvX = buildTile.x * 32, mvY = buildTile.y * 32;
+							
+							if(bwapi.isExplored(buildTile.x, buildTile.y))
+							{
+								bwapi.build(worker, buildTile.x, buildTile.y, bldg.getID());
+							}
+							else
+							{
+
+								bwapi.move(worker, mvX, mvY);
+							}
+							
 							buildingsStack.get(nextToBuildIndex).status = BuildStatus.ACCEPTTED;
 							return true;
 							//buildingBuildings.push(bldg);
