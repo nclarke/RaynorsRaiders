@@ -32,6 +32,11 @@ public class ManagerMilitary extends RRAITemplate
 		NOT_DISPATCHED, DISPATCHED
 	};
 	
+	private enum TeamStatus
+	{
+		ATTACK, RETREAT, IDLE
+	};
+	
 	private class MilitaryTeam
 	{
 		LinkedList<Unit> militaryTeam;
@@ -39,6 +44,7 @@ public class ManagerMilitary extends RRAITemplate
 		int currentTeamSize;
 		RallyStatus rallyStatus;
 		DispatchStatus dispatchStatus;
+		TeamStatus teamStatus;
 		
 		public MilitaryTeam(LinkedList<Unit> militaryTeam, int attackLocationX,  int attackLocationY)
 		{
@@ -48,6 +54,7 @@ public class ManagerMilitary extends RRAITemplate
 			this.currentTeamSize = militaryTeam.size();
 			this.rallyStatus = RallyStatus.NOT_RALLIED;
 			this.dispatchStatus = DispatchStatus.NOT_DISPATCHED;
+			this.teamStatus = TeamStatus.IDLE;
 		}
 		
 		public LinkedList<Unit> getMilitaryTeam()
@@ -100,6 +107,16 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			dispatchStatus = ds;
 		}
+		
+		public TeamStatus getTeamStatus()
+		{
+			return teamStatus;
+		}
+		
+		public void setTeamStatus(TeamStatus ts)
+		{
+			teamStatus = ts;
+		}
 	}
 	
 	public ManagerMilitary()
@@ -128,6 +145,7 @@ public class ManagerMilitary extends RRAITemplate
 		//attackLocationsTest();
 		
 		rallyTeamToAttack();
+		handleTeamStatus();
 		removeEmptyMilitaryTeam();
 		handleUnitsAttacking();
 	}
@@ -702,6 +720,33 @@ public class ManagerMilitary extends RRAITemplate
 			}
 			
 			militaryTeams.get(index).setDispatchStatus(DispatchStatus.DISPATCHED);
+			militaryTeams.get(index).setTeamStatus(TeamStatus.ATTACK);
+		}
+	}
+	
+	private void handleTeamStatus()
+	{
+		int initialTeamSize = 0;
+		
+		for(int index = 0; index < militaryTeams.size(); index++)
+		{
+			if(militaryTeams.get(index).getDispatchStatus().equals(DispatchStatus.DISPATCHED) && 
+					(militaryTeams.get(index).getTeamStatus().equals(TeamStatus.ATTACK)))
+			{
+				initialTeamSize = militaryTeams.get(index).getTeamSize();
+				
+				for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
+				{
+					if(militaryTeams.get(index).getMilitaryTeam().get(index2).isStartingAttack())
+					{
+						System.out.println("TeamSize: " + militaryTeams.get(index).getTeamSize() + " Init TeamSize/2: " + initialTeamSize/2);
+						if(militaryTeams.get(index).getTeamSize() <= (initialTeamSize/2))
+						{
+							bwapi.move(militaryTeams.get(index).getMilitaryTeam().get(index2).getID(), homePositionX, homePositionY);
+						}
+					}
+				}
+			}
 		}
 	}
 	
