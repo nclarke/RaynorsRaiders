@@ -88,7 +88,7 @@ public class CoreBaby extends RRAITemplate
 		}
 		
 		/* Add units */
-		if (builder.roster.size() < 20)
+		//if (builder.roster.size() < 20)
 			genUnitsBasic();
 		
 		
@@ -184,9 +184,8 @@ public class CoreBaby extends RRAITemplate
 		buildingGoals.add(new BuildingRR(18, 12, 0, UnitTypes.Terran_Refinery, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(18, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Academy, BuildStatus.HOLD));
 	}
 	
 }
