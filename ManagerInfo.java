@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.*;
 
 import javabot.JNIBWAPI;
+import javabot.RaynorsRaiders.MiltScouter.Base;
 import javabot.model.BaseLocation;
 import javabot.model.Unit;
 import javabot.types.TechType;
@@ -25,6 +26,8 @@ public class ManagerInfo extends RRAITemplate
 	int selfID;
 	int hostileX;
 	int hostileY;
+	boolean isScouting;
+	List<MiltScouter.Base> enemyBases;
 	
 	public ManagerInfo() {
 		//SET UP ALL INTERNAL VARIABLES HERE
@@ -32,8 +35,10 @@ public class ManagerInfo extends RRAITemplate
 		hostileX = 0;
 		hostileY = 0;
 		scouter = new MiltScouter(this);
+		isScouting = false;
 		neutralUnits = new ArrayList<Unit>();
 		enemyUnits = new ArrayList<Unit>();
+		enemyBases = new LinkedList<MiltScouter.Base>();
 	}
 	
 	
@@ -46,8 +51,15 @@ public class ManagerInfo extends RRAITemplate
 
 	public void checkUp() 
 	{
-		if (this.bwapi.getFrameCount() % 1050 == 0)
+//		if (this.bwapi.getFrameCount() == 1)
 			this.scouter.scout();
+			for(Base base : scouter.bases)
+			{
+				if(base.hasEnemy && !enemyBases.contains(base))
+				{
+					enemyBases.add(base);
+				}				
+			}
 	
 	}
 	
@@ -66,7 +78,7 @@ public class ManagerInfo extends RRAITemplate
 			if(!this.enemyUnits.contains(unit))
 			{
 				enemyUnits.add(unit);
-				//System.out.println("New Enemy unit discovered of type: "+bwapi.getUnitType(unitID));
+				System.out.println("New Enemy unit discovered of type: "+bwapi.getUnitType(unitID));
 			}
 		
 		}
@@ -94,11 +106,11 @@ public class ManagerInfo extends RRAITemplate
 			if (this.scouter.scout.getTypeID() == UnitTypes.Terran_SCV.ordinal())
 				workers.checkInWorker(scouter.scout.getID());
 			this.scouter.scout = null;
-			//System.out.println("scout checked back in");
+			this.scouter.bases.get(scouter.currIndex).hasEnemy = true;
+			System.out.println("scout checked back in");
 
 			
 		}
-		//System.out.println("here");
 /*		System.out.println("ID of: "+bwapi.getUnit(unitID).getPlayerID());
 		if(bwapi.getUnit(unitID).getPlayerID() == 0) //neutral Unit
 		{
@@ -123,7 +135,6 @@ public class ManagerInfo extends RRAITemplate
 			System.out.println("here4");
 			//our unit
 		}*/
-		//System.out.println("done");
 		
 	}
 

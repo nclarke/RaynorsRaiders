@@ -16,9 +16,11 @@ public class MiltScouter
 	 * (AI is very rich in the beginning, gets its level changed from ZERO to TWO) */
 //	int homePositionX, homePositionY;
 	BaseLocation homeBase;
+	List <Base> bases;
 	Unit scout;
 	LinkedList<Tile> scoutingPositions;
 	ManagerInfo mInfo;
+	int currIndex;
 	
 	LinkedList<Unit> hostilUnits;
 	
@@ -40,6 +42,13 @@ public class MiltScouter
 		}
 	}
 	
+	public class Base {
+		BaseLocation baseLoc;
+		Tile tile;
+		boolean hasSeen;
+		boolean hasEnemy;
+	}
+	
 	
 	
 	public MiltScouter(ManagerInfo mInfo)
@@ -47,10 +56,21 @@ public class MiltScouter
 		this.mInfo = mInfo;
 		System.out.println("Scouter online");
 		this.scoutingPositions = new LinkedList<Tile>();
+		this.bases = new ArrayList<Base>();
 	}
 	
 	public void startUp()
 	{
+		for (BaseLocation b : mInfo.bwapi.getMap().getBaseLocations())
+		{
+			Base base = new Base();
+			base.baseLoc = b;
+			base.hasEnemy = false;
+			base.hasSeen = false;
+			base.tile = new Tile(b.getX(), b.getY());
+			bases.add(base);
+			
+		}
 	}
 
 	
@@ -72,7 +92,6 @@ public class MiltScouter
 		{
 			if (unit.getID() == ID)
 			{
-				addEnemyBases();
 				return unit;
 			}
 		}
@@ -115,20 +134,28 @@ public class MiltScouter
 	 */
 	public void scout(){
 		if (this.scout == null){
+			System.out.println("\n\n\ngetting a new scout. currIndex: "+currIndex);
 			this.scout = getNewScoutUnit();
+			this.currIndex =0;
 			System.out.println("new scout is: "+this.scout);
 			if (this.scout == null)
 				return;
 		}
-		if(scoutHasArrived() && !this.scoutingPositions.isEmpty()){
-			Tile next=this.scoutingPositions.peek();
-			System.out.println("new scouting location at ("+next.getX()+","+next.getY()+")");
-			mInfo.bwapi.move(scout.getID(), next.getX(),next.getY());
-		}
-		else if(this.scoutingPositions.isEmpty()){
-			System.out.println("no more scouting locations");
-			mInfo.workers.checkInWorker(scout.getID());
-			this.scout = null;
+		mInfo.bwapi.move(scout.getID(), this.bases.get(currIndex).tile.getX(),this.bases.get(currIndex).tile.getY());
+		if(scoutHasArrived()){
+			if (currIndex >= bases.size())
+			{
+				currIndex = 0;
+				System.out.println("no more scouting locations");
+				mInfo.workers.checkInWorker(scout.getID());
+				this.scout = null;
+			}
+			else
+			{
+				Tile next=this.bases.get(currIndex).tile;
+				System.out.println("new scouting location at ("+next.getX()+","+next.getY()+")");
+				mInfo.bwapi.move(scout.getID(), next.getX(),next.getY());
+			}
 		}
 	}
 	
@@ -137,14 +164,20 @@ public class MiltScouter
 	public boolean scoutHasArrived()
 	{
 		Tile next;
-		if(!this.scoutingPositions.isEmpty()){
-			next=this.scoutingPositions.peek();
-/*			System.out.println("scout going to: ("+next.getX()+","+next.getY()+")");
+		if(!this.bases.isEmpty()){
+			next=this.bases.get(currIndex).tile;
+			System.out.println("currIndex is: "+currIndex+" of "+bases.size());
+			System.out.println("scout going to: ("+next.getX()+","+next.getY()+")");
 			System.out.println("   and is now at: ("+scout.getX()+","+scout.getY()+")");
-			System.out.println("this is your home location: ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
-*/
+			System.out.println("   this is your home location: ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
+			if (bases.get(currIndex).baseLoc.isIsland())
+			{
+				System.out.println("	It's an Island!!!");
+				currIndex++;			
+			}
+			
 			//			System.out.println("frameCoutn: "+MM.bwapi.getFrameCount());
-			if(!((scout.getX() < (next.getX() + 100) && scout.getX() > (next.getX() - 100) ) 
+			else if(!bases.get(currIndex).baseLoc.isIsland() && !((scout.getX() < (next.getX() + 100) && scout.getX() > (next.getX() - 100) ) 
 					&& (scout.getY() < (next.getY() + 100) && scout.getY() > (next.getY() - 100) )))
 			{
 				mInfo.bwapi.move(scout.getID(), next.getX(),next.getY());
@@ -153,9 +186,21 @@ public class MiltScouter
 			}	
 			else
 			{
-			//					System.out.println("here3");
+
+								System.out.println("incrementing++");
 				//scout has reached the Tile, so he can go scout some more
-				this.scoutingPositions.pop();
+				this.bases.get(currIndex).hasSeen = true;
+				if(scout.isUnderAttack())
+					this.bases.get(currIndex).hasEnemy = true;
+				
+				currIndex++;
+				while(currIndex < bases.size() && bases.get(currIndex).hasEnemy)
+				{
+					System.out.println("++");
+					currIndex++;
+				}
+
+				System.out.println("ending with a currIndex of #"+currIndex);
 				return true;
 			}
 		}
@@ -193,7 +238,7 @@ public class MiltScouter
 	{		
 		for (BaseLocation b : mInfo.bwapi.getMap().getBaseLocations()) 
 		{
-			
+		
 			if (b.isStartLocation() && (b.getX() != mInfo.military.homePositionX) && (b.getY() != mInfo.military.homePositionY)) 
 			{
 				System.out.println("this is your home location: ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
@@ -202,6 +247,7 @@ public class MiltScouter
 				this.mInfo.baby.hostileY = b.getY();
 				
 			}
+			
 		}
 		this.scoutingPositions.add(new Tile(mInfo.military.homePositionX, mInfo.military.homePositionY));
 	}
