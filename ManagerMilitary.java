@@ -148,6 +148,7 @@ public class ManagerMilitary extends RRAITemplate
 		handleTeamStatus();
 		removeEmptyMilitaryTeam();
 		handleUnitsAttacking();
+		handleUnitPoolAttacks();
 	}
 	
 	/*
@@ -469,9 +470,7 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			if(militaryTeams.get(index).getMilitaryTeam().size() == 0)
 			{
-				System.out.println("OLD SIZE: " + militaryTeams.size());
 				militaryTeams.remove(index);
-				System.out.println("NEW SIZE: " + militaryTeams.size());
 			}
 		}
 	}
@@ -556,14 +555,14 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Marine).size(); index++)
+		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Vulture).size(); index++)
 		{
 			if(tmp.size() < 5)
 			{
-				if(unitPool.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
-						unitPool.get(UnitTypes.Terran_Marine).get(index).isCompleted())
+				if(unitPool.get(UnitTypes.Terran_Vulture).get(index).isIdle() && 
+						unitPool.get(UnitTypes.Terran_Vulture).get(index).isCompleted())
 				{
-					tmp.add(unitPool.get(UnitTypes.Terran_Marine).get(index));
+					tmp.add(unitPool.get(UnitTypes.Terran_Vulture).get(index));
 				}
 			}
 		}
@@ -644,7 +643,6 @@ public class ManagerMilitary extends RRAITemplate
 					if(usedUnits.get(index).getID() == (unitPool.get(tmp).get(index2).getID()))
 					{
 						unitPool.get(tmp).remove(index2);
-						System.out.println("Military Manager: removeUsedUnits. New size is " + unitPool.get(tmp).size());
 					}
 				}
 			}
@@ -737,12 +735,12 @@ public class ManagerMilitary extends RRAITemplate
 				
 				for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
 				{
-					if(militaryTeams.get(index).getMilitaryTeam().get(index2).isStartingAttack())
+					if(militaryTeams.get(index).getMilitaryTeam().get(index2).isUnderAttack())
 					{
 						System.out.println("TeamSize: " + militaryTeams.get(index).getTeamSize() + " Init TeamSize/2: " + initialTeamSize/2);
 						if(militaryTeams.get(index).getTeamSize() <= (initialTeamSize/2))
 						{
-							bwapi.move(militaryTeams.get(index).getMilitaryTeam().get(index2).getID(), homePositionX, homePositionY);
+							bwapi.rightClick(militaryTeams.get(index).getMilitaryTeam().get(index2).getID(), homePositionX, homePositionY);
 						}
 					}
 				}
@@ -827,6 +825,49 @@ public class ManagerMilitary extends RRAITemplate
 					if((tmp.isIdle()))
 					{
 						bwapi.unsiege(tmp.getID());
+					}
+				}
+			}
+		}
+	}
+	
+	private void handleUnitPoolAttacks()
+	{
+		for(UnitTypes ut: UnitTypes.values())
+		{
+			for(int index = 0; index < unitPool.get(ut).size(); index++)
+			{
+				Unit poolUnit = unitPool.get(ut).get(index);
+				
+				if(poolUnit.getTypeID() == UnitTypes.Terran_Vulture.ordinal())
+				{
+					if(poolUnit.isStartingAttack())
+					{
+						bwapi.useTech(poolUnit.getID(), TechTypes.Spider_Mines.ordinal(), poolUnit.getX(), poolUnit.getY());
+					}
+				}
+				
+				if(poolUnit.getTypeID() == UnitTypes.Terran_Ghost.ordinal())
+				{
+					if(poolUnit.isUnderAttack())
+					{	
+						bwapi.cloak(poolUnit.getID());
+					}
+				}
+				
+				if(poolUnit.getTypeID() == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
+				{					
+					if(poolUnit.isStartingAttack())
+					{
+						bwapi.siege(poolUnit.getID());
+					}
+				}
+				
+				if(poolUnit.getTypeID() == UnitTypes.Terran_Siege_Tank_Siege_Mode.ordinal())
+				{
+					if((poolUnit.isIdle()))
+					{
+						bwapi.unsiege(poolUnit.getID());
 					}
 				}
 			}
