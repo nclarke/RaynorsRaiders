@@ -119,6 +119,28 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
+	public class UnitTypesRequest
+	{
+		UnitTypes unitTy;
+		int numOfUnits;
+		
+		public UnitTypesRequest(UnitTypes unitTypesNeeded, int numOfNeeded)
+		{
+			this.unitTy = unitTypesNeeded;
+			this.numOfUnits = numOfNeeded;
+		}
+		
+		public UnitTypes getUnitTypes()
+		{
+			return this.unitTy;
+		}
+		
+		public int getNumOfUnits()
+		{
+			return this.numOfUnits;
+		}
+	}
+	
 	public ManagerMilitary()
 	{		
 		unitPool = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);

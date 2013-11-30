@@ -10,6 +10,7 @@ import javabot.model.ChokePoint;
 import javabot.model.Region;
 import javabot.types.UnitType;
 import javabot.types.UnitType.UnitTypes;
+import javabot.RaynorsRaiders.ManagerMilitary.UnitTypesRequest;
 
 public class CoreBaby extends RRAITemplate 
 {
