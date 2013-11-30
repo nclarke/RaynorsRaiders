@@ -141,6 +141,16 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
+	private int getTotalNumOfUnits(LinkedList<UnitTypesRequest> utr)
+	{
+		int total = 0;
+		for(int index = 0; index < utr.size(); index++)
+		{
+			total += utr.get(index).getNumOfUnits();
+		}
+		return total;
+	}
+	
 	public ManagerMilitary()
 	{		
 		unitPool = new EnumMap<UnitTypes, LinkedList<Unit>>(UnitTypes.class);
@@ -525,6 +535,34 @@ public class ManagerMilitary extends RRAITemplate
 						//System.out.println("Military Manager: Added unit " + ut.getID() + " to group");
 					}
 				}
+			}
+		}
+		
+		if(tmp.size() == numOfUnits)
+		{
+			for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Medic).size()/2); index++)
+			{
+				if(unitPool.get(UnitTypes.Terran_Medic).get(index).isIdle() 
+						&& unitPool.get(UnitTypes.Terran_Medic).get(index).isCompleted())
+					tmp.add(unitPool.get(UnitTypes.Terran_Medic).get(index));
+			}
+			
+			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
+			removeUsedUnits(tmp);
+		}
+	}
+	
+	public void unitOperation(LinkedList<UnitTypesRequest> unitTypes, int locationX, int locationY)
+	{
+		int numOfUnits = getTotalNumOfUnits(unitTypes);
+		
+		LinkedList<Unit> tmp = new LinkedList<Unit>();
+		
+		for(int index = 0; index < unitTypes.size(); index++)
+		{
+			for(int index2 = 0; index2 < unitTypes.get(index).getNumOfUnits(); index2++)
+			{
+				tmp.add(unitPool.get(unitTypes.get(index).getUnitTypes()).get(index2));
 			}
 		}
 		
