@@ -21,6 +21,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 	boolean debgFlag = false;
 	boolean healthFlag = false;
 	boolean militaryDebugFlag = false;
+	int syncCount = 0;
 	
 	/* Master unit list */
 	LinkedList<Unit> masterUnitList = new LinkedList<Unit>();
@@ -120,6 +121,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		 //Draw debug information on screen
 		if (debgFlag)
 			drawDebugInfo();
+		syncCount = 0;
 		
 		// This sets up the base location
 		if (frameCount == 1)
@@ -151,18 +153,20 @@ public class RaynorsRaiders implements BWAPIEventListener
 			managerBuild.checkUp();
 			managerInfo.checkUp();
 		}
+		syncCount = 1;
 		
 		if (frameCount % 30 == 0)
 		{
 			managerMilitary.checkUp();
 			managerMilitary.testVult();
 		}
+		syncCount = 2;
 		if (frameCount == 200)
 		{
 			managerMilitary.scanLocation(500, 1000);
 		}
-		managerMilitary.testStutter();
-
+		//managerMilitary.testStutter();
+		syncCount = 3;
 	}
 	
 	public void drawDebugInfo() 
@@ -172,6 +176,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 				+ managerBuild.homePositionY + ")", true);
 		bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
 				+ managerBuild.getStartLocation().getY() + ")", true);
+		bwapi.drawText(0, 20, "SyncCount=" + syncCount, true);
 
 		int undx = 0;
 		int screenNdx = 50;
@@ -226,8 +231,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 		
 		msg = "Genome Status: Blood " + coreBaby.genomeSetting.bloodFrequency + 
 		 " Def " + coreBaby.genomeSetting.defensiveness + " Spread " + 
-		 coreBaby.genomeSetting.spread + " Count " + coreBaby.countdown;
-		bwapi.drawText(300, 20, msg, true);
+		 coreBaby.genomeSetting.spread + " Count " + coreBaby.countdown +
+		 " Campaign " + coreBaby.campaign;
+		bwapi.drawText(100, 20, msg, true);
 		
 		
 		//if (managerBuild.buildingBuildings.size() != 0) 

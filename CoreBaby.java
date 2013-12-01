@@ -15,7 +15,7 @@ import javabot.RaynorsRaiders.ManagerMilitary.UnitTypesRequest;
 public class CoreBaby extends RRAITemplate 
 {
 	ArrayList<BuildingRR> buildingGoals;
-	int hostileX,hostileY, countdown;
+	int hostileX,hostileY, countdown, campaign ;
 	CoreSupportGenome genomeSetting;
 	LinkedList<UnitTypes> genBasicUnitList;
 
@@ -44,10 +44,13 @@ public class CoreBaby extends RRAITemplate
 		countdown = 200;
 		genomeSetting = new CoreSupportGenome((int) (Math.random() * 100), (int) (Math.random() * 100));
 		genBasicUnitList = new LinkedList<UnitTypes>();
+		campaign = genomeSetting.bloodFrequency * 10;
 	}
 	
 	public void AILinkData() {
 		buildingGoals = builder.buildingsStack;
+		hostileX = this.info.hostileX;
+		hostileY = this.info.hostileY;
 	}
 	
 	public void setup() 
@@ -57,6 +60,7 @@ public class CoreBaby extends RRAITemplate
 		genBasicUnitList.add(UnitTypes.Terran_Vulture);
 		genBasicUnitList.add(UnitTypes.Terran_Medic);
 		genBasicUnitList.add(UnitTypes.Terran_Siege_Tank_Tank_Mode);
+		
 	}
 	
 	public void checkUp() 
@@ -95,18 +99,28 @@ public class CoreBaby extends RRAITemplate
 		
 		/* Military Orders */
 		if (countdown-- <= 0) {
-			if (genomeSetting.defensiveness > (int) (Math.random() * 100)) {
+			if (genomeSetting.defensiveness > (int) (Math.random() * 100) && campaign > 0) {
 				genDefendMilitaryGroup();
 				if (buildingGoals.size() - builder.completedBuildingsIndex < 3)
 					genDefensiveBasic();
 			}
 			else {
-				genSpreadMilitaryGroup();
+				if (campaign > 0) {
+					genSpreadMilitaryGroup();
+				}
+				else {
+					genFullMilitaryAssault();
+				}
 				if (buildingGoals.size() - builder.completedBuildingsIndex < 3)
 					genOffensiveBasic();
 			}
-			countdown = genomeSetting.bloodFrequency;
+			if (campaign > 0) 
+				countdown = genomeSetting.bloodFrequency;
+			else
+				countdown = genomeSetting.bloodFrequency/10;
 		}
+		if (campaign > 0)
+			campaign--;
 		
 	}
 	
@@ -119,11 +133,11 @@ public class CoreBaby extends RRAITemplate
 	{
 		int index;
 
-		for (index = 0; index < 4; index++)
-			builder.roster.addLast(UnitTypes.Terran_Marine);
-		builder.roster.addLast(UnitTypes.Terran_Medic);
-		for (index = 0; index < 2; index++)
-			builder.roster.addLast(UnitTypes.Terran_Siege_Tank_Tank_Mode);
+		//for (index = 0; index < 4; index++)
+		builder.roster.addLast(UnitTypes.Terran_Marine);
+		//builder.roster.addLast(UnitTypes.Terran_Medic);
+		//for (index = 0; index < 2; index++)
+		builder.roster.addLast(UnitTypes.Terran_Siege_Tank_Tank_Mode);
 		builder.roster.addLast(UnitTypes.Terran_Vulture);
 		
 	}
@@ -160,11 +174,18 @@ public class CoreBaby extends RRAITemplate
 				military.unitOperation(genBasicUnitList, 20, regions.get(i).getCenterX(), regions.get(i).getCenterY());
 			}
 			if (i == 0) {
-				military.unitOperation(genBasicUnitList, 20, hostileX, hostileY);
+				military.unitOperation(genBasicUnitList, 20, info.hostileX, info.hostileY);
 				System.out.println("Base Attack " + i);
 			}
 		}
 		System.out.println("End group spread");
+	}
+	
+	public void genFullMilitaryAssault() {
+		military.orderAllMilitaryTeamsToAtk(info.hostileX, info.hostileY);
+		military.orderUnitPoolToAtk(info.hostileX, info.hostileY);
+		military.scanLocation(info.hostileX, info.hostileY);
+		
 	}
 	
 	public void genDefendMilitaryGroup() {
@@ -179,14 +200,14 @@ public class CoreBaby extends RRAITemplate
 	
 	public void initBuildStyle_siegeExpand() 
 	{
-		buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(18, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(18, 12, 0, UnitTypes.Terran_Refinery, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(18, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(26, 16, 0, UnitTypes.Terran_Academy, BuildStatus.HOLD));
+		//buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
+		//buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 6, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 9, 0, UnitTypes.Terran_Refinery, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Academy, BuildStatus.HOLD));
 	}
 	
 }
