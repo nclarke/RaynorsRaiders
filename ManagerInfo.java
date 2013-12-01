@@ -71,6 +71,7 @@ public class ManagerInfo extends RRAITemplate
 			if(!this.neutralUnits.contains(unit))
 			{
 				neutralUnits.add(unit);
+				System.out.println("New Neautral unit discovered of type: "+bwapi.getUnitType(unitID));
 			}
 		}
 		else if(bwapi.getUnit(unitID).getPlayerID() != selfID) //enemy Unit
@@ -86,20 +87,14 @@ public class ManagerInfo extends RRAITemplate
 		{
 			//our unit
 		}
-/*		
-		System.out.println("this was the unit discovered: "+unitID);
-		System.out.println("of type: "+bwapi.getUnitType(unitID));
-		System.out.println("of player ID: "+bwapi.getUnit(unitID).getPlayerID());
-		System.out.println("of type ID: "+bwapi.getUnit(unitID).getTypeID());
-		System.out.println("\n");
-		*/
 	}
 	
 	public void unitDestoryed(int unitID)
 	{		
 		Unit unit = bwapi.getUnit(unitID);
 		System.out.println("destroyed unitID: "+unitID);
-//		System.out.println("ID of: "+bwapi.getUnit(unitID).getPlayerID());
+
+
 		if (unitID == this.scouter.scout.getID())
 		{
 			System.out.println("scout destroyed of tyep:"+scouter.scout.getTypeID());
@@ -111,30 +106,17 @@ public class ManagerInfo extends RRAITemplate
 
 			
 		}
-/*		System.out.println("ID of: "+bwapi.getUnit(unitID).getPlayerID());
-		if(bwapi.getUnit(unitID).getPlayerID() == 0) //neutral Unit
+
+		for(Unit u : this.enemyUnits)
 		{
-			System.out.println("here2");
-			if(this.neutralUnits.contains(unit))
-			{
-				neutralUnits.remove(unit);
-			}
+			if(u.getID() == unitID)
+				this.enemyUnits.remove(u);
 		}
-		else if(bwapi.getUnit(unitID).getPlayerID() != selfID) //enemy Unit
+		for(Unit u : this.neutralUnits)
 		{
-			System.out.println("here3");
-			if(this.enemyUnits.contains(unit))
-			{
-				enemyUnits.remove(unit);
-				System.out.println("Enemy unit distroeyed of type: "+bwapi.getUnitType(unitID));
-			}
-		
+			if(u.getID() == unitID)
+				this.neutralUnits.remove(u);
 		}
-		else
-		{
-			System.out.println("here4");
-			//our unit
-		}*/
 		
 	}
 
