@@ -8,6 +8,7 @@ import javabot.RaynorsRaiders.ManagerBuild.BuildStatus;
 import javabot.RaynorsRaiders.ManagerBuild.BuildingRR;
 import javabot.model.ChokePoint;
 import javabot.model.Region;
+import javabot.model.Unit;
 import javabot.types.UnitType;
 import javabot.types.UnitType.UnitTypes;
 import javabot.RaynorsRaiders.ManagerMilitary.UnitTypesRequest;
@@ -19,30 +20,12 @@ public class CoreBaby extends RRAITemplate
 	CoreSupportGenome genomeSetting;
 	LinkedList<UnitTypes> genBasicUnitList;
 
-	public class CoreSupportGenome {
-		int bloodFrequency;
-		int mutation;
-		int responsePotential;
-		int spread;
-		int defensiveness;
-		
-		CoreSupportGenome(int mutation, int phase) {
-			bloodFrequency = Math.abs(mutation) % 100;
-			mutation += phase;
-			responsePotential = Math.abs(mutation) % 100;
-			mutation += phase;
-			spread = Math.abs(mutation) % 100;
-			mutation += phase;
-			defensiveness = Math.abs(mutation) % 100;
-		}
-	}
-	
 	public CoreBaby() 
 	{
 		hostileX = 0;
 		hostileY = 0;
 		countdown = 200;
-		genomeSetting = new CoreSupportGenome((int) (Math.random() * 100), (int) (Math.random() * 100));
+		genomeSetting = new CoreSupportGenome();
 		genBasicUnitList = new LinkedList<UnitTypes>();
 		campaign = genomeSetting.bloodFrequency * 10;
 	}
@@ -77,8 +60,8 @@ public class CoreBaby extends RRAITemplate
 			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal) 
 				buildingGoals.get(builder.nextToBuildIndex).status = BuildStatus.ATTEMPT_BUILD;
 			
-			if (SCVsNeeded > SCVsTotal) 
-				workers.trainWorker();
+			//if (SCVsNeeded > SCVsTotal) 
+			//	workers.trainWorker();
 			
 			if (supplyUsed + 10 > supplyTotal && buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot) 
 					buildingGoals.add(builder.nextToBuildIndex, new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
@@ -91,6 +74,7 @@ public class CoreBaby extends RRAITemplate
 				builder.nextToBuildIndex = buildingGoals.size() - 1;
 			}
 		}
+		workers.trainWorker();
 		
 		/* Add units */
 		//if (builder.roster.size() < 20)
@@ -153,7 +137,7 @@ public class CoreBaby extends RRAITemplate
 	
 	public void genDefensiveBasic() {
 		buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Bunker, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Missile_Turret, BuildStatus.HOLD));
+		//buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Missile_Turret, BuildStatus.HOLD));
 	}
 	
 	public void genOffensiveBasic() {
@@ -182,8 +166,10 @@ public class CoreBaby extends RRAITemplate
 	}
 	
 	public void genFullMilitaryAssault() {
-		military.orderAllMilitaryTeamsToAtk(info.hostileX, info.hostileY);
-		military.orderUnitPoolToAtk(info.hostileX, info.hostileY);
+		Unit test = military.getNearestEnemyUnit(builder.homePositionX,builder.homePositionY);
+		military.unitOperation(genBasicUnitList, 20, test.getX(), test.getY());
+		military.orderAllMilitaryTeamsToAtk(test.getX(), test.getY());
+		//military.orderUnitPoolToAtk(info.hostileX, info.hostileY);
 		military.scanLocation(info.hostileX, info.hostileY);
 		
 	}
@@ -208,6 +194,11 @@ public class CoreBaby extends RRAITemplate
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Academy, BuildStatus.HOLD));
+	}
+	
+	
+	public void cleanUp(boolean winner) {
+		genomeSetting.GenomeWriteNewEntry(winner);
 	}
 	
 }

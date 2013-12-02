@@ -282,8 +282,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 	}
 	public void matchEnded(boolean winner) 
 	{
-		//System.out.println("RaynorsRaiders: Match Ended");
-		//System.out.println("RaynorsRaiders: Did we win? " + winner);
+		this.coreBaby.cleanUp(winner);
+		System.out.println("RaynorsRaiders: Match Ended");
+		System.out.println("RaynorsRaiders: Did we win? " + winner);
 	}
 	public void nukeDetect(int x, int y) { }
 	public void nukeDetect() { }
