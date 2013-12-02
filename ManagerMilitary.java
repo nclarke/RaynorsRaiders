@@ -413,6 +413,9 @@ public class ManagerMilitary extends RRAITemplate
 			
 		if(unitTypeID == UnitTypes.Terran_Wraith.ordinal())
 			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Wraith);
+		
+		if(unitTypeID == UnitTypes.Terran_Science_Vessel.ordinal())
+			addCreatedMilitaryUnitsHelper(createdUnit, UnitTypes.Terran_Science_Vessel);
 	}
 	
 	/*
@@ -485,10 +488,15 @@ public class ManagerMilitary extends RRAITemplate
 			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Siege_Tank_Siege_Mode);
 			removeUnitInMilitaryTeams(destroyedUnit);
 		}
-			
 		if(unitTypeID == UnitTypes.Terran_Wraith.ordinal())
 		{
 			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Wraith);
+			removeUnitInMilitaryTeams(destroyedUnit);
+		}
+		
+		if(unitTypeID == UnitTypes.Terran_Science_Vessel.ordinal())
+		{
+			removeDestroyedMilitaryUnitsHelper(destroyedUnit, UnitTypes.Terran_Science_Vessel);
 			removeUnitInMilitaryTeams(destroyedUnit);
 		}
 	}
@@ -528,7 +536,8 @@ public class ManagerMilitary extends RRAITemplate
 				if(tmp.size() < numOfUnits)
 				{
 					if(unitPool.get(unitTy).get(index).isIdle() && 
-							unitPool.get(unitTy).get(index).isCompleted())
+							unitPool.get(unitTy).get(index).isCompleted() && 
+							unitPool.get(unitTy).get(index).isExists())
 					{
 						//System.out.println("Military Manager: Adding unit " + ut.getID() + " to group");
 						tmp.add(unitPool.get(unitTy).get(index));
@@ -540,11 +549,24 @@ public class ManagerMilitary extends RRAITemplate
 		
 		if(tmp.size() == numOfUnits)
 		{
-			for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Medic).size()/2); index++)
+			if(!containsUnitTypeInList(tmp, UnitTypes.Terran_Medic))
 			{
-				if(unitPool.get(UnitTypes.Terran_Medic).get(index).isIdle() 
-						&& unitPool.get(UnitTypes.Terran_Medic).get(index).isCompleted())
-					tmp.add(unitPool.get(UnitTypes.Terran_Medic).get(index));
+				for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Medic).size()/2); index++)
+				{
+					if(unitPool.get(UnitTypes.Terran_Medic).get(index).isIdle() 
+							&& unitPool.get(UnitTypes.Terran_Medic).get(index).isCompleted())
+						tmp.add(unitPool.get(UnitTypes.Terran_Medic).get(index));
+				}
+			}
+			
+			if(!containsUnitTypeInList(tmp, UnitTypes.Terran_Science_Vessel))
+			{
+				for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Science_Vessel).size()/3); index++)
+				{
+					if(unitPool.get(UnitTypes.Terran_Science_Vessel).get(index).isIdle() 
+							&& unitPool.get(UnitTypes.Terran_Science_Vessel).get(index).isCompleted())
+						tmp.add(unitPool.get(UnitTypes.Terran_Science_Vessel).get(index));
+				}
 			}
 			
 			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
@@ -562,17 +584,33 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			for(int index2 = 0; index2 < unitTypes.get(index).getNumOfUnits(); index2++)
 			{
+				if(unitPool.get(unitTypes.get(index).getUnitTypes()).get(index).isIdle() && 
+						unitPool.get(unitTypes.get(index).getUnitTypes()).get(index).isCompleted() && 
+						unitPool.get(unitTypes.get(index).getUnitTypes()).get(index).isExists())
 				tmp.add(unitPool.get(unitTypes.get(index).getUnitTypes()).get(index2));
 			}
 		}
 		
 		if(tmp.size() == numOfUnits)
 		{
-			for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Medic).size()/2); index++)
+			if(!containsUnitTypeInList(tmp, UnitTypes.Terran_Medic))
 			{
-				if(unitPool.get(UnitTypes.Terran_Medic).get(index).isIdle() 
-						&& unitPool.get(UnitTypes.Terran_Medic).get(index).isCompleted())
-					tmp.add(unitPool.get(UnitTypes.Terran_Medic).get(index));
+				for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Medic).size()/2); index++)
+				{
+					if(unitPool.get(UnitTypes.Terran_Medic).get(index).isIdle() 
+							&& unitPool.get(UnitTypes.Terran_Medic).get(index).isCompleted())
+						tmp.add(unitPool.get(UnitTypes.Terran_Medic).get(index));
+				}
+			}
+			
+			if(!containsUnitTypeInList(tmp, UnitTypes.Terran_Science_Vessel))
+			{
+				for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Science_Vessel).size()/3); index++)
+				{
+					if(unitPool.get(UnitTypes.Terran_Science_Vessel).get(index).isIdle() 
+							&& unitPool.get(UnitTypes.Terran_Science_Vessel).get(index).isCompleted())
+						tmp.add(unitPool.get(UnitTypes.Terran_Science_Vessel).get(index));
+				}
 			}
 			
 			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
@@ -593,7 +631,8 @@ public class ManagerMilitary extends RRAITemplate
 			if(tmp.size() < numOfUnits)
 			{
 				if(unitPool.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
-						unitPool.get(UnitTypes.Terran_Marine).get(index).isCompleted())
+						unitPool.get(UnitTypes.Terran_Marine).get(index).isCompleted() &&
+						unitPool.get(UnitTypes.Terran_Marine).get(index).isExists())
 				{
 					tmp.add(unitPool.get(UnitTypes.Terran_Marine).get(index));
 				}
@@ -607,6 +646,16 @@ public class ManagerMilitary extends RRAITemplate
 		}
 	}
 	
+	private boolean containsUnitTypeInList(LinkedList<Unit> units, UnitTypes ut)
+	{
+		for(int index = 0; index < units.size(); index++)
+		{
+			if(units.get(index).getTypeID() == ut.ordinal())
+				return true;
+		}
+		return false;
+	}
+	
 	/*
 	 * Similar to the above, except team sizes are 5. Put Marines in a team to attack by default.
 	 * This method is mainly used for TESTING.
@@ -615,25 +664,39 @@ public class ManagerMilitary extends RRAITemplate
 	{
 		LinkedList<Unit> tmp = new LinkedList<Unit>();
 		
-		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Vulture).size(); index++)
-		{
+		for(int index = 0; index < unitPool.get(UnitTypes.Terran_Marine).size(); index++)
+		{			
 			if(tmp.size() < 5)
 			{
-				if(unitPool.get(UnitTypes.Terran_Vulture).get(index).isIdle() && 
-						unitPool.get(UnitTypes.Terran_Vulture).get(index).isCompleted())
+				if(unitPool.get(UnitTypes.Terran_Marine).get(index).isIdle() && 
+						unitPool.get(UnitTypes.Terran_Marine).get(index).isCompleted() && 
+						unitPool.get(UnitTypes.Terran_Marine).get(index).isExists())
 				{
-					tmp.add(unitPool.get(UnitTypes.Terran_Vulture).get(index));
+					tmp.add(unitPool.get(UnitTypes.Terran_Marine).get(index));
 				}
 			}
 		}
 		
 		if(tmp.size() == 5)
 		{
-			for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Medic).size()/2); index++)
+			if(!containsUnitTypeInList(tmp, UnitTypes.Terran_Medic))
 			{
-				if(unitPool.get(UnitTypes.Terran_Medic).get(index).isIdle() 
-						&& unitPool.get(UnitTypes.Terran_Medic).get(index).isCompleted())
-					tmp.add(unitPool.get(UnitTypes.Terran_Medic).get(index));
+				for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Medic).size()/2); index++)
+				{
+					if(unitPool.get(UnitTypes.Terran_Medic).get(index).isIdle() 
+							&& unitPool.get(UnitTypes.Terran_Medic).get(index).isCompleted())
+						tmp.add(unitPool.get(UnitTypes.Terran_Medic).get(index));
+				}
+			}
+			
+			if(!containsUnitTypeInList(tmp, UnitTypes.Terran_Science_Vessel))
+			{
+				for(int index = 0; index < (unitPool.get(UnitTypes.Terran_Science_Vessel).size()/3); index++)
+				{
+					if(unitPool.get(UnitTypes.Terran_Science_Vessel).get(index).isIdle() 
+							&& unitPool.get(UnitTypes.Terran_Science_Vessel).get(index).isCompleted())
+						tmp.add(unitPool.get(UnitTypes.Terran_Science_Vessel).get(index));
+				}
 			}
 			militaryTeams.add(new MilitaryTeam(tmp, locationX, locationY));
 			removeUsedUnits(tmp);
@@ -744,16 +807,19 @@ public class ManagerMilitary extends RRAITemplate
 		if(unitGroup != null)
 		{
 			for(int index = 0; index < unitGroup.size(); index++)
-			{
-				double dist = Math.sqrt(Math.pow(unitGroup.get(index).getX() - pixelPositionX, 2) + Math.pow(unitGroup.get(index).getY() - pixelPositionY, 2));
-				
-				if(dist <= 110)
+			{	
+				if(unitGroup.get(index).isExists())
 				{
-					checkReadyFlag = true;
-				}
-				else
-				{
-					return false;
+					double dist = Math.sqrt(Math.pow(unitGroup.get(index).getX() - pixelPositionX, 2) + Math.pow(unitGroup.get(index).getY() - pixelPositionY, 2));
+					
+					if(dist <= 110)
+					{
+						checkReadyFlag = true;
+					}
+					else
+					{
+						return false;
+					}
 				}
 			}
 		}
@@ -847,6 +913,57 @@ public class ManagerMilitary extends RRAITemplate
 			{
 				Unit tmp = militaryTeams.get(index).getMilitaryTeam().get(index2);
 				
+				if(tmp.getTypeID() == UnitTypes.Terran_Marine.ordinal())
+				{
+					if((tmp.isStartingAttack()) && (!tmp.isStimmed()))
+					{
+						bwapi.useTech(tmp.getID(), TechTypes.Stim_Packs.ordinal());
+					}
+					
+					for(int groupUnits = 0; groupUnits < militaryTeams.get(index).getMilitaryTeam().size(); groupUnits++)
+					{
+						int targetID = militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getTargetUnitID();
+						Unit targetUnit = bwapi.getUnit(targetID);
+						
+						if(targetUnit.getHitPoints() <= targetUnit.getInitialHitPoints()/2)
+						{
+							bwapi.attack(tmp.getID(), targetID);
+						}
+					}
+				}
+				
+				if(tmp.getTypeID() == UnitTypes.Terran_Medic.ordinal())
+				{
+					for(int groupUnits = 0; groupUnits < militaryTeams.get(index).getMilitaryTeam().size(); groupUnits++)
+					{
+						if((militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getTypeID() != UnitTypes.Terran_Medic.ordinal()) &&
+								(militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getTypeID() != UnitTypes.Terran_Science_Vessel.ordinal()))
+						{
+							bwapi.follow(tmp.getID(), militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getID());
+						}
+						
+						if(militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getHitPoints() < 
+								militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getInitialHitPoints())
+						{
+							bwapi.useTech(tmp.getID(), TechTypes.Healing.ordinal(), 
+									militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getX(),
+									militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getY());
+						}
+					}
+				}
+				
+				if(tmp.getTypeID() == UnitTypes.Terran_Science_Vessel.ordinal())
+				{
+					for(int groupUnits = 0; groupUnits < militaryTeams.get(index).getMilitaryTeam().size(); groupUnits++)
+					{
+						if((militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getTypeID() != UnitTypes.Terran_Medic.ordinal()) &&
+								(militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getTypeID() != UnitTypes.Terran_Science_Vessel.ordinal()))
+						{
+							bwapi.follow(tmp.getID(), militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getID());
+						}
+					}
+				}
+				
 				if(tmp.getTypeID() == UnitTypes.Terran_Vulture.ordinal())
 				{
 					if(tmp.isStartingAttack())
@@ -898,6 +1015,14 @@ public class ManagerMilitary extends RRAITemplate
 			for(int index = 0; index < unitPool.get(ut).size(); index++)
 			{
 				Unit poolUnit = unitPool.get(ut).get(index);
+				
+				if(poolUnit.getTypeID() == UnitTypes.Terran_Marine.ordinal())
+				{
+					if(poolUnit.isStartingAttack() && (!poolUnit.isStimmed()))
+					{
+						bwapi.useTech(poolUnit.getID(), TechTypes.Stim_Packs.ordinal());
+					}
+				}
 				
 				if(poolUnit.getTypeID() == UnitTypes.Terran_Vulture.ordinal())
 				{
