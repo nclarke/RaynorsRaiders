@@ -572,7 +572,7 @@ public class ManagerBuild extends RRAITemplate
 						Point buildTile = getBuildTile(worker, bldg.getID(), xtile, ytile);
 						// if we found a good build position, and we aren't already constructing a bldg 
 						// order our worker to build it
-						if ((buildTile.x != -1) && (!weAreBuilding(bldg.getID()))) 
+						if ((buildTile.x != -1))
 						{
 							int mvX = buildTile.x * 32, mvY = buildTile.y * 32;
 							
