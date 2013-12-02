@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.util.*;
 
 import javabot.JNIBWAPI;
-import javabot.RaynorsRaiders.MiltScouter.Base;
 import javabot.model.BaseLocation;
 import javabot.model.Unit;
 import javabot.types.TechType;
@@ -27,7 +26,32 @@ public class ManagerInfo extends RRAITemplate
 	int hostileX;
 	int hostileY;
 	boolean isScouting;
-	List<MiltScouter.Base> enemyBases;
+	List<Base> enemyBases;
+	Unit closestUnit; /*the closest enemy unit to our base*/
+	Tile closestTile; /*tile of the closest enemy unit to our base*/
+	
+	
+	public class Tile {
+		int x;
+		int y;
+		public Tile(int x,int y){
+			this.x=x;
+			this.y=y;
+		}
+		public int getX(){
+			return this.x;
+		}
+		public int getY(){
+			return this.y;
+		}
+	}
+	
+	public class Base {
+		BaseLocation baseLoc;
+		Tile tile;
+		boolean hasSeen;
+		boolean hasEnemy;
+	}
 	
 	public ManagerInfo() {
 		//SET UP ALL INTERNAL VARIABLES HERE
@@ -38,7 +62,9 @@ public class ManagerInfo extends RRAITemplate
 		isScouting = false;
 		neutralUnits = new ArrayList<Unit>();
 		enemyUnits = new ArrayList<Unit>();
-		enemyBases = new LinkedList<MiltScouter.Base>();
+		enemyBases = new LinkedList<Base>();
+		closestTile = new Tile(0, 0);
+		closestUnit = null;
 	}
 	
 	
@@ -80,6 +106,12 @@ public class ManagerInfo extends RRAITemplate
 			{
 				enemyUnits.add(unit);
 				System.out.println("New Enemy unit discovered of type: "+bwapi.getUnitType(unitID));
+				if (Math.abs(unit.getTileX() - military.homePositionX) < closestTile.getX() && 
+				 Math.abs(unit.getTileY() - military.homePositionY) < closestTile.getY() )
+				{
+					closestTile = new Tile(unit.getTileX(), unit.getTileY());
+					closestUnit = unit;
+				}
 			}
 		
 		}
@@ -111,6 +143,11 @@ public class ManagerInfo extends RRAITemplate
 		{
 			if(u.getID() == unitID)
 				this.enemyUnits.remove(u);
+			if(closestUnit.getID() == unitID)
+			{
+				closestTile = new Tile(0,0);
+				closestUnit = null;
+			}
 		}
 		for(Unit u : this.neutralUnits)
 		{

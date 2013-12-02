@@ -7,6 +7,8 @@ import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.Level;
 import javabot.model.*;
 import javabot.types.UnitType.UnitTypes;
+import javabot.RaynorsRaiders.ManagerInfo.Base;
+import javabot.RaynorsRaiders.ManagerInfo.Tile;
 import javabot.util.*;
 
 public class MiltScouter
@@ -16,9 +18,9 @@ public class MiltScouter
 	 * (AI is very rich in the beginning, gets its level changed from ZERO to TWO) */
 //	int homePositionX, homePositionY;
 	BaseLocation homeBase;
-	List <Base> bases;
+	List <ManagerInfo.Base> bases;
 	Unit scout;
-	LinkedList<Tile> scoutingPositions;
+	LinkedList<ManagerInfo.Tile> scoutingPositions;
 	ManagerInfo mInfo;
 	int currIndex;
 	
@@ -27,27 +29,7 @@ public class MiltScouter
 	/*store-enemy-base?*/
 	
 
-	public class Tile {
-		int x;
-		int y;
-		public Tile(int x,int y){
-			this.x=x;
-			this.y=y;
-		}
-		public int getX(){
-			return this.x;
-		}
-		public int getY(){
-			return this.y;
-		}
-	}
-	
-	public class Base {
-		BaseLocation baseLoc;
-		Tile tile;
-		boolean hasSeen;
-		boolean hasEnemy;
-	}
+
 	
 	
 	
@@ -55,19 +37,19 @@ public class MiltScouter
 	{
 		this.mInfo = mInfo;
 		System.out.println("Scouter online");
-		this.scoutingPositions = new LinkedList<Tile>();
-		this.bases = new ArrayList<Base>();
+		this.scoutingPositions = new LinkedList<ManagerInfo.Tile>();
+		this.bases = new ArrayList<ManagerInfo.Base>();
 	}
 	
 	public void startUp()
 	{
 		for (BaseLocation b : mInfo.bwapi.getMap().getBaseLocations())
 		{
-			Base base = new Base();
+			ManagerInfo.Base base = mInfo.new Base();
 			base.baseLoc = b;
 			base.hasEnemy = false;
 			base.hasSeen = false;
-			base.tile = new Tile(b.getX(), b.getY());
+			base.tile = mInfo.new Tile(b.getX(), b.getY());
 			bases.add(base);
 			
 		}
@@ -116,7 +98,7 @@ public class MiltScouter
 	/*scout to a specific position immediately*/
 	public void scout(int X, int Y)
 	{
-		this.scoutingPositions.addFirst(new Tile(X, Y));
+		this.scoutingPositions.addFirst(mInfo.new Tile(X, Y));
 		scout();
 	}
 
@@ -124,7 +106,7 @@ public class MiltScouter
 	/*scout to a specific position after other positions have been seen*/
 	public void scoutEventually(int X, int Y)
 	{
-		this.scoutingPositions.add(new Tile(X, Y));
+		this.scoutingPositions.add(mInfo.new Tile(X, Y));
 		scout();
 	}
 	
@@ -242,14 +224,14 @@ public class MiltScouter
 			if (b.isStartLocation() && (b.getX() != mInfo.military.homePositionX) && (b.getY() != mInfo.military.homePositionY)) 
 			{
 				System.out.println("this is your home location: ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
-				this.scoutingPositions.add(new Tile(b.getX(), b.getY()));//, y).Tile(b.getX(),b.getY()));
+				this.scoutingPositions.add(mInfo.new Tile(b.getX(), b.getY()));//, y).Tile(b.getX(),b.getY()));
 				this.mInfo.baby.hostileX = b.getX();
 				this.mInfo.baby.hostileY = b.getY();
 				
 			}
 			
 		}
-		this.scoutingPositions.add(new Tile(mInfo.military.homePositionX, mInfo.military.homePositionY));
+		this.scoutingPositions.add(mInfo.new Tile(mInfo.military.homePositionX, mInfo.military.homePositionY));
 	}
 
 }
