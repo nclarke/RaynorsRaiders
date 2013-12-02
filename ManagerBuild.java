@@ -840,8 +840,28 @@ public class ManagerBuild extends RRAITemplate
 	
 	public void scheduleBuildTime()
 	{
-		//Collections.sort(buildingsStack.subList(completedBuildingsIndex + 1, nextToBuildIndex), buildTime);
+		Collections.sort(buildingsStack.subList(completedBuildingsIndex + 1, nextToBuildIndex), buildTime);
 		// FIXME - causing crashes
+	}
+	
+	public void resetOrder(int unitID)
+	{
+		for(int i = 0; i < completedBuildingsIndex+1; i++)
+		{
+			BuildingRR bldg = buildingsStack.get(i);
+			
+			if(bldg.unit.getID() == unitID)
+			{
+				buildingsStack.remove(i);
+/*
+				bldg.unit = null;
+				bldg.status = BuildStatus.HOLD;
+				bldg.worker = null;
+				
+				buildingsStack.add(bldg);
+*/
+			}
+		}
 	}
 }
 

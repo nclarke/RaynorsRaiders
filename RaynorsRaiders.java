@@ -324,12 +324,11 @@ public class RaynorsRaiders implements BWAPIEventListener
 			if(createdUnitType == managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).blueprint.ordinal())
 			{
 				managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).unit = createdUnit;
-				managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).status = BuildStatus.ACCEPTTED;
 
 				managerBuild.nextToBuildIndex++;
 				
 				// sort under construction according to build time
-				managerBuild.scheduleBuildTime();
+				//managerBuild.scheduleBuildTime();
 
 			}
 		}
@@ -343,6 +342,10 @@ public class RaynorsRaiders implements BWAPIEventListener
 
 		this.managerInfo.unitDestoryed(unitID);
 		// This is an error, checking in a worker that does not exist anymore ^^^
+		
+
+		managerBuild.resetOrder(unitID);
+		
 		
 		for (Unit u : masterUnitList)
 		{
