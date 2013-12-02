@@ -287,8 +287,7 @@ public class ManagerBuild extends RRAITemplate
 					}
 				}
 				
-				if(!trainingGroundsPresent || bwapi.getSelf().getMinerals() - underConstructionM() < soldier.getMineralPrice() && 
-						bwapi.getSelf().getGas() - underConstructionG() < soldier.getGasPrice()) 
+				if(!trainingGroundsPresent) 
 				{
 					i++;
 				}
@@ -311,17 +310,10 @@ public class ManagerBuild extends RRAITemplate
 			break;
 		case BLOCKING_STACK:
 			c = null;
-			soldier = null;
 			
 			c = roster.peek();
-			soldier = bwapi.getUnitType(c.ordinal());
 			
-			if(bwapi.getSelf().getMinerals() - underConstructionM() >= soldier.getMineralPrice() && 
-					bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
-			{
-				train(c, 0);
-				// add units to military list
-			}
+            train(c, 0);
 			break;
 		case HOLD_ALL:
 			//System.out.println("halting construction...");
@@ -693,7 +685,7 @@ public class ManagerBuild extends RRAITemplate
 		{
 			if(bwapi.getSelf().getGas() - underConstructionG() >= soldier.getGasPrice()) 
 			{
-				int queueSize = 5;
+				int queueSize = 1;
 				Unit grounds = null;
 				for(BuildingRR file : buildingsStack) 
 				{
