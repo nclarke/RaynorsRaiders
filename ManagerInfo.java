@@ -63,7 +63,7 @@ public class ManagerInfo extends RRAITemplate
 		neutralUnits = new ArrayList<Unit>();
 		enemyUnits = new ArrayList<Unit>();
 		enemyBases = new LinkedList<Base>();
-		closestTile = new Tile(0, 0);
+		closestTile = new Tile(9999, 9999);
 		closestUnit = null;
 	}
 	
@@ -109,6 +109,7 @@ public class ManagerInfo extends RRAITemplate
 				if (Math.abs(unit.getTileX() - military.homePositionX) < closestTile.getX() && 
 				 Math.abs(unit.getTileY() - military.homePositionY) < closestTile.getY() )
 				{
+					System.out.println("found new closestunit at ("+unit.getTileX()+","+unit.getTileY()+")");
 					closestTile = new Tile(unit.getTileX(), unit.getTileY());
 					closestUnit = unit;
 				}
@@ -129,7 +130,7 @@ public class ManagerInfo extends RRAITemplate
 
 		if (unitID == this.scouter.scout.getID())
 		{
-			System.out.println("scout destroyed of tyep:"+scouter.scout.getTypeID());
+			System.out.println("scout destroyed of type: "+scouter.scout.getTypeID());
 			if (this.scouter.scout.getTypeID() == UnitTypes.Terran_SCV.ordinal())
 				workers.checkInWorker(scouter.scout.getID());
 			this.scouter.scout = null;
@@ -138,11 +139,17 @@ public class ManagerInfo extends RRAITemplate
 
 			
 		}
-
+//		System.out.println("here now with : "+unitID);
 		for(Unit u : this.enemyUnits)
 		{
+//			System.out.println("unit of : " +u);
+//			System.out.println("middle (closest: "+closestUnit+", "+closestUnit.getID());
+//			System.out.println("unit ID of : " +u.getID());
 			if(u.getID() == unitID)
+			{
 				this.enemyUnits.remove(u);
+			}
+//			System.out.println("middle (closest: "+closestUnit+", "+closestUnit.getID());
 			if(closestUnit.getID() == unitID)
 			{
 				closestTile = new Tile(0,0);
@@ -154,7 +161,8 @@ public class ManagerInfo extends RRAITemplate
 			if(u.getID() == unitID)
 				this.neutralUnits.remove(u);
 		}
-		
+
+//		System.out.println("ending now");
 	}
 
 	

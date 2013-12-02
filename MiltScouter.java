@@ -116,7 +116,7 @@ public class MiltScouter
 	 */
 	public void scout(){
 		if (this.scout == null){
-			System.out.println("\n\n\ngetting a new scout. currIndex: "+currIndex);
+			System.out.println("\ngetting a new scout. currIndex: "+currIndex);
 			this.scout = getNewScoutUnit();
 			this.currIndex =0;
 			System.out.println("new scout is: "+this.scout);
@@ -154,7 +154,7 @@ public class MiltScouter
 //			System.out.println("   this is your home location: ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
 			if (bases.get(currIndex).baseLoc.isIsland())
 			{
-				System.out.println("	It's an Island!!!");
+//				System.out.println("	It's an Island!!!");
 				currIndex++;			
 			}
 			
@@ -169,7 +169,7 @@ public class MiltScouter
 			else
 			{
 
-								System.out.println("incrementing++");
+//								System.out.println("incrementing++");
 				//scout has reached the Tile, so he can go scout some more
 				this.bases.get(currIndex).hasSeen = true;
 				if(scout.isUnderAttack())
@@ -178,11 +178,11 @@ public class MiltScouter
 				currIndex++;
 				while(currIndex < bases.size() && bases.get(currIndex).hasEnemy)
 				{
-					System.out.println("++");
+//					System.out.println("++");
 					currIndex++;
 				}
 
-				System.out.println("ending with a currIndex of #"+currIndex);
+//				System.out.println("ending with a currIndex of #"+currIndex);
 				return true;
 			}
 		}
