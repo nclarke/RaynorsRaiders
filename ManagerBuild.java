@@ -208,16 +208,13 @@ public class ManagerBuild extends RRAITemplate
 				int i = nextToBuildIndex; // if nextToBuildIndex == buildingsStack.size(), then the list doesn't have any orders to process
 				boolean canBuild = false;
 				UnitTypes b = null;
-				UnitType bldg = null;
 				
 				// go through list until we find a buildable structure
 				while(!canBuild && i < buildingsStack.size())
 				{
 					b = buildingsStack.get(i).blueprint;
-					bldg = bwapi.getUnitType(b.ordinal());
 		
-					if(weAreBuilding(b.ordinal()) || buildingsStack.get(i).status != BuildStatus.ATTEMPT_BUILD || bwapi.getSelf().getMinerals() - underConstructionM() < bldg.getMineralPrice() && 
-							bwapi.getSelf().getGas() - underConstructionG() < bldg.getGasPrice()) 
+					if(buildingsStack.get(i).status != BuildStatus.ATTEMPT_BUILD) 
 					{
 						i++;
 					}
@@ -243,16 +240,10 @@ public class ManagerBuild extends RRAITemplate
 				if(i < buildingsStack.size() && i > -1)
 				{
 					b = buildingsStack.get(i).blueprint;
-					bldg = bwapi.getUnitType(b.ordinal());
 					
-					if(buildingsStack.get(i).status == BuildStatus.ATTEMPT_BUILD && bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice() && 
-					bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
+					if(buildingsStack.get(i).status == BuildStatus.ATTEMPT_BUILD) 
 					{
 						build(b, buildingsStack.get(i).baseAssignment);
-					}
-					else
-					{
-						// insufficient resources
 					}
 				}
 				else
@@ -490,9 +481,9 @@ public class ManagerBuild extends RRAITemplate
 */		
 		bldg = bwapi.getUnitType(structure.ordinal());
 		
-		if (bwapi.getSelf().getMinerals() >= bldg.getMineralPrice()) 
+		if (bwapi.getSelf().getMinerals() - underConstructionM() >= bldg.getMineralPrice()) 
 		{
-			if(bwapi.getSelf().getGas() >= bldg.getGasPrice()) 
+			if(bwapi.getSelf().getGas() - underConstructionG() >= bldg.getGasPrice()) 
 			{
 				if(bldg.isAddon()) 
 				{
