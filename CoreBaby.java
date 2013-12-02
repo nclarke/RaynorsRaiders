@@ -57,7 +57,7 @@ public class CoreBaby extends RRAITemplate
 			int supplyNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSupply;
 			int SCVsNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSCVs;
 			
-			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal) 
+			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal)
 				buildingGoals.get(builder.nextToBuildIndex).status = BuildStatus.ATTEMPT_BUILD;
 			
 			//if (SCVsNeeded > SCVsTotal) 
@@ -82,7 +82,8 @@ public class CoreBaby extends RRAITemplate
 		
 		
 		/* Military Orders */
-		if (countdown-- <= 0) {
+		if (countdown <= 0) {
+			countdown--;
 			if (genomeSetting.defensiveness > (int) (Math.random() * 100) && campaign > 0) {
 				genDefendMilitaryGroup();
 				if (buildingGoals.size() - builder.completedBuildingsIndex < 3)
@@ -95,8 +96,10 @@ public class CoreBaby extends RRAITemplate
 				else {
 					genFullMilitaryAssault();
 				}
-				if (buildingGoals.size() - builder.completedBuildingsIndex < 3)
+				if (buildingGoals.size() - builder.completedBuildingsIndex < 3) {
 					genOffensiveBasic();
+					System.out.println("Ready to build more!");
+				}
 			}
 			if (campaign > 0) 
 				countdown = genomeSetting.bloodFrequency;
@@ -166,11 +169,10 @@ public class CoreBaby extends RRAITemplate
 	}
 	
 	public void genFullMilitaryAssault() {
-		Unit test = military.getNearestEnemyUnit(builder.homePositionX,builder.homePositionY);
-		military.unitOperation(genBasicUnitList, 20, test.getX(), test.getY());
-		military.orderAllMilitaryTeamsToAtk(test.getX(), test.getY());
+		military.unitOperation(genBasicUnitList, 20, 0,0);
+		military.orderAllMilitaryTeamsToAtk(0,0);
 		//military.orderUnitPoolToAtk(info.hostileX, info.hostileY);
-		military.scanLocation(info.hostileX, info.hostileY);
+		military.scanLocation(0,0);
 		
 	}
 	
@@ -188,8 +190,8 @@ public class CoreBaby extends RRAITemplate
 	{
 		//buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
 		//buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(0, 6, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(0, 9, 0, UnitTypes.Terran_Refinery, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 1, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 2, 0, UnitTypes.Terran_Refinery, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
