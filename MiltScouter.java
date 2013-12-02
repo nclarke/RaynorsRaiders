@@ -149,7 +149,7 @@ public class MiltScouter
 		if(!this.bases.isEmpty()){
 			next=this.bases.get(currIndex).tile;
 //			System.out.println("currIndex is: "+currIndex+" of "+bases.size());
-//			System.out.println("scout going to: ("+next.getX()+","+next.getY()+")");
+			System.out.println("scout going to: ("+next.getX()+","+next.getY()+")");
 //			System.out.println("   and is now at: ("+scout.getX()+","+scout.getY()+")");
 //			System.out.println("   this is your home location: ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
 			if (bases.get(currIndex).baseLoc.isIsland())

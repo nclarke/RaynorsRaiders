@@ -106,8 +106,8 @@ public class ManagerInfo extends RRAITemplate
 			{
 				enemyUnits.add(unit);
 				System.out.println("New Enemy unit discovered of type: "+bwapi.getUnitType(unitID));
-				if (Math.abs(unit.getTileX() - military.homePositionX) < closestTile.getX() && 
-				 Math.abs(unit.getTileY() - military.homePositionY) < closestTile.getY() )
+				if (Math.abs(unit.getTileX() - military.homePositionX) < Math.abs( closestTile.getX() - military.homePositionX) && 
+				 Math.abs(unit.getTileY() - military.homePositionY) < Math.abs(closestTile.getY() - military.homePositionY))
 				{
 					System.out.println("found new closestunit at ("+unit.getTileX()+","+unit.getTileY()+")");
 					closestTile = new Tile(unit.getTileX(), unit.getTileY());
@@ -152,7 +152,7 @@ public class ManagerInfo extends RRAITemplate
 //			System.out.println("middle (closest: "+closestUnit+", "+closestUnit.getID());
 			if(closestUnit.getID() == unitID)
 			{
-				closestTile = new Tile(0,0);
+				closestTile = new Tile(9999, 9999);
 				closestUnit = null;
 			}
 		}
