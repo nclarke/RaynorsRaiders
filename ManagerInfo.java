@@ -123,16 +123,19 @@ public class ManagerInfo extends RRAITemplate
 				}
 			}
 
+			double nearest = 999999;
 			Base temp = scouter.homeBase;
 			for(Base b : scouter.bases)
 			{
-				if(Math.abs(unit.getTileX() - b.tile.getX()) < Math.abs(unit.getTileX() - temp.tile.getX()))
+				if(b != null)
 				{
-					temp = b;
-				}
-				if(Math.abs(unit.getTileY() - b.tile.getY()) < Math.abs(unit.getTileY() - temp.tile.getY()))
-				{
-					temp = b;
+					double dist = Math.sqrt(Math.pow(unit.getX() - b.tile.getX()*32, 2) + Math.pow(unit.getY() - b.tile.getY()*32, 2));
+					
+					if(dist < nearest)
+					{
+						temp = b;
+						nearest = dist;
+					}
 				}
 			}
 			temp.hasEnemy = true;
