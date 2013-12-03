@@ -158,8 +158,14 @@ public class RaynorsRaiders implements BWAPIEventListener
 		if (frameCount % 30 == 0)
 		{
 			managerMilitary.checkUp();
-			managerMilitary.testVult();
+			//managerMilitary.testVult();
 		}
+		
+		if(frameCount % 1 == 0)
+		{
+			managerMilitary.handleUnitMicros();
+		}
+		
 		syncCount = 2;
 		if (frameCount == 200)
 		{
