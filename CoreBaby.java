@@ -24,7 +24,7 @@ public class CoreBaby extends RRAITemplate
 	{
 		hostileX = 0;
 		hostileY = 0;
-		countdown = 200;
+		countdown = 100;
 		genomeSetting = new CoreSupportGenome();
 		genBasicUnitList = new LinkedList<UnitTypes>();
 		campaign = genomeSetting.bloodFrequency * 10;
@@ -57,13 +57,13 @@ public class CoreBaby extends RRAITemplate
 			int supplyNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSupply;
 			int SCVsNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSCVs;
 			
-			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal)
+			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal && buildingGoals.get(builder.nextToBuildIndex).status == BuildStatus.HOLD)
 				buildingGoals.get(builder.nextToBuildIndex).status = BuildStatus.ATTEMPT_BUILD;
 			
 			//if (SCVsNeeded > SCVsTotal) 
 			//	workers.trainWorker();
 			
-			if (supplyUsed + 10 > supplyTotal && buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot) 
+			if (supplyUsed + 5 > supplyTotal && buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot) 
 					buildingGoals.add(builder.nextToBuildIndex, new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
 		}
 		else
@@ -82,12 +82,18 @@ public class CoreBaby extends RRAITemplate
 		
 		
 		/* Military Orders */
-		if (countdown <= 0) {
+		if (campaign > 0)
+			campaign--;
+		if (countdown > 0)
 			countdown--;
+		
+		if (countdown <= 0) {
+			
 			if (genomeSetting.defensiveness > (int) (Math.random() * 100) && campaign > 0) {
 				genDefendMilitaryGroup();
 				if (buildingGoals.size() - builder.completedBuildingsIndex < 3)
-					genDefensiveBasic();
+					//genDefensiveBasic();
+					;
 			}
 			else {
 				if (campaign > 0) {
@@ -97,17 +103,13 @@ public class CoreBaby extends RRAITemplate
 					genFullMilitaryAssault();
 				}
 				if (buildingGoals.size() - builder.completedBuildingsIndex < 3) {
-					genOffensiveBasic();
+					//genOffensiveBasic();
 					System.out.println("Ready to build more!");
 				}
 			}
-			if (campaign > 0) 
-				countdown = genomeSetting.bloodFrequency;
-			else
-				countdown = genomeSetting.bloodFrequency/10;
+			countdown = genomeSetting.bloodFrequency;
 		}
-		if (campaign > 0)
-			campaign--;
+
 		
 	}
 	
