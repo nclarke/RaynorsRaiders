@@ -160,6 +160,14 @@ public class RaynorsRaiders implements BWAPIEventListener
 			managerMilitary.checkUp();
 			//managerMilitary.testVult();
 		}
+		if (frameCount % 50 == 0)
+		{
+			managerBuild.updateProduction();
+		}
+		if (frameCount % 15 == 0)
+		{
+			//managerBuild.trainUnits();
+		}
 		
 		if(frameCount % 1 == 0)
 		{
@@ -171,7 +179,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		{
 			managerMilitary.scanLocation(500, 1000);
 		}
-		managerMilitary.testSiege();
+		//managerMilitary.testSiege();
 		//managerMilitary.testStutter();
 		syncCount = 3;
 	}
@@ -187,13 +195,23 @@ public class RaynorsRaiders implements BWAPIEventListener
 		int screenNdx = 40;
 		bwapi.drawText(300, screenNdx, "Start unit list is ", true);
 		screenNdx += 10;
-		for (Unit u : managerMilitary.unitPool.get(UnitTypes.Terran_Siege_Tank_Tank_Mode))
+		bwapi.drawText(300, screenNdx, "prod size is" + managerBuild.productionBuildings.size(), true);
+		screenNdx += 10;
+		//for (UnitTypes ut : managerBuild.roster)
+		//{
+			//bwapi.drawText(300, screenNdx, ut.name(), true);
+			//screenNdx += 10;
+		//}
+		
+		//for (Unit u : managerMilitary.unitPool.get(UnitTypes.Terran_Siege_Tank_Tank_Mode))
+		for (Unit u : managerBuild.productionBuildings)
 		{
-			if (!bwapi.getUnitType(u.getTypeID()).isBuilding())
-			{
-				bwapi.drawText(300, screenNdx, bwapi.getUnitType(u.getTypeID()).getName(), true);
+			//if (!bwapi.getUnitType(u.getTypeID()).isBuilding())
+			//{
+				bwapi.drawText(300, screenNdx, bwapi.getUnitType(u.getTypeID()).getName() +
+						" " + u.isTraining(), true);
 				screenNdx += 10;				
-			}
+			//}
 		}
 		bwapi.drawText(300, screenNdx, "End unit list", true);
 		screenNdx += 10;

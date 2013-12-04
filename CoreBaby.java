@@ -77,7 +77,7 @@ public class CoreBaby extends RRAITemplate
 		workers.trainWorker();
 		
 		/* Add units */
-		//if (builder.roster.size() < 20)
+		if (builder.roster.size() < 20)
 			genUnitsBasic();
 		
 		

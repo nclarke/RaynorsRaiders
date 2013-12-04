@@ -31,8 +31,10 @@ public class ManagerBuild extends RRAITemplate
 	LinkedList<UnitTypes> roster;
 	LinkedList<Unit> builtBuildings;
 	LinkedList<Unit> buildingBuildings;
+	LinkedList<Unit> productionBuildings;
 	LinkedList<BaseLocation> ourBases;
 	DescisionTree techTree;
+	UnitType barracksUnit, factoryUnit, starportUnit;
 	
 	UnitTypes tempType;
 	Unit tempUnit;
@@ -51,6 +53,7 @@ public class ManagerBuild extends RRAITemplate
 		super();
 		builtBuildings = new LinkedList<Unit>();
 		buildingBuildings = new LinkedList<Unit>();
+		productionBuildings = new LinkedList<Unit>();
 		
 		buildingsStack = new ArrayList<BuildingRR>();
 		completedBuildingsIndex = -1;
@@ -143,6 +146,81 @@ public class ManagerBuild extends RRAITemplate
 */
 		buildTime = new EarliestBuild();
 
+		barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Marine.ordinal());
+		factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal());
+		starportUnit = bwapi.getUnitType(UnitTypes.Terran_Wraith.ordinal());
+
+	}
+	
+	public void updateProduction()
+	{
+		System.out.println("Update production");
+		productionBuildings.clear();
+		for (Unit u : bwapi.getMyUnits())
+		{
+			if (bwapi.getUnitType(u.getTypeID()).isBuilding() && !u.isConstructing())
+			{
+				if (u.getTypeID() == UnitTypes.Terran_Barracks.ordinal() ||
+						u.getTypeID() == UnitTypes.Terran_Factory.ordinal() ||
+						u.getTypeID() == UnitTypes.Terran_Starport.ordinal())
+				{
+						productionBuildings.add(u);
+				}
+			}
+		}
+	}
+	
+	public void trainUnits()
+	{	
+		for (Unit u : productionBuildings)
+		{
+			if (u.getTrainingQueueSize() == 0)
+			{
+				if (u.getTypeID() == UnitTypes.Terran_Barracks.ordinal() && barracksUnit != null)
+				{
+					if(bwapi.getSelf().getMinerals() - underConstructionM() >= barracksUnit.getMineralPrice())
+					{
+						if(bwapi.getSelf().getGas() - underConstructionG() >= barracksUnit.getGasPrice())
+						{
+							bwapi.train(u.getID(), barracksUnit.getID());
+						}
+						else 
+							react.econ_sendBuildAlert(BuildAlert.NO_GAS);
+					}
+					else 
+						react.econ_sendBuildAlert(BuildAlert.NO_MINERALS);
+								 
+				}
+				if (u.getTypeID() == UnitTypes.Terran_Factory.ordinal() && factoryUnit != null)
+				{
+					if(bwapi.getSelf().getMinerals() - underConstructionM() >= factoryUnit.getMineralPrice())
+					{
+						if(bwapi.getSelf().getGas() - underConstructionG() >= factoryUnit.getGasPrice())
+						{
+							bwapi.train(u.getID(), factoryUnit.getID());
+						}
+						else
+							react.econ_sendBuildAlert(BuildAlert.NO_GAS);
+					}
+					else 
+						react.econ_sendBuildAlert(BuildAlert.NO_MINERALS);
+				}
+				if (u.getTypeID() == UnitTypes.Terran_Starport.ordinal() && starportUnit != null)
+				{
+					if(bwapi.getSelf().getMinerals() - underConstructionM() >= starportUnit.getMineralPrice())
+					{
+						if(bwapi.getSelf().getGas() - underConstructionG() >= starportUnit.getGasPrice())
+						{
+							bwapi.train(u.getID(), starportUnit.getID());
+						}
+						else
+							react.econ_sendBuildAlert(BuildAlert.NO_GAS);
+					}
+					else 
+						react.econ_sendBuildAlert(BuildAlert.NO_MINERALS);			
+				}
+			}
+		}
 	}
 	
 	private void constructionStatus()
