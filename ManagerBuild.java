@@ -149,24 +149,16 @@ public class ManagerBuild extends RRAITemplate
 	{
 		for(int i = completedBuildingsIndex + 1 ; i < nextToBuildIndex; i++)
 		{
-			BuildingRR bldg = buildingsStack.get(i);
-
-			if(bldg != null && bldg.unit != null)
+			if(buildingsStack.get(i) != null && buildingsStack.get(i).unit != null)
 			{
-//System.out.println(bwapi.getUnitType(bldg.unit.getTypeID()).getName() + " ready in " + bldg.unit.getRemainingBuildTimer());	
-				if(bldg.unit.isCompleted())
+				Unit bldg = buildingsStack.get(i).unit;
+//System.out.println(bwapi.getUnitType(bldg.getTypeID()).getName() + " ready in " + bldg.getRemainingBuildTimer());
+
+				if(bldg.isCompleted() && buildingsStack.get(i).worker != null)
 				{
 					completedBuildingsIndex++;
-					buildingsStack.remove(i);
-					buildingsStack.add(completedBuildingsIndex, bldg);
-					
 					workers.checkInWorker(buildingsStack.get(i).worker.getID());
 					buildingsStack.get(i).worker = null;
-				}
-				else if(!bldg.worker.isConstructing())
-				{
-					//bwapi.move(bldg.worker.getID(), this.homePositionX, this.homePositionY);
-					build(bldg.blueprint, bldg.baseAssignment);
 				}
 			}
 		}
@@ -209,8 +201,6 @@ public class ManagerBuild extends RRAITemplate
 	
 			//System.out.println(worker + " is working on " + blueprint + " maps to " + unit);
 		}
-
-		constructionStatus();
 
         // building construction
 		switch(bldgMode) {
@@ -267,6 +257,8 @@ public class ManagerBuild extends RRAITemplate
 			default:
 				break;
 		}
+
+		constructionStatus();
 		
 //System.out.println("roster: " + roster.toString());
 		// unit training
@@ -606,10 +598,10 @@ public class ManagerBuild extends RRAITemplate
 							if(bwapi.isExplored(buildTile.x, buildTile.y))
 							{
 								bwapi.build(worker, buildTile.x, buildTile.y, bldg.getID());
-								nextToBuildIndex++;
 							}
 							else
 							{
+
 								bwapi.move(worker, mvX, mvY);
 							}
 							
@@ -776,7 +768,7 @@ public class ManagerBuild extends RRAITemplate
 		int stopDist = 40;
 		int tileX = x/32; int tileY = y/32;
 		int tilesize = 4;
-
+	
 		// Refinery, Assimilator, Extractor
 		if (bwapi.getUnitType(buildingTypeID).isRefinery()) {
 			for (Unit n : bwapi.getNeutralUnits()) {
@@ -811,9 +803,8 @@ public class ManagerBuild extends RRAITemplate
 							{
 								tilesize = 4;
 							}
-														
+							
 							if ((Math.abs(u.getTileX()-i) < tilesize) && (Math.abs(u.getTileY()-j) < tilesize)) unitsInWay = true;
-
 						}
 						if (!unitsInWay) {
 							ret.x = i; ret.y = j;
