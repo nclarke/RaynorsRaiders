@@ -21,12 +21,12 @@ public class ManagerInfo extends RRAITemplate
 
 	MiltScouter scouter;
 	List<Unit> neutralUnits;
-	List<Unit> enemyUnits;
+	List<Unit> enemyUnits;/*refresh after sometime*/
 	int selfID;
 	int hostileX;
 	int hostileY;
 	boolean isScouting;
-	List<Base> enemyBases;
+	List<Base> enemyBases;/*make better*/
 	Unit closestUnit; /*the closest enemy unit to our base*/
 	Tile closestTile; /*tile of the closest enemy unit to our base*/
 	
@@ -77,7 +77,14 @@ public class ManagerInfo extends RRAITemplate
 
 	public void checkUp() 
 	{
-//		if (this.bwapi.getFrameCount() == 1)
+		this.isScouting = false;
+		if(this.scouter.scout != null)
+			this.isScouting = true;
+		
+//		System.out.println("Total supply used: "+bwapi.getSelf().getSupplyUsed());
+//		System.out.println("Total supply overall: "+bwapi.getSelf().getSupplyTotal());
+		if (this.isScouting || bwapi.getSelf().getSupplyUsed() == 10)
+		{
 			this.scouter.scout();
 			for(Base base : scouter.bases)
 			{
@@ -86,6 +93,7 @@ public class ManagerInfo extends RRAITemplate
 					enemyBases.add(base);
 				}				
 			}
+		}
 	
 	}
 	
@@ -114,6 +122,23 @@ public class ManagerInfo extends RRAITemplate
 					closestUnit = unit;
 				}
 			}
+
+			double nearest = 999999;
+			Base temp = scouter.homeBase;
+			for(Base b : scouter.bases)
+			{
+				if(b != null)
+				{
+					double dist = Math.sqrt(Math.pow(unit.getX() - b.tile.getX()*32, 2) + Math.pow(unit.getY() - b.tile.getY()*32, 2));
+					
+					if(dist < nearest)
+					{
+						temp = b;
+						nearest = dist;
+					}
+				}
+			}
+			temp.hasEnemy = true;
 		
 		}
 		else
@@ -128,13 +153,13 @@ public class ManagerInfo extends RRAITemplate
 		System.out.println("destroyed unitID: "+unitID);
 
 
-		if (unitID == this.scouter.scout.getID())
+		if (this.scouter.scout != null && unitID == this.scouter.scout.getID())
 		{
 			System.out.println("scout destroyed of type: "+scouter.scout.getTypeID());
-			if (this.scouter.scout.getTypeID() == UnitTypes.Terran_SCV.ordinal())
-				workers.checkInWorker(scouter.scout.getID());
+			// 			if (this.scouter.scout.getTypeID() == UnitTypes.Terran_SCV.ordinal())
+				//				workers.checkInWorker(scouter.scout.getID());
 			this.scouter.scout = null;
-			this.scouter.bases.get(scouter.currIndex).hasEnemy = true;
+//			this.scouter.bases.get(scouter.currIndex).hasEnemy = true;
 			System.out.println("scout checked back in");
 
 			
@@ -162,7 +187,7 @@ public class ManagerInfo extends RRAITemplate
 				this.neutralUnits.remove(u);
 		}
 
-//		System.out.println("ending now");
+		System.out.println("ending now");
 	}
 
 	

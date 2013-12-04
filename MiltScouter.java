@@ -17,7 +17,7 @@ public class MiltScouter
 	/* EnumMap for us to know what UnitTypes to train per Level - Level is determined by how well AI is doing in the game 
 	 * (AI is very rich in the beginning, gets its level changed from ZERO to TWO) */
 //	int homePositionX, homePositionY;
-	BaseLocation homeBase;
+	ManagerInfo.Base homeBase;
 	List <ManagerInfo.Base> bases;
 	Unit scout;
 	LinkedList<ManagerInfo.Tile> scoutingPositions;
@@ -47,11 +47,15 @@ public class MiltScouter
 		{
 			ManagerInfo.Base base = mInfo.new Base();
 			base.baseLoc = b;
-			base.hasEnemy = false;
+//			base.hasEnemy = false;
 			base.hasSeen = false;
 			base.tile = mInfo.new Tile(b.getX(), b.getY());
 			bases.add(base);
-			
+			if(b.isStartLocation() && b.getX() == mInfo.military.homePositionX
+			 && b.getY() == mInfo.military.homePositionY)
+			{
+				this.homeBase = base;
+			}
 		}
 	}
 
@@ -148,10 +152,10 @@ public class MiltScouter
 		Tile next;
 		if(!this.bases.isEmpty()){
 			next=this.bases.get(currIndex).tile;
-//			System.out.println("currIndex is: "+currIndex+" of "+bases.size());
+			System.out.println("currIndex is: "+currIndex+" of "+bases.size());
 			System.out.println("scout going to: ("+next.getX()+","+next.getY()+")");
-//			System.out.println("   and is now at: ("+scout.getX()+","+scout.getY()+")");
-//			System.out.println("   this is your home location: ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
+			System.out.println("   and is now at: ("+scout.getX()+","+scout.getY()+")");
+			System.out.println("   this is your home location: ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
 			if (bases.get(currIndex).baseLoc.isIsland())
 			{
 //				System.out.println("	It's an Island!!!");
@@ -169,7 +173,7 @@ public class MiltScouter
 			else
 			{
 
-//								System.out.println("incrementing++");
+								System.out.println("incrementing++");
 				//scout has reached the Tile, so he can go scout some more
 				this.bases.get(currIndex).hasSeen = true;
 				if(scout.isUnderAttack())

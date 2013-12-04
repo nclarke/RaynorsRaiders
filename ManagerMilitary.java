@@ -812,7 +812,7 @@ public class ManagerMilitary extends RRAITemplate
 				{
 					double dist = Math.sqrt(Math.pow(unitGroup.get(index).getX() - pixelPositionX, 2) + Math.pow(unitGroup.get(index).getY() - pixelPositionY, 2));
 					
-					if(dist <= 110)
+					if(dist <= 130)
 					{
 						checkReadyFlag = true;
 					}
@@ -842,7 +842,6 @@ public class ManagerMilitary extends RRAITemplate
 					bwapi.attack(militaryTeams.get(index).getMilitaryTeam().get(index2).getID(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
 				}
 			}
-			
 			militaryTeams.get(index).setDispatchStatus(DispatchStatus.DISPATCHED);
 			militaryTeams.get(index).setTeamStatus(TeamStatus.ATTACK);
 		}
@@ -1004,6 +1003,42 @@ public class ManagerMilitary extends RRAITemplate
 						bwapi.unsiege(tmp.getID());
 					}
 				}
+			}
+		}
+	}
+	
+	public void handleUnitMicros()
+	{
+		for(int index = 0; index < militaryTeams.size(); index++)
+		{
+			for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
+			{
+				Unit tmp = militaryTeams.get(index).getMilitaryTeam().get(index2);
+				Unit toAttack = getNearestEnemyUnit(tmp.getX(), tmp.getY());
+				
+				if(tmp.getTypeID() == UnitTypes.Terran_Vulture.ordinal())
+				{			        
+			    	if (tmp.getGroundWeaponCooldown() == 0)
+			    	{
+			    		bwapi.attack(tmp.getID(), toAttack.getID());
+			    	}
+			    	else
+			    	{
+			    		bwapi.move(tmp.getID(), -(toAttack.getX()), -(toAttack.getY()));
+			    	}
+				}
+				
+				/*if(tmp.getTypeID() == UnitTypes.Terran_Marine.ordinal())
+				{			        
+			    	if (tmp.getGroundWeaponCooldown() == 0)
+			    	{
+			    		bwapi.attack(tmp.getID(), toAttack.getID());
+			    	}
+			    	else
+			    	{
+			    		bwapi.move(tmp.getID(), -(toAttack.getX()), -(toAttack.getY()));
+			    	}
+				}*/
 			}
 		}
 	}

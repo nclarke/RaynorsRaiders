@@ -551,6 +551,9 @@ public class ManagerBuild extends RRAITemplate
 						
 						if(structure.ordinal() == UnitTypes.Terran_Command_Center.ordinal())
 						{
+							double nearestDist = 9999999;
+							BaseLocation nearestBase = null;
+							
 							for(BaseLocation bl : bwapi.getMap().getBaseLocations())
 							{
 								for(BaseLocation ours : ourBases)
@@ -561,10 +564,26 @@ public class ManagerBuild extends RRAITemplate
 									}
 									else
 									{
-										xtile = bl.getX();
-										ytile = bl.getY();
+										double dist = Math.sqrt(Math.pow(bl.getX() - ours.getX(), 2) + Math.pow(bl.getY() - ours.getY(), 2));
+										if (dist < nearestDist) 
+										{
+											nearestDist = dist;
+											nearestBase = bl;
+							 			}
 									}
 								}
+							}
+							
+							if(nearestBase != null)
+							{
+								xtile = nearestBase.getX();
+								ytile = nearestBase.getY();
+								
+								ourBases.add(nearestBase);
+							}
+							else
+							{
+								// no base location
 							}
 						}
 				
