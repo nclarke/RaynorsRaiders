@@ -63,13 +63,9 @@ public class CoreBaby extends RRAITemplate
 		
 		
 		/* Add units */
-<<<<<<< HEAD
 		if (builder.roster.size() < 20)
 			genUnitsBasic();
-=======
-		//if (builder.roster.size() < 20)
-		genUnitsBasic();
->>>>>>> 5a48a6ea34de5ae349449778aee3911c6cfc4861
+
 		
 		
 		/* Military Orders */
