@@ -193,6 +193,7 @@ public class CoreBaby extends RRAITemplate
 		//buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
 		//buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 1, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
+		//buildingGoals.add(new BuildingRR(0, 1, 0, UnitTypes.Terran_Bunker, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 2, 0, UnitTypes.Terran_Refinery, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));

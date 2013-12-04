@@ -225,6 +225,21 @@ public class ManagerMilitary extends RRAITemplate
     	}
     }
     
+    public void testSiege()
+    {
+		Unit toAttack;
+    	Unit tank = unitPool.get(UnitTypes.Terran_Siege_Tank_Tank_Mode).get(0);
+    	toAttack = getNearestEnemyUnit(tank.getX(), tank.getY());
+		if (getEnemiesWithinUnitSightRange(tank) > 0)
+		{
+			//bwapi.siege(tank.getID());
+		}
+		else
+		{
+			bwapi.attack(tank.getID(), toAttack.getX(), toAttack.getY());
+		}
+    	
+    }
     /*
      * Gets and returns the enemy unit (not building) that currently visible
      * and closet the the passed in location
@@ -239,7 +254,7 @@ public class ManagerMilitary extends RRAITemplate
 	    {
 	    	
 	    	if ((!unit.isCompleted()) || bwapi.getUnitType(unit.getTypeID()).isBuilding()) continue;
-	    	double dist = Math.sqrt(Math.pow(unit.getX() - x, 2) + Math.pow(unit.getY() - y, 2));
+	    	double dist = Math.pow(unit.getX() - x, 2) + Math.pow(unit.getY() - y, 2);
 	    	if (nearestID == -1 || dist < nearestDist) 
 	    	{
 	    		toRtn = unit;
@@ -247,6 +262,27 @@ public class ManagerMilitary extends RRAITemplate
 	    	}
 	    }
 	    return toRtn;
+    }
+    
+    public int getEnemiesWithinUnitSightRange(Unit ourUnit)
+    {
+    	int count = 0, radius;
+    	double distance;
+    	UnitType ut;
+    	int unitID;
+    	unitID = ourUnit.getID();
+    	ut = bwapi.getUnitType(unitID);
+    	ourUnit = bwapi.getUnit(unitID);
+    	radius = ut.getSightRange();
+    	for (Unit u : bwapi.getEnemyUnits())
+    	{
+    		distance = Math.pow(u.getX() - ourUnit.getX(),2) + Math.pow(u.getY() - ourUnit.getY(), 2);
+    		if (distance < (radius * radius))
+    		{
+    			count++;
+    		}
+    	}
+    	return count;
     }
     
     public void testStutter()
@@ -268,6 +304,11 @@ public class ManagerMilitary extends RRAITemplate
     	{
     		bwapi.move(vult.getID(), 0, 0);
     	}
+    }
+    
+    public void wraithAttack()
+    {
+    	
     }
     
     public void scanLocation(int x, int y)
@@ -345,7 +386,7 @@ public class ManagerMilitary extends RRAITemplate
 			if(unitID == (unitPool.get(unitType).get(index).getID()))
 			{
 				unitPool.get(unitType).remove(index);
-				//System.out.println("Military Manager: Removed. New size is " + militaryUnits.get(UnitTypes.Terran_Marine).size());
+				//System.out.println("Military Manager: Removed. New size is " + unitPool.get(unitType).size());
 			}
 		}
 	}
@@ -981,7 +1022,7 @@ public class ManagerMilitary extends RRAITemplate
 				}
 				
 				if(tmp.getTypeID() == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
-				{					
+				{		
 					if(tmp.isAttacking())
 					{
 						bwapi.siege(tmp.getID());

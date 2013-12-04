@@ -37,7 +37,7 @@ public class ManagerWorkers extends RRAITemplate
 	@Override
 	public void checkUp() 
 	{
-		System.out.println("In workers checkup");
+		//System.out.println("In workers checkup");
 		Worker curWorker;
 		Unit curWorkerUnit;
 		for (Worker w : allWorkers)
@@ -388,7 +388,10 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public void removeWorkerFromBase(Worker toRem, int baseNdx)
 	{
-		baseWorkers.get(baseNdx).remove(toRem);
+		if (baseWorkers.get(baseNdx).contains(toRem))
+			baseWorkers.get(baseNdx).remove(toRem);
+		else
+			System.out.println("MW: Remove worker from base failed.");
 	}
 	
 	public int getTotalNumWorkers()
@@ -447,8 +450,6 @@ public class ManagerWorkers extends RRAITemplate
 					break;
 				case GAS :
 					closestId = getNearestUnit(UnitTypes.Terran_Refinery.ordinal(), (int)w.asgnedBaseX, (int)w.asgnedBaseY); 
-					//closestId = getNearestGas(curWorker.asgnedBaseX, curWorker.asgnedBaseY);
-					//System.out.println("---------------------Idle Gas, Closest id is " + closestId);
 					if (closestId != -1) 
 						bwapi.rightClick(curUnit.getID(), closestId);
 					break;
@@ -460,36 +461,6 @@ public class ManagerWorkers extends RRAITemplate
 				}
 			}
 		}
-		/*
-		for (Unit unit : bwapi.getMyUnits())
-		{
-			if (unit.getTypeID() == UnitTypes.Terran_SCV.ordinal() && unit.isIdle()) // if this unit is Terran_SCV (worker) and if it is idle (not doing anything),
-			{
-				curWorker = getWorkerByID(unit.getID());
-				//System.out.println("     Worker Idle with order " + curWorker.curOrder);
-				switch (curWorker.curOrder)
-				{
-				case MINE :
-					closestId = getNearestMin(curWorker.asgnedBaseX, curWorker.asgnedBaseY); 
-					if (closestId != -1) 
-						bwapi.rightClick(unit.getID(), closestId);
-					break;
-				case GAS :
-					closestId = getNearestUnit(UnitTypes.Terran_Refinery.ordinal(), (int)curWorker.asgnedBaseX, (int)curWorker.asgnedBaseY); 
-					//closestId = getNearestGas(curWorker.asgnedBaseX, curWorker.asgnedBaseY);
-					//System.out.println("---------------------Idle Gas, Closest id is " + closestId);
-					if (closestId != -1) 
-						bwapi.rightClick(unit.getID(), closestId);
-					break;
-				case ATTACK :
-					break;
-				default :
-					break;
-				}
-			}
-		}
-		//System.out.println("End Handle Idle");
-		*/
 	}
 	
 	private int getNearestMin(double workerX, double workerY) 

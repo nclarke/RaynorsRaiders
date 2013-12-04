@@ -171,6 +171,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		{
 			managerMilitary.scanLocation(500, 1000);
 		}
+		managerMilitary.testSiege();
 		//managerMilitary.testStutter();
 		syncCount = 3;
 	}
@@ -180,31 +181,53 @@ public class RaynorsRaiders implements BWAPIEventListener
 		////System.out.println("Start debug");
 		bwapi.drawText(0, 0, "Home base location is ( " + managerBuild.homePositionX + ", "
 				+ managerBuild.homePositionY + ")", true);
-		bwapi.drawText(200, 0, "Home base location is ( " + managerBuild.getStartLocation().getX() + ", "
-				+ managerBuild.getStartLocation().getY() + ")", true);
 		bwapi.drawText(0, 20, "SyncCount=" + syncCount, true);
 
 		int undx = 0;
-		int screenNdx = 50;
-		bwapi.drawText(300, 40, "Master unit list is ", true);
-		for (Unit u : masterUnitList)
+		int screenNdx = 40;
+		bwapi.drawText(300, screenNdx, "Start unit list is ", true);
+		screenNdx += 10;
+		for (Unit u : managerMilitary.unitPool.get(UnitTypes.Terran_Siege_Tank_Tank_Mode))
 		{
-			bwapi.drawText(300, screenNdx, bwapi.getUnitType(u.getTypeID()).getName(), true);
-			screenNdx += 10;
+			if (!bwapi.getUnitType(u.getTypeID()).isBuilding())
+			{
+				bwapi.drawText(300, screenNdx, bwapi.getUnitType(u.getTypeID()).getName(), true);
+				screenNdx += 10;				
+			}
 		}
-		bwapi.drawText(300, screenNdx, "End master unit list", true);
+		bwapi.drawText(300, screenNdx, "End unit list", true);
+		screenNdx += 10;
+		bwapi.drawText(300, screenNdx, "Start unit list is ", true);
+		screenNdx += 10;
+		for (Unit u : managerMilitary.unitPool.get(UnitTypes.Terran_Siege_Tank_Siege_Mode))
+		{
+			if (!bwapi.getUnitType(u.getTypeID()).isBuilding())
+			{
+				bwapi.drawText(300, screenNdx, bwapi.getUnitType(u.getTypeID()).getName(), true);
+				screenNdx += 10;				
+			}
+		}
+		bwapi.drawText(300, screenNdx, "End unit list", true);
 		
 		//bwapi.drawHealth(healthFlag);
+		int numEnemies = -1;
 		for (Unit u : bwapi.getMyUnits())  
 		{
 			//if (u.isUnderAttack()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.RED, false, false);
 			//else if (u.isGatheringMinerals()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.BLUE, false, false);
 			//else if (u.isGatheringGas()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.GREEN, false, false);
 			//else if (u.isAttacking()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.ORANGE, false, false);
-			
-			
 			bwapi.drawLine(u.getX(), u.getY(), u.getTargetX(), u.getTargetY(), BWColor.WHITE, false);
 		}
+		//Unit u = bwapi.getMyUnits().get(30);
+		//UnitType utd;
+    	//utd = bwapi.getUnitType(u.getID());
+		
+		
+		
+		//bwapi.drawCircle(u.getX(), u.getY(), utd.getSightRange(), BWColor.PURPLE, false, false);
+		//bwapi.drawCircle(u.getX(), u.getY(), utd.getSeekRange(), BWColor.ORANGE, false, false);
+		
 		managerWorkers.debug();
 		
 		int buildOrderNdx = 100;
@@ -393,6 +416,22 @@ public class RaynorsRaiders implements BWAPIEventListener
 	}
 	public void unitEvade(int unitID) { }
 	public void unitHide(int unitID) { }
-	public void unitMorph(int unitID) { }
+	public void unitMorph(int unitID) 
+	{
+		Unit u = bwapi.getUnit(unitID);
+		if (u.getTypeID() == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
+		{
+			managerMilitary.removeDestroyedMilitaryUnits(unitID, UnitTypes.Terran_Siege_Tank_Siege_Mode.ordinal());
+			managerMilitary.addCreatedMilitaryUnits(u, UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal());
+		}
+		else
+		{
+			managerMilitary.removeDestroyedMilitaryUnits(unitID, UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal());
+			managerMilitary.addCreatedMilitaryUnits(u, UnitTypes.Terran_Siege_Tank_Siege_Mode.ordinal());
+		}
+		System.out.println("Morphing: type is " + bwapi.getUnitType(u.getTypeID()).getName());
+		//managerMilitary.removeDestroyedMilitaryUnits(unitID, u.getTypeID());
+		
+	}
 	public void unitShow(int unitID) { }
 }
