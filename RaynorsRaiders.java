@@ -128,6 +128,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		{		
 			managerBuild.captureBaseLocation();
 			managerMilitary.startUp();
+			coreBaby.startUp();
 			if( managerBuild.baseSetup() != 1)
 			{
 				//Throw error here
@@ -171,7 +172,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		{
 			managerMilitary.scanLocation(500, 1000);
 		}
-		managerMilitary.testSiege();
+		//managerMilitary.testSiege();
 		//managerMilitary.testStutter();
 		syncCount = 3;
 	}
@@ -263,6 +264,9 @@ public class RaynorsRaiders implements BWAPIEventListener
 		 coreBaby.genomeSetting.spread + " Count " + coreBaby.countdown +
 		 " Campaign " + coreBaby.campaign;
 		bwapi.drawText(100, 20, msg, true);
+		
+		msg = "Enemy x: " + coreBaby.hostileX + "Enemy y: " + coreBaby.hostileY;
+		bwapi.drawText(100, 40, msg, true);
 		
 		
 		//if (managerBuild.buildingBuildings.size() != 0) 
