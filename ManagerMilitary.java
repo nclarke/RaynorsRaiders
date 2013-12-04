@@ -176,7 +176,7 @@ public class ManagerMilitary extends RRAITemplate
 		
 		//for testing purposes - sends units to attack and tries to handle attack logistics for different units
 		System.out.println("START OF MM CHECKUP");
-		attackLocationsTest();
+		//attackLocationsTest();
 		
 		rallyTeamToAttack();
 		handleUnitsAttacking();
