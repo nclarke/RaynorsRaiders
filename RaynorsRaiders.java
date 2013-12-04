@@ -150,13 +150,14 @@ public class RaynorsRaiders implements BWAPIEventListener
 			managerWorkers.checkUp();
 			coreBaby.checkUp();
 			//coreReactive.checkUp();
-			managerBuild.checkUp();
+			//managerBuild.checkUp();
 			managerInfo.checkUp();
 		}
 		syncCount = 1;
 		
 		if (frameCount % 30 == 0)
 		{
+			managerBuild.checkUp();
 			managerMilitary.checkUp();
 			//managerMilitary.testVult();
 		}
@@ -328,15 +329,14 @@ public class RaynorsRaiders implements BWAPIEventListener
 		// is there a function that can return UnitTypes?
 		if(bwapi.getUnitType(createdUnitType).isBuilding())
 		{
-			if(createdUnitType == managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).blueprint.ordinal())
+			for(int i = managerBuild.completedBuildingsIndex+1; i < managerBuild.nextToBuildIndex; i++)
 			{
-				managerBuild.buildingsStack.get(managerBuild.nextToBuildIndex).unit = createdUnit;
-
-				managerBuild.nextToBuildIndex++;
+				BuildingRR bldg = managerBuild.buildingsStack.get(i);
 				
-				// sort under construction according to build time
-				//managerBuild.scheduleBuildTime();
-
+				if(bldg.unit == null && createdUnitType == bldg.blueprint.ordinal())
+				{
+					bldg.unit = createdUnit;
+				}
 			}
 		}
 	}
