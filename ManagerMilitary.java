@@ -386,13 +386,8 @@ public class ManagerMilitary extends RRAITemplate
 			if(unitID == (unitPool.get(unitType).get(index).getID()))
 			{
 				unitPool.get(unitType).remove(index);
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 				//System.out.println("Military Manager: Removed. New size is " + unitPool.get(unitType).size());
-=======
->>>>>>> 75e8b975ad5f428b2bed14bc6b4bacb363df50c6
-=======
->>>>>>> 75e8b975ad5f428b2bed14bc6b4bacb363df50c6
 			}
 		}
 	}
