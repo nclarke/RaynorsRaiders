@@ -214,7 +214,7 @@ public class ManagerBuild extends RRAITemplate
 				{
 					b = buildingsStack.get(i).blueprint;
 		
-					if(buildingsStack.get(i).status != BuildStatus.ATTEMPT_BUILD) 
+					if(buildingsStack.get(i).status == BuildStatus.HOLD) 
 					{
 						i++;
 					}
@@ -241,7 +241,7 @@ public class ManagerBuild extends RRAITemplate
 				{
 					b = buildingsStack.get(i).blueprint;
 					
-					if(buildingsStack.get(i).status == BuildStatus.ATTEMPT_BUILD) 
+					if(buildingsStack.get(i).status != BuildStatus.HOLD) 
 					{
 						build(b, buildingsStack.get(i).baseAssignment);
 					}
@@ -598,6 +598,7 @@ public class ManagerBuild extends RRAITemplate
 							if(bwapi.isExplored(buildTile.x, buildTile.y))
 							{
 								bwapi.build(worker, buildTile.x, buildTile.y, bldg.getID());
+								buildingsStack.get(nextToBuildIndex).status = BuildStatus.ACCEPTTED;
 							}
 							else
 							{
@@ -605,7 +606,6 @@ public class ManagerBuild extends RRAITemplate
 								bwapi.move(worker, mvX, mvY);
 							}
 							
-							buildingsStack.get(nextToBuildIndex).status = BuildStatus.ACCEPTTED;
 							return true;
 							//buildingBuildings.push(bldg);
 						}
