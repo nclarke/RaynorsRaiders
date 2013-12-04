@@ -37,7 +37,7 @@ public class ManagerWorkers extends RRAITemplate
 	@Override
 	public void checkUp() 
 	{
-//		System.out.println("In workers checkup");
+		System.out.println("In workers checkup");
 		Worker curWorker;
 		Unit curWorkerUnit;
 		for (Worker w : allWorkers)
@@ -68,6 +68,7 @@ public class ManagerWorkers extends RRAITemplate
 					if (gw.curOrder == ManagerWorkers.workerOrders.GAS)
 						curNumGasWorkers++;
 				}
+				System.out.println("Gas workers are " + curNumGasWorkers);
 				if (gas & (curNumGasWorkers < 3))
 				{
 					System.out.println("MW: assiging workers to gas");
@@ -328,7 +329,7 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public void removeWorker(int unitID)
 	{
-		//System.out.println("In lost worker");
+		System.out.println("MW: In lost worker");
 		int ndx = 0;
 		Worker toRemove = new Worker();
 		toRemove.unitID = unitID;
@@ -339,7 +340,7 @@ public class ManagerWorkers extends RRAITemplate
 			if (allWorkers.get(ndx).unitID == unitID)
 			{
 				System.out.println("MW: Found remove");
-				//removeWorkerFromBase(allWorkers.get(ndx), allWorkers.get(ndx).asgnedBase);
+				removeWorkerFromBase(allWorkers.get(ndx), allWorkers.get(ndx).asgnedBase);
 				allWorkers.remove(ndx);
 			}
 		}
@@ -387,8 +388,7 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public void removeWorkerFromBase(Worker toRem, int baseNdx)
 	{
-		LinkedList<Worker> curBaseWorkers = baseWorkers.get(baseNdx);
-		curBaseWorkers.remove(toRem);
+		baseWorkers.get(baseNdx).remove(toRem);
 	}
 	
 	public int getTotalNumWorkers()
