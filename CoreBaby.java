@@ -6,11 +6,13 @@ import javabot.JNIBWAPI;
 import javabot.RaynorsRaiders.*;
 import javabot.RaynorsRaiders.ManagerBuild.BuildStatus;
 import javabot.RaynorsRaiders.ManagerBuild.BuildingRR;
+import javabot.model.BaseLocation;
 import javabot.model.ChokePoint;
 import javabot.model.Region;
 import javabot.model.Unit;
 import javabot.types.UnitType;
 import javabot.types.UnitType.UnitTypes;
+import javabot.RaynorsRaiders.ManagerInfo.Tile;
 import javabot.RaynorsRaiders.ManagerMilitary.UnitTypesRequest;
 
 public class CoreBaby extends RRAITemplate 
@@ -24,16 +26,14 @@ public class CoreBaby extends RRAITemplate
 	{
 		hostileX = 0;
 		hostileY = 0;
-		countdown = 100;
+		countdown = 200;
 		genomeSetting = new CoreSupportGenome();
 		genBasicUnitList = new LinkedList<UnitTypes>();
-		campaign = genomeSetting.bloodFrequency * 10;
+		campaign = genomeSetting.bloodFrequency * 100;
 	}
 	
 	public void AILinkData() {
 		buildingGoals = builder.buildingsStack;
-		hostileX = this.info.hostileX;
-		hostileY = this.info.hostileY;
 	}
 	
 	public void setup() 
@@ -46,39 +46,30 @@ public class CoreBaby extends RRAITemplate
 		
 	}
 	
+	public void startUp() {
+		for (BaseLocation b : bwapi.getMap().getBaseLocations()) 
+		{
+		
+			if (b.isStartLocation() && (b.getX() != military.homePositionX) && (b.getY() != military.homePositionY)) 
+			{
+				hostileX = b.getX();
+				hostileY = b.getY();
+			}	
+		}	
+	}
+	
 	public void checkUp() 
 	{
-		/* --- Base Building --- */
-		int supplyTotal = bwapi.getSelf().getSupplyTotal()/2;
-		int supplyUsed = bwapi.getSelf().getSupplyUsed()/2;
 		
-		if (buildingGoals.size() > 0 && builder.nextToBuildIndex != -1) {
-			int SCVsTotal = workers.getBaseWorkers(buildingGoals.get(builder.nextToBuildIndex).baseAssignment);
-			int supplyNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSupply;
-			int SCVsNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSCVs;
-			
-			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal && buildingGoals.get(builder.nextToBuildIndex).status == BuildStatus.HOLD)
-				buildingGoals.get(builder.nextToBuildIndex).status = BuildStatus.ATTEMPT_BUILD;
-			
-			//if (SCVsNeeded > SCVsTotal) 
-			//	workers.trainWorker();
-			
-			if (supplyUsed + 5 > supplyTotal && buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot) 
-					buildingGoals.add(builder.nextToBuildIndex, new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
-		}
-		else
-		{
-			if (supplyUsed + 10 > supplyTotal) 
-			{
-				buildingGoals.add(new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
-				builder.nextToBuildIndex = buildingGoals.size() - 1;
-			}
-		}
-		workers.trainWorker();
 		
 		/* Add units */
+<<<<<<< HEAD
 		if (builder.roster.size() < 20)
 			genUnitsBasic();
+=======
+		//if (builder.roster.size() < 20)
+		genUnitsBasic();
+>>>>>>> 5a48a6ea34de5ae349449778aee3911c6cfc4861
 		
 		
 		/* Military Orders */
@@ -111,6 +102,34 @@ public class CoreBaby extends RRAITemplate
 		}
 
 		
+		/* --- Base Building --- */
+		int supplyTotal = bwapi.getSelf().getSupplyTotal()/2;
+		int supplyUsed = bwapi.getSelf().getSupplyUsed()/2;
+		
+		if (buildingGoals.size() > 0 && builder.nextToBuildIndex != -1) {
+			int SCVsTotal = workers.getBaseWorkers(buildingGoals.get(builder.nextToBuildIndex).baseAssignment);
+			int supplyNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSupply;
+			int SCVsNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSCVs;
+			
+			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal && buildingGoals.get(builder.nextToBuildIndex).status == BuildStatus.HOLD)
+				buildingGoals.get(builder.nextToBuildIndex).status = BuildStatus.ATTEMPT_BUILD;
+			
+			//if (SCVsNeeded > SCVsTotal) 
+			//	workers.trainWorker();
+			
+			if (supplyUsed + 5 > supplyTotal && buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot) 
+					buildingGoals.add(builder.nextToBuildIndex, new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
+		}
+		else
+		{
+			if (supplyUsed + 10 > supplyTotal) 
+			{
+				buildingGoals.add(new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
+				builder.nextToBuildIndex = buildingGoals.size() - 1;
+			}
+		}
+		workers.trainWorker();
+	
 	}
 	
 	public void debug() 
@@ -121,12 +140,8 @@ public class CoreBaby extends RRAITemplate
 	public void genUnitsBasic()
 	{
 		int index;
-
-		//for (index = 0; index < 4; index++)
 		builder.roster.addLast(UnitTypes.Terran_Marine);
-		//builder.roster.addLast(UnitTypes.Terran_Medic);
-		//for (index = 0; index < 2; index++)
-		builder.roster.addLast(UnitTypes.Terran_Siege_Tank_Tank_Mode);
+		//builder.roster.addLast(UnitTypes.Terran_Siege_Tank_Tank_Mode);
 		builder.roster.addLast(UnitTypes.Terran_Vulture);
 		
 	}
@@ -163,7 +178,7 @@ public class CoreBaby extends RRAITemplate
 				military.unitOperation(genBasicUnitList, 20, regions.get(i).getCenterX(), regions.get(i).getCenterY());
 			}
 			if (i == 0) {
-				military.unitOperation(genBasicUnitList, 20, info.hostileX, info.hostileY);
+				military.unitOperation(genBasicUnitList, 20, hostileX, hostileY);
 				System.out.println("Base Attack " + i);
 			}
 		}
@@ -171,10 +186,10 @@ public class CoreBaby extends RRAITemplate
 	}
 	
 	public void genFullMilitaryAssault() {
-		military.unitOperation(genBasicUnitList, 20, 0,0);
-		military.orderAllMilitaryTeamsToAtk(0,0);
+		military.unitOperation(genBasicUnitList, 20, hostileX,hostileY);
+		military.orderAllMilitaryTeamsToAtk(hostileX,hostileY);
 		//military.orderUnitPoolToAtk(info.hostileX, info.hostileY);
-		military.scanLocation(0,0);
+		military.scanLocation(hostileX,hostileY);
 		
 	}
 	
