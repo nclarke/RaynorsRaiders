@@ -29,6 +29,8 @@ public class ManagerBuild extends RRAITemplate
 	BuildMode unitsMode;
 	LinkedList<UnitTypes> orders;
 	LinkedList<UnitTypes> roster;
+	LinkedList<TechTypes> researchStack;
+	LinkedList<UpgradeTypes> upgradesStack;
 	LinkedList<Unit> builtBuildings;
 	LinkedList<Unit> buildingBuildings;
 	LinkedList<Unit> productionBuildings;
@@ -54,6 +56,9 @@ public class ManagerBuild extends RRAITemplate
 		builtBuildings = new LinkedList<Unit>();
 		buildingBuildings = new LinkedList<Unit>();
 		productionBuildings = new LinkedList<Unit>();
+		
+		researchStack = new LinkedList<TechTypes>();
+		upgradesStack = new LinkedList<UpgradeTypes>();
 		
 		buildingsStack = new ArrayList<BuildingRR>();
 		completedBuildingsIndex = -1;
@@ -345,7 +350,6 @@ public class ManagerBuild extends RRAITemplate
 		case FIRST_POSSIBLE:
 			int i = 0;
 			boolean canTrain = false;
-			boolean trainingGroundsPresent = false;
 			UnitTypes c = null;
 			UnitType soldier = null;
 			
@@ -355,34 +359,25 @@ public class ManagerBuild extends RRAITemplate
 				c = roster.get(i);
 				soldier = bwapi.getUnitType(c.ordinal());
 
-				for(BuildingRR file : buildingsStack)
+				for(int j = 0; j < completedBuildingsIndex+1; j++)
 				{
+					BuildingRR bldg = buildingsStack.get(j);
 					
-					if(file.blueprint.ordinal() == soldier.getWhatBuildID() && file.unit != null && file.unit.isCompleted())
+					if(bldg.blueprint.ordinal() == soldier.getWhatBuildID())
 					{
-						trainingGroundsPresent = true;
+						canTrain = true;
 						break;
 					}
 				}
 				
-				if(!trainingGroundsPresent) 
+				if(!canTrain) 
 				{
 					i++;
 				}
 				else 
 				{
-					canTrain = true;
+					train(c, i);
 				}
-			}
-			
-			if(canTrain)
-			{
-				train(c, i);
-			   // add unit to military list
-			}
-			else 
-			{
-				//System.out.println("could not build anything in roster");
 			}
 				
 			break;
@@ -400,7 +395,70 @@ public class ManagerBuild extends RRAITemplate
 			break;
 			
 		}
-				
+
+		//research
+//System.out.println("research: " + researchStack.toString());
+		int i = 0;
+		boolean canResearch = false;
+		TechTypes r = null;
+		TechType item = null;
+		
+		while(!canResearch && i < researchStack.size())
+		{
+			r = researchStack.get(i);
+			item = bwapi.getTechType(r.ordinal());
+
+			for(int j = 0; j < completedBuildingsIndex+1; j++)
+			{
+				BuildingRR bldg = buildingsStack.get(j);
+				if(bldg.unit.getTypeID() == item.getWhatResearchesTypeID())
+				{
+					canResearch = true;
+					break;
+				}
+			}
+			
+			if(!canResearch) 
+			{
+				i++;
+			}
+			else 
+			{
+				research(r, i);
+			}
+		}
+		
+		//upgrade
+		i = 0;
+		boolean canUpgrade = false;
+		UpgradeTypes u = null;
+		UpgradeType gear = null;
+		
+		while(!canUpgrade && i < upgradesStack.size())
+		{
+			u = upgradesStack.get(i);
+			gear = bwapi.getUpgradeType(u.ordinal());
+
+			for(int j = 0; j < completedBuildingsIndex+1; j++)
+			{
+				BuildingRR bldg = buildingsStack.get(j);
+				if(bldg.unit.getTypeID() == gear.getWhatUpgradesTypeID())
+				{
+					canUpgrade = true;
+					break;
+				}
+			}
+			
+			if(!canUpgrade) 
+			{
+				i++;
+			}
+			else 
+			{
+				upgrade(u, i);
+			}
+		}
+		
 	}
 	
 	public void debug() {
@@ -714,7 +772,7 @@ public class ManagerBuild extends RRAITemplate
     // input: upgrade(UpgradeTypes.xxxx)
     // method will do resource check before attempting upgrade
     // so far, will only upgrade at base price
-	public void upgrade(UpgradeTypes lvlup) 
+	public void upgrade(UpgradeTypes lvlup, int pos) 
 	{
 		UpgradeType gear = bwapi.getUpgradeType(lvlup.ordinal());
 	
@@ -722,11 +780,13 @@ public class ManagerBuild extends RRAITemplate
 		{
 			if(bwapi.getSelf().getGas() >= gear.getGasPriceBase()) 
 			{
-				for(Unit unit : bwapi.getMyUnits()) 
+				for(int i = 0; i < completedBuildingsIndex+1; i++) 
 				{
-					if(unit.getTypeID() == gear.getWhatUpgradesTypeID()) 
+					BuildingRR bldg = buildingsStack.get(i);
+					if(bldg.unit.getTypeID() == gear.getWhatUpgradesTypeID()) 
 					{
-						bwapi.upgrade(unit.getID(), gear.getID());
+						bwapi.upgrade(bldg.unit.getID(), gear.getID());
+						upgradesStack.remove(pos);
 					}
 				}
 			}
@@ -743,7 +803,7 @@ public class ManagerBuild extends RRAITemplate
 
    // input: research(TechTypes.xxxx)
     // method will do resource check before attempting research
-	public void research(TechTypes item) 
+	public void research(TechTypes item, int pos) 
 	{
 		TechType tech = bwapi.getTechType(item.ordinal());
 	
@@ -752,11 +812,13 @@ public class ManagerBuild extends RRAITemplate
 		  if(bwapi.getSelf().getGas() >= tech.getGasPrice()) 
 		  {
 		
-			  for(Unit unit : bwapi.getMyUnits()) 
+			  for(int i = 0; i < completedBuildingsIndex+1; i++) 
 			  {
-				  if(unit.getTypeID() == tech.getWhatResearchesTypeID()) 
+				  BuildingRR bldg = buildingsStack.get(i);
+				  if(bldg.unit.getTypeID() == tech.getWhatResearchesTypeID()) 
 				  {
-					  bwapi.research(unit.getID(), tech.getID());
+					  bwapi.research(bldg.unit.getID(), tech.getID());
+					  researchStack.remove(pos);
 				  }
 			  }
 		  }
@@ -773,7 +835,6 @@ public class ManagerBuild extends RRAITemplate
 
 	//input: train(UnitTypes.xxxx)
 	// method will do research check before attempting to train
-
 	public void train(UnitTypes cadet, int pos) 
 	{
 		UnitType soldier = bwapi.getUnitType(cadet.ordinal());
@@ -784,15 +845,16 @@ public class ManagerBuild extends RRAITemplate
 			{
 				int queueSize = 1;
 				Unit grounds = null;
-				for(BuildingRR file : buildingsStack) 
+				for(int i = 0; i < completedBuildingsIndex+1; i++) 
 				{
-					if(file.unit != null && file.unit.getTypeID() == soldier.getWhatBuildID() && file.unit.isCompleted()) 
+					BuildingRR bldg = buildingsStack.get(i);
+					if(bldg.unit.getTypeID() == soldier.getWhatBuildID()) 
 					{	
-						if(file.unit.getTrainingQueueSize() < queueSize) 
+						if(bldg.unit.getTrainingQueueSize() < queueSize) 
 						{
 							//grounds = bwapi.getUnit(file.unit.getID());
-							grounds = file.unit;
-							queueSize = file.unit.getTrainingQueueSize();
+							grounds = bldg.unit;
+							queueSize = bldg.unit.getTrainingQueueSize();
 						}
 					}
 				}
