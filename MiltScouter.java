@@ -45,20 +45,49 @@ public class MiltScouter
 	{
 		for (BaseLocation b : mInfo.bwapi.getMap().getBaseLocations())
 		{
-			ManagerInfo.Base base = mInfo.new Base();
-			base.baseLoc = b;
-//			base.hasEnemy = false;
-			base.hasSeen = false;
-			base.tile = mInfo.new Tile(b.getX(), b.getY());
-			bases.add(base);
-			System.out.println("initializing the home base");
-			System.out.println("this b ("+b.getX()+","+b.getY()+")");
-			System.out.println("from milt ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
-			if(b.isStartLocation() && b.getX() == mInfo.military.homePositionX
-			 && b.getY() == mInfo.military.homePositionY)
+			if(b.isStartLocation())
 			{
-				this.homeBase = base;
-				System.out.println("Our base is at ("+base.baseLoc.getX()+","+base.baseLoc.getY()+")");
+				ManagerInfo.Base base = mInfo.new Base();
+				base.baseLoc = b;
+				base.hasEnemy = false;
+				base.hasSeen = false;
+				base.tile = mInfo.new Tile(b.getX(), b.getY());
+				bases.add(base);
+				System.out.println("initializing the home base");
+				System.out.println("this b ("+b.getX()+","+b.getY()+")");
+				System.out.println("from milt ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
+				if(b.isStartLocation() && b.getX() == mInfo.military.homePositionX
+						&& b.getY() == mInfo.military.homePositionY)
+				{
+					this.homeBase = base;
+					System.out.println("Our base is at ("+base.baseLoc.getX()+","+base.baseLoc.getY()+")");
+					bases.remove(base);
+				}
+			}
+		}
+		
+		
+		
+		for (BaseLocation b : mInfo.bwapi.getMap().getBaseLocations())
+		{
+			if(!bases.contains(b))
+			{
+				ManagerInfo.Base base = mInfo.new Base();
+				base.baseLoc = b;
+				base.hasEnemy = false;
+				base.hasSeen = false;
+				base.tile = mInfo.new Tile(b.getX(), b.getY());
+				bases.add(base);
+				System.out.println("initializing the home base");
+				System.out.println("this b ("+b.getX()+","+b.getY()+")");
+				System.out.println("from milt ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
+				if(b.isStartLocation() && b.getX() == mInfo.military.homePositionX
+						&& b.getY() == mInfo.military.homePositionY)
+				{
+					this.homeBase = base;
+					System.out.println("Our base is at ("+base.baseLoc.getX()+","+base.baseLoc.getY()+")");
+					bases.remove(base);
+				}
 			}
 		}
 	}
