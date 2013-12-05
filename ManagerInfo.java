@@ -100,8 +100,8 @@ public class ManagerInfo extends RRAITemplate
 	{
 		if(firstWorkerID > 0)
 		{
-			if(scouter.scout.isUnderAttack())
-			{
+			if(scouter.scout.isUnderAttack() && military.getEnemiesWithinUnitSightRange(scouter.scout) > 1)
+			{ //retreat!
 				scouter.currIndex++;
 				firstWorkerID = -1;
 				System.out.println("!!scout is under attack! retreat to index "+scouter.currIndex);
@@ -227,6 +227,17 @@ public class ManagerInfo extends RRAITemplate
 		{
 			firstWorkerID = -1;
 			System.out.println("!!destroyed first worker: "+firstWorkerID);
+			if(scouter.scout.isUnderAttack())
+				return;
+			for(Unit u: this.enemyUnits)
+			{
+				System.out.println("workering...");
+				if(u.getTypeID() == UnitTypes.Protoss_Probe.ordinal())
+				{
+					firstWorkerID = u.getID();
+					System.out.println("!!found first worker: "+firstWorkerID);
+				}
+			}
 		}
 		else if (unitID == this.scouter.scoutID)
 		{
