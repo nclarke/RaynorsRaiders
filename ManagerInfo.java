@@ -147,6 +147,8 @@ public class ManagerInfo extends RRAITemplate
 				if(base.hasEnemy && !enemyBases.contains(base))
 				{
 					enemyBases.add(base);
+					hostileX = base.baseLoc.getX();
+					hostileY = base.baseLoc.getY();
 					System.out.println("\nADDED AN ENEMY BASE LOCATION!\n");
 				}				
 			}
@@ -225,6 +227,7 @@ public class ManagerInfo extends RRAITemplate
 
 		if(unitID == firstWorkerID)
 		{
+			int emp = firstWorkerID;
 			System.out.println("!!destroyed first worker: "+firstWorkerID);
 			if(scouter.scout.isUnderAttack())
 			{
@@ -241,6 +244,11 @@ public class ManagerInfo extends RRAITemplate
 					firstWorkerID = u.getID();
 					System.out.println("!!found first worker: "+firstWorkerID);
 				}
+			}
+			if(emp == firstWorkerID)
+			{
+				firstWorkerID = -1;
+				return;
 			}
 		}
 		else if (unitID == this.scouter.scoutID)
