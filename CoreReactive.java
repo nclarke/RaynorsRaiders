@@ -12,6 +12,7 @@ public class CoreReactive extends RRAITemplate
 {
 	//Data structs
 	LinkedList<BuildAlert> core_econ_buildAlerts;
+	int defcon, agressiveCountdown;
 	
 	public enum BuildAlert 
 	{
@@ -30,13 +31,22 @@ public class CoreReactive extends RRAITemplate
 		//System.out.println("CoreReactive Online");
 	}
 	
+	public void startUp() {
+		agressiveCountdown = baby.campaign;
+	}
+	
 	
 	/* This is to be run frequently, and is the quick-decider for things such as resources */
 	public void checkUp() 
 	{
-		if (baby.genomeSetting.defensiveness > (int) (Math.random() * 100)) {
-			Unit targetUnit = bwapi.getUnit(info.scouter.getNearestUnit(UnitTypes.Protoss_Zealot.ordinal(), builder.homePositionX, builder.homePositionY));
-			military.unitOperation(20, targetUnit.getX(), targetUnit.getY());
+		if (agressiveCountdown-- <= 0) {
+			if(defcon-- <= 0) {
+				if (baby.genomeSetting.defensiveness > (int) (Math.random() * 100)) {
+					Unit targetUnit = bwapi.getUnit(info.scouter.getNearestUnit(UnitTypes.Protoss_Zealot.ordinal(), builder.homePositionX, builder.homePositionY));
+					military.unitOperation(20, targetUnit.getX(), targetUnit.getY());
+				}
+			defcon = baby.genomeSetting.bloodFrequency * 5;
+			}
 		}
 	}
 	
