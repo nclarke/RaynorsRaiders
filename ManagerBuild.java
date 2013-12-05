@@ -232,7 +232,7 @@ public class ManagerBuild extends RRAITemplate
 	
 	private void constructionStatus()
 	{
-		for(int i = completedBuildingsIndex + 1 ; i < nextToBuildIndex; i++)
+		for(int i = 0; i < nextToBuildIndex; i++)
 		{
 			if(buildingsStack.get(i) != null && buildingsStack.get(i).unit != null)
 			{

@@ -130,7 +130,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			managerBuild.captureBaseLocation();
 			managerMilitary.startUp();
 			managerInfo.startUp();
-			coreBaby.startUp();
+			coreReactive.startUp();
 			if( managerBuild.baseSetup() != 1)
 			{
 				//Throw error here
@@ -152,7 +152,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 			//managerWorkers.handleIdle();
 			managerWorkers.checkUp();
 			coreBaby.checkUp();
-			//coreReactive.checkUp();
+			coreReactive.checkUp();
 			managerBuild.checkUp();
 			managerInfo.checkUp();
 		}
