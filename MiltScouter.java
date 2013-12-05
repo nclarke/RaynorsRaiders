@@ -23,6 +23,7 @@ public class MiltScouter
 	LinkedList<ManagerInfo.Tile> scoutingPositions;
 	ManagerInfo mInfo;
 	int currIndex;
+	int scoutID;
 	
 	LinkedList<Unit> hostilUnits;
 	
@@ -159,6 +160,7 @@ public class MiltScouter
 			System.out.println("new scout is: "+this.scout);
 			if (this.scout == null)
 				return;
+			scoutID = scout.getID();
 		}
 		mInfo.bwapi.move(scout.getID(), this.bases.get(currIndex).tile.getX(),this.bases.get(currIndex).tile.getY());
 		if(scoutHasArrived()){
