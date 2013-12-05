@@ -397,10 +397,10 @@ public class ManagerBuild extends RRAITemplate
 			break;
 			
 		}
-<<<<<<< HEAD
+
 		*/
 				
-=======
+
 
 		//research
 //System.out.println("research: " + researchStack.toString());
@@ -464,8 +464,6 @@ public class ManagerBuild extends RRAITemplate
 				upgrade(u, i);
 			}
 		}
-		
->>>>>>> dff1eb9a4dcbfad37db55068fe273444dbf0877b
 	}
 	
 	public void debug() {
@@ -564,16 +562,14 @@ public class ManagerBuild extends RRAITemplate
 	private int underConstructionM() 
 	{
 		int cost = 0;
-		if (cost == 0)
-			return 0;
 		
-		for(Unit unit : bwapi.getMyUnits()) 
+		for(int i = completedBuildingsIndex+1; i < nextToBuildIndex; i++) 
 		{
-			if(unit.isConstructing()) 
-			{
-				UnitType bldg = bwapi.getUnitType(unit.getBuildTypeID());
-				
-				cost += bldg.getMineralPrice();
+			BuildingRR bldg = buildingsStack.get(i);
+			
+			if(bldg.unit == null) 
+			{				
+				cost += bwapi.getUnitType(bldg.blueprint.ordinal()).getMineralPrice();
 			}
 		}
 		
@@ -582,15 +578,14 @@ public class ManagerBuild extends RRAITemplate
 	private int underConstructionG() 
 	{
 		int cost = 0;
-		if (cost == 0)
-			return 0;
-		for(Unit unit : bwapi.getMyUnits()) 
+
+		for(int i = completedBuildingsIndex+1; i < nextToBuildIndex; i++) 
 		{
-			if(unit.isConstructing()) 
-			{
-				UnitType bldg = bwapi.getUnitType(unit.getBuildTypeID());
-				
-				cost += bldg.getGasPrice();
+			BuildingRR bldg = buildingsStack.get(i);
+			
+			if(bldg.unit == null) 
+			{				
+				cost += bwapi.getUnitType(bldg.blueprint.ordinal()).getGasPrice();
 			}
 		}
 		
