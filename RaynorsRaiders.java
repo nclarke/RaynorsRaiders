@@ -193,10 +193,22 @@ public class RaynorsRaiders implements BWAPIEventListener
 		////System.out.println("Start debug");
 		bwapi.drawText(0, 0, "Home base location is ( " + managerBuild.homePositionX + ", "
 				+ managerBuild.homePositionY + ")", true);
+		bwapi.drawText(200, 0, "Number of workers are " + managerWorkers.allWorkers.size(), true);
 		bwapi.drawText(0, 10, "DebugScreen= " + debugScreen, true);
 		bwapi.drawText(0, 20, "SyncCount= " + syncCount, true);
-		bwapi.drawText(400, 20, "Mins are : " + (bwapi.getSelf().getMinerals() - managerBuild.underConstructionM()) + 
-				"           Gas is: " + (bwapi.getSelf().getGas() - managerBuild.underConstructionG()), true);
+		//bwapi.drawText(400, 20, "Mins are : " + (bwapi.getSelf().getMinerals() - managerBuild.underConstructionM()) + 
+				//"           Gas is: " + (bwapi.getSelf().getGas() - managerBuild.underConstructionG()), true);
+		
+		String msg;
+	
+		msg = "Genome Status: Blood " + coreBaby.genomeSetting.bloodFrequency + 
+		 " Def " + coreBaby.genomeSetting.defensiveness + " Spread " + 
+		 coreBaby.genomeSetting.spread + " Count " + coreBaby.countdown +
+		 " Campaign " + coreBaby.campaign;
+		bwapi.drawText(100, 20, msg, true);
+		
+		msg = "Enemy x: " + coreBaby.hostileX + " Enemy y: " + coreBaby.hostileY;
+		bwapi.drawText(100, 30, msg, true);
 		
 		if (debugScreen == 0)
 			drawDebug0();
@@ -215,51 +227,23 @@ public class RaynorsRaiders implements BWAPIEventListener
 	public void drawDebug0()
 	{
 		int undx = 0;
-		int screenNdx = 40;
-		bwapi.drawText(300, screenNdx, "Start unit list is ", true);
+		int screenNdx = 50;
+
+		bwapi.drawText(300, screenNdx, "Production buildings ", true);
 		screenNdx += 10;
-		bwapi.drawText(300, screenNdx, "prod size is" + managerBuild.productionBuildings.size(), true);
-		screenNdx += 10;
-		//for (UnitTypes ut : managerBuild.roster)
-		//{
-			//bwapi.drawText(300, screenNdx, ut.name(), true);
-			//screenNdx += 10;
-		//}
 		
-		//for (Unit u : managerMilitary.unitPool.get(UnitTypes.Terran_Siege_Tank_Tank_Mode))
+		
 		for (Unit u : managerBuild.productionBuildings)
 		{
-			//if (!bwapi.getUnitType(u.getTypeID()).isBuilding())
-			//{
-				bwapi.drawText(300, screenNdx, bwapi.getUnitType(u.getTypeID()).getName() +
-						" " + u.isTraining(), true);
-				screenNdx += 10;				
-			//}
+			bwapi.drawText(300, screenNdx, bwapi.getUnitType(u.getTypeID()).getName() +
+					" " + u.isTraining(), true);
+			screenNdx += 10;				
 		}
 		bwapi.drawText(300, screenNdx, "End unit list", true);
 		screenNdx += 10;
-		bwapi.drawText(300, screenNdx, "Start unit list is ", true);
-		screenNdx += 10;
-		for (Unit u : managerMilitary.unitPool.get(UnitTypes.Terran_Siege_Tank_Siege_Mode))
-		{
-			if (!bwapi.getUnitType(u.getTypeID()).isBuilding())
-			{
-				bwapi.drawText(300, screenNdx, bwapi.getUnitType(u.getTypeID()).getName(), true);
-				screenNdx += 10;				
-			}
-		}
-		bwapi.drawText(300, screenNdx, "End unit list", true);
 		
-		//bwapi.drawHealth(healthFlag);
 		int numEnemies = -1;
-		for (Unit u : bwapi.getMyUnits())  
-		{
-			//if (u.isUnderAttack()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.RED, false, false);
-			//else if (u.isGatheringMinerals()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.BLUE, false, false);
-			//else if (u.isGatheringGas()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.GREEN, false, false);
-			//else if (u.isAttacking()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.ORANGE, false, false);
-			bwapi.drawLine(u.getX(), u.getY(), u.getTargetX(), u.getTargetY(), BWColor.WHITE, false);
-		}
+
 		//Unit u = bwapi.getMyUnits().get(30);
 		//UnitType utd;
     	//utd = bwapi.getUnitType(u.getID());
@@ -269,21 +253,19 @@ public class RaynorsRaiders implements BWAPIEventListener
 		//bwapi.drawCircle(u.getX(), u.getY(), utd.getSightRange(), BWColor.PURPLE, false, false);
 		//bwapi.drawCircle(u.getX(), u.getY(), utd.getSeekRange(), BWColor.ORANGE, false, false);
 		
-		managerWorkers.debug();
 		
-		int buildOrderNdx = 100;
+		int buildOrderNdx = 50;
 		for (ManagerBuild.BuildingRR bo : coreBaby.buildingGoals)
 		{
 			bwapi.drawText(0, buildOrderNdx, bo.blueprint.toString() + " " + bo.status.toString(), true);
 			buildOrderNdx += 10;
 		}
-		buildOrderNdx = 100;
-		//System.out.println("Ordersssss to build is: " + managerBuild.orders.size());
+		buildOrderNdx = 50;
 		if (managerBuild.orders.size() != 0)
 		{
 			for (UnitTypes ut : managerBuild.orders)
 			{
-				bwapi.drawText(200, buildOrderNdx,ut.toString(), true);
+				bwapi.drawText(300, buildOrderNdx,ut.toString(), true);
 				buildOrderNdx += 10;
 			}
 		}
@@ -294,36 +276,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 		buildOrderNdx = buildOrderNdx + 30;
 		
-		int unitNdx = 0;
-		String msg;
-		msg = "Number of vultures " + managerMilitary.unitPool.get(UnitTypes.Terran_Vulture).size(); 
-		bwapi.drawText(300, unitNdx, msg, true);
-		
-		msg = "Genome Status: Blood " + coreBaby.genomeSetting.bloodFrequency + 
-		 " Def " + coreBaby.genomeSetting.defensiveness + " Spread " + 
-		 coreBaby.genomeSetting.spread + " Count " + coreBaby.countdown +
-		 " Campaign " + coreBaby.campaign;
-		bwapi.drawText(100, 20, msg, true);
-		
-		msg = "Enemy x: " + coreBaby.hostileX + "Enemy y: " + coreBaby.hostileY;
-		bwapi.drawText(100, 40, msg, true);
-		
-		
-		//if (managerBuild.buildingBuildings.size() != 0) 
-		//{
-			//for (UnitTypes ut2 : managerBuild.buildingBuildings)
-			//{
-				//bwapi.drawText(200, buildOrderNdx,ut2.toString(), true);
-				//buildOrderNdx += 10;
-			//}
-		//}
-		//else
-		//{
-			//bwapi.drawText(200, buildOrderNdx, "Nothing building", true);
-			//buildOrderNdx += 10;
-		//}
-		//System.out.println("Here");
-		
+		//int unitNdx = 0;		
 	}
 	
 	/*
@@ -332,6 +285,14 @@ public class RaynorsRaiders implements BWAPIEventListener
 	
 	public void drawDebug1()
 	{
+		for (Unit u : bwapi.getMyUnits())  
+		{
+			//if (u.isUnderAttack()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.RED, false, false);
+			//else if (u.isGatheringMinerals()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.BLUE, false, false);
+			//else if (u.isGatheringGas()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.GREEN, false, false);
+			//else if (u.isAttacking()) bwapi.drawCircle(u.getX(), u.getY(), 12, BWColor.ORANGE, false, false);
+			bwapi.drawLine(u.getX(), u.getY(), u.getTargetX(), u.getTargetY(), BWColor.WHITE, false);
+		}
 		if(militaryDebugFlag)
 		{
 			//managerMilitary.debug();
@@ -340,7 +301,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 	}
 	public void drawDebug2()
 	{
-		
+		managerWorkers.debug();
 	}
 	
 	public void gameEnded() 
@@ -383,7 +344,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 	{
 		Unit createdUnit = bwapi.getUnit(unitID), createdFrom = null;
 		int createdUnitType = createdUnit.getTypeID();
-		bwapi.printText("Unit Created " + String.valueOf(unitID));
+		//bwapi.printText("Unit Created " + String.valueOf(unitID));
 		masterUnitList.add(bwapi.getUnit(unitID));
 		//System.out.println("creating type id is " + bwapi.getUnit(unitID).getTypeID());
 		
@@ -403,6 +364,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		if (createdUnitType == UnitTypes.Terran_Command_Center.ordinal())
 		{
 			//System.out.println("Created CC");
+			managerBuild.newBaseLocation(unitID);
 			//managerBuild.newBaseLocation(createdUnit);
 		}
 		
@@ -428,7 +390,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 	public void unitDestroy(int unitID)
 	{		
 	//	System.out.println("In unit destroyed");
-		bwapi.printText("Unit Destroyed " + String.valueOf(unitID));
+		//bwapi.printText("Unit Destroyed " + String.valueOf(unitID));
 		Unit taggedForDeath = null;
 
 		this.managerInfo.unitDestoryed(unitID);

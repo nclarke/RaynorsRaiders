@@ -232,6 +232,7 @@ public class CoreBaby extends RRAITemplate
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Engineering_Bay, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Missile_Turret, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Missile_Turret, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Command_Center, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Academy, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Missile_Turret, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 17, 0, UnitTypes.Terran_Comsat_Station, BuildStatus.HOLD));

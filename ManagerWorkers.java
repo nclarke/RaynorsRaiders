@@ -183,6 +183,7 @@ public class ManagerWorkers extends RRAITemplate
 			else if ( (cc.getTrainingQueueSize() == 0) & getBaseToAddWorkers() != -1)
 			{
 				//if not training and another base needs workers train for that base
+				bwapi.train(cc.getID(), UnitTypes.Terran_SCV.ordinal());
 			}
 			else 
 			{
@@ -297,7 +298,8 @@ public class ManagerWorkers extends RRAITemplate
 			gasWorkers = 3;
 		else
 			gasWorkers = 0;
-		//System.out.println("base needs workers? " + (baseWorkers < ( (SCVS_PER_MIN_PATCH * baseMins) + gasWorkers)) );
+		System.out.println("Base is " + baseNdx);
+		System.out.println("base needs workers? " + (baseWorkers < ( (SCVS_PER_MIN_PATCH * baseMins) + gasWorkers)) );
 		return (baseWorkers < ( (SCVS_PER_MIN_PATCH * baseMins) + gasWorkers) );
 	}
 	
@@ -475,8 +477,8 @@ public class ManagerWorkers extends RRAITemplate
 		{
 			if (neu.getTypeID() == UnitTypes.Resource_Mineral_Field.ordinal()) 
 			{
-				double distance = Math.sqrt(Math.pow(neu.getX() - workerX, 2)
-				+ Math.pow(neu.getY() - workerY, 2));
+				double distance = Math.pow(neu.getX() - workerX, 2)
+				+ Math.pow(neu.getY() - workerY, 2);
 				if ((rtnID == -1) || (distance < closestDist)) 
 				{
 					closestDist = distance;
@@ -500,8 +502,8 @@ public class ManagerWorkers extends RRAITemplate
 			if (u.getTypeID() == UnitTypes.Resource_Vespene_Geyser.ordinal() || 
 					u.getTypeID() == UnitTypes.Terran_Refinery.ordinal()) 
 			{
-				double distance = Math.sqrt(Math.pow(u.getX() - workerX, 2)
-						+ Math.pow(u.getY() - workerY, 2));
+				double distance = Math.pow(u.getX() - workerX, 2)
+						+ Math.pow(u.getY() - workerY, 2);
 				if ((rtnID == -1) || (distance < closestDist)) 
 				{
 					closestDist = distance;
@@ -551,9 +553,6 @@ public class ManagerWorkers extends RRAITemplate
 		int baseNdx = 0;
 		String workerString = "";
 		Unit curWorker;
-		
-		bwapi.drawText(200, 200, "Number workers is " + allWorkers.size(), true);
-		
 		
 		for (Worker w : allWorkers)
 		{
@@ -619,6 +618,8 @@ public class ManagerWorkers extends RRAITemplate
 			int gasID;
 			boolean gas;
 			Unit gasUnit;
+			bwapi.drawText(b.getX()-64, b.getY()-(32*2)-40, "Random", false);
+			bwapi.drawText(b.getX()-64, b.getY()-(32*2)-30, "Base # " + ndx, false);
 			
 			if (!b.isMineralOnly())
 			{
@@ -637,8 +638,8 @@ public class ManagerWorkers extends RRAITemplate
 			baseWorkers = getBaseWorkers(ndx++);
 			baseMins = b.getMinerals();
 			
-			bwapi.drawText(b.getX()-64, b.getY()-(32*2)-10, "Num mins is " + baseMins, false);
-			bwapi.drawText(b.getX()-64, b.getY()-(32*2), "Num workers is " + baseWorkers, false);
+			bwapi.drawText(b.getX()-64, b.getY()-(32*2)-10, "Numb mins is " + baseMins, false);
+			bwapi.drawText(b.getX()-64, b.getY()-(32*2), "Numb workers is " + baseWorkers, false);
 		}
 		
 		/*

@@ -509,12 +509,31 @@ public class ManagerBuild extends RRAITemplate
 		return ourBases.size();
 	}
 	
+	public BaseLocation closetBaseLocation(int x, int y)
+	{
+		BaseLocation toRtn = null;
+		double nearestDistance = 99999999999999.9, distance;
+		
+		for (BaseLocation bl : bwapi.getMap().getBaseLocations())
+		{
+			distance = Math.pow(bl.getX() - x, 2) + Math.pow(bl.getY() - y, 2);
+			if (distance < nearestDistance)
+			{
+				nearestDistance = distance;
+				toRtn = bl;
+			}
+		}
+		return toRtn;
+	}
+	
 	/*
 	 * Gets called whenever a new base is created. Called from build in MB when building a cc
 	 */
 	
-	public void newBaseLocation(BaseLocation bl)
+	public void newBaseLocation(int unitID)
 	{
+		BaseLocation bl;
+		bl = closetBaseLocation(bwapi.getUnit(unitID).getX(), bwapi.getUnit(unitID).getY());
 		System.out.println("---------------------------------IN MB: adding new base");
 		int temp;
 		temp = workers.addBaseToBaseWorkers();
@@ -718,7 +737,7 @@ public class ManagerBuild extends RRAITemplate
 							{
 								xtile = nearestBase.getX();
 								ytile = nearestBase.getY();
-								newBaseLocation(nearestBase);
+								//newBaseLocation(nearestBase);
 								//ourBases.add(nearestBase);
 							}
 							else
