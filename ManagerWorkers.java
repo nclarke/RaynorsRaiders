@@ -560,6 +560,8 @@ public class ManagerWorkers extends RRAITemplate
 			curWorker = bwapi.getUnit(w.unitID);
 			if (curWorker == null)
 				;
+			else if (curWorker.isUnderAttack())
+				bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.YELLOW, false, false);
 			else if (curWorker.isGatheringMinerals()) 
 				bwapi.drawCircle(curWorker.getX(), curWorker.getY(), 12, BWColor.BLUE, false, false);
 			else if (curWorker.isGatheringGas()) 

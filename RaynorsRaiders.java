@@ -111,6 +111,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		managerWorkers.setup();
 		managerInfo.setup();
 		System.out.println("Game setup complete");
+		bwapi.sendText("GL HF");
 		
 	}
 	
