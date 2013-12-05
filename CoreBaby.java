@@ -144,7 +144,6 @@ public class CoreBaby extends RRAITemplate
 	}
 	
 	public void genDefensiveBasic() {
-		flip++;
 		if (flip == 0) {
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Marine.ordinal());
 			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Vulture.ordinal());
@@ -155,12 +154,13 @@ public class CoreBaby extends RRAITemplate
 		}
 		if (flip == 20)
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Firebat.ordinal());
+		flip++;
 		if (flip > 2)
 			flip = 0;
 	}
 	
 	public void genOffensiveBasic() {
-		flip++;
+
 		if (flip == 0) {
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Marine.ordinal());
 			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Vulture.ordinal());
@@ -171,6 +171,7 @@ public class CoreBaby extends RRAITemplate
 		}
 		if (flip == 2)
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Firebat.ordinal());
+		flip++;
 		if (flip > 2)
 			flip = 0;
 	}
