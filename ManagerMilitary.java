@@ -877,7 +877,7 @@ public class ManagerMilitary extends RRAITemplate
 				{
 					double dist = Math.sqrt(Math.pow(unitGroup.get(index).getX() - pixelPositionX, 2) + Math.pow(unitGroup.get(index).getY() - pixelPositionY, 2));
 					
-					if(dist <= 140)
+					if(dist <= 210)
 					{
 						checkReadyFlag = true;
 					}
@@ -936,7 +936,7 @@ public class ManagerMilitary extends RRAITemplate
 					}
 					else
 					{
-						bwapi.attack(milUnit.getID(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
+						bwapi.patrol(milUnit.getID(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
 					}
 				}
 			}
