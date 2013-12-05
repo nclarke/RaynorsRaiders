@@ -924,7 +924,7 @@ public class ManagerMilitary extends RRAITemplate
 				{
 					Unit milUnit = militaryTeams.get(index).getMilitaryTeam().get(index2);
 					
-					if(milUnit.isIdle())
+					/*if(milUnit.isIdle())
 					{
 						ChokePoint entrance = null;
 						Region baseStart = react.gen_findClosestRegion(militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
@@ -939,9 +939,9 @@ public class ManagerMilitary extends RRAITemplate
 							militaryTeams.get(index).setLocation(entrance.getFirstSideX(), entrance.getFirstSideY());
 					}
 					else
-					{
+					{*/
 						bwapi.attack(milUnit.getID(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
-					}
+					//}
 				}
 			}
 		}
