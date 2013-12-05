@@ -89,6 +89,7 @@ public class ManagerInfo extends RRAITemplate
 	{
 		System.out.println("starting up scouter...");
 		this.scouter.startUp();
+		System.out.println("start Location ("+scouter.homeBase.baseLoc.getX()+","+scouter.homeBase.baseLoc.getY()+")");
 		System.out.println("... done starting scouter");
 		
 	}
@@ -120,6 +121,8 @@ public class ManagerInfo extends RRAITemplate
 		else if (this.isScouting || (bwapi.getSelf().getSupplyUsed()/2) == 8 || 
 		 (scouter.scout == null  && (bwapi.getSelf().getSupplyUsed()/2)%40 == 0))
 		{
+//			if((scouter.scout == null  && (bwapi.getSelf().getSupplyUsed()/2)%40 == 0))
+//				System.out.println("\n\n\n\n\nNEWS SCOUT\n\n\n\n");
 			this.scouter.scout();
 			for(Base base : scouter.bases)
 			{
@@ -293,6 +296,8 @@ public class ManagerInfo extends RRAITemplate
 	
 	private void acclimate()
 	{
+		if(scouter.scout == null)
+			return;
 		int count = 1;
 		boolean greaterX = scouter.homeBase.baseLoc.getX() < scouter.scout.getX();
 		boolean greaterY = scouter.homeBase.baseLoc.getY() < scouter.scout.getY();
@@ -300,7 +305,7 @@ public class ManagerInfo extends RRAITemplate
 		System.out.println("greaters: ("+greaterX+","+greaterY+")");
 		System.out.println("count: " +count);
 		System.out.println("is scout moving? "+scouter.scout.isMoving());
-		while (count > 0 && !scouter.scout.isMoving())
+		while (scouter.scout == null && count > 0 && !scouter.scout.isMoving())
 		{
 			if (greaterX && greaterY)
 				bwapi.move(scouter.scout.getID(), scouter.scout.getX() - 1, scouter.scout.getY() - 1);
