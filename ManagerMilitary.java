@@ -10,6 +10,7 @@ import javabot.types.TechType.TechTypes;
 import javabot.types.UnitType;
 import javabot.types.UnitType.UnitTypes;
 import javabot.util.*;
+import javabot.RaynorsRaiders.CoreReactive.*;
 
 public class ManagerMilitary extends RRAITemplate
 {
@@ -174,14 +175,16 @@ public class ManagerMilitary extends RRAITemplate
 	public void checkUp() {
 		
 		//for testing purposes - sends units to attack and tries to handle attack logistics for different units
-		attackLocationsTest();
+		System.out.println("START OF MM CHECKUP");
+		//attackLocationsTest();
 		
 		rallyTeamToAttack();
 		handleUnitsAttacking();
 		handleUnitPoolAttacks();
 		maintainAttackLocations();
-		handleTeamStatus();
+		//handleTeamStatus();
 		removeEmptyMilitaryTeam();
+		System.out.println("END OF MM CHECKUP");
 	}
 	
 	/*
@@ -421,6 +424,7 @@ public class ManagerMilitary extends RRAITemplate
 				Unit tmp = militaryTeams.get(index).getMilitaryTeam().get(index2);
 				if(unitObj == (tmp.getID()))
 				{
+					//System.out.println("MILITARYTEAMS" );
 					militaryTeams.get(index).getMilitaryTeam().remove(index2);
 					newSize = militaryTeams.get(index).getMilitaryTeam().size();
 					militaryTeams.get(index).setTeamSize(newSize);
@@ -569,7 +573,9 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			if(militaryTeams.get(index).getMilitaryTeam().size() == 0)
 			{
+				System.out.println("MM: OLD MILITARYTEAMS SIZE: " + militaryTeams.size() );
 				militaryTeams.remove(index);
+				System.out.println("MM: NEW MILITARYTEAMS SIZE: " +  militaryTeams.size() );
 			}
 		}
 	}
@@ -937,7 +943,7 @@ public class ManagerMilitary extends RRAITemplate
 				{
 					if(militaryTeams.get(index).getMilitaryTeam().get(index2).isStartingAttack())
 					{
-						System.out.println("TeamSize: " + militaryTeams.get(index).getTeamSize());
+						//System.out.println("TeamSize: " + militaryTeams.get(index).getTeamSize());
 						if(militaryTeams.get(index).getTeamSize() < (initialTeamSize))
 						{
 							militaryTeams.get(index).setTeamStatus(TeamStatus.RETREAT);
@@ -994,8 +1000,14 @@ public class ManagerMilitary extends RRAITemplate
 					{
 						bwapi.useTech(tmp.getID(), TechTypes.Stim_Packs.ordinal());
 					}
+<<<<<<< HEAD
 					/*
 					for(int groupUnits = 0; groupUnits < militaryTeams.get(index).getMilitaryTeam().size(); groupUnits++)
+=======
+					
+					//commented out: causing crashes 
+					/*for(int groupUnits = 0; groupUnits < militaryTeams.get(index).getMilitaryTeam().size(); groupUnits++)
+>>>>>>> dff1eb9a4dcbfad37db55068fe273444dbf0877b
 					{
 						int targetID = militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getTargetUnitID();
 						Unit targetUnit = bwapi.getUnit(targetID);
@@ -1004,8 +1016,12 @@ public class ManagerMilitary extends RRAITemplate
 						{
 							bwapi.attack(tmp.getID(), targetID);
 						}
+<<<<<<< HEAD
 					}
 					*/
+=======
+					}*/
+>>>>>>> dff1eb9a4dcbfad37db55068fe273444dbf0877b
 				}
 				
 				if(tmp.getTypeID() == UnitTypes.Terran_Medic.ordinal())
@@ -1153,7 +1169,28 @@ public class ManagerMilitary extends RRAITemplate
 				}
 				
 				if(poolUnit.getTypeID() == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
-				{					
+				{
+					int xtile, ytile;
+					Region r = react.gen_findClosestRegion(homePositionX, homePositionY);
+					ChokePoint cp = null;
+
+					if (r != null) 
+					{
+						if (r.getChokePoints().isEmpty())
+						{
+							//System.out.println("No chokepoint?");
+						}
+						else 
+						{
+							cp = r.getChokePoints().get(0);
+						}
+					}
+					
+					xtile = cp.getFirstSideX();
+					ytile = cp.getFirstSideY();
+					
+					bwapi.move(poolUnit.getID(), xtile, ytile);
+					
 					if(poolUnit.isStartingAttack())
 					{
 						bwapi.siege(poolUnit.getID());
