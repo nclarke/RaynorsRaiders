@@ -111,13 +111,14 @@ public class ManagerInfo extends RRAITemplate
 		System.out.println("scout is: "+scouter.scout+", and isScouting: "+isScouting);
 		System.out.println("Total supply used: "+bwapi.getSelf().getSupplyUsed());
 		System.out.println("Total supply overall: "+bwapi.getSelf().getSupplyTotal());
-		if(timeToDwell)
+		if(timeToDwell && isScouting)
 		{
 			System.out.println("scout: Time to dwell at");
 			System.out.println("	here ("+scouter.scout.getX()+","+scouter.scout.getY()+")");
 			dwell();
 		}
-		else if (this.isScouting || (bwapi.getSelf().getSupplyUsed()/2) == 8 || (bwapi.getSelf().getSupplyUsed()/2) == 40)
+		else if (this.isScouting || (bwapi.getSelf().getSupplyUsed()/2) == 8 || 
+		 (scouter.scout == null  && (bwapi.getSelf().getSupplyUsed()/2)%40 == 0))
 		{
 			this.scouter.scout();
 			for(Base base : scouter.bases)
