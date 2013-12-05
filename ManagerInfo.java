@@ -225,14 +225,18 @@ public class ManagerInfo extends RRAITemplate
 
 		if(unitID == firstWorkerID)
 		{
-			firstWorkerID = -1;
 			System.out.println("!!destroyed first worker: "+firstWorkerID);
 			if(scouter.scout.isUnderAttack())
+			{
+				firstWorkerID = -1;
 				return;
+			}
 			for(Unit u: this.enemyUnits)
 			{
 				System.out.println("workering...");
-				if(u.getTypeID() == UnitTypes.Protoss_Probe.ordinal())
+				if(u.getID() == firstWorkerID)
+					enemyUnits.remove(u);
+				else if(u.getTypeID() == UnitTypes.Protoss_Probe.ordinal())
 				{
 					firstWorkerID = u.getID();
 					System.out.println("!!found first worker: "+firstWorkerID);
