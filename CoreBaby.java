@@ -63,8 +63,8 @@ public class CoreBaby extends RRAITemplate
 		
 		
 		/* Add units */
-		if (builder.roster.size() < 20)
-			genUnitsBasic();
+		//if (builder.roster.size() < 20)
+			//genUnitsBasic();
 
 		
 		
@@ -105,7 +105,7 @@ public class CoreBaby extends RRAITemplate
 		int supplyTotal = bwapi.getSelf().getSupplyTotal()/2;
 		int supplyUsed = bwapi.getSelf().getSupplyUsed()/2;
 		
-		if (buildingGoals.size() > 0 && builder.nextToBuildIndex != -1) {
+		if (buildingGoals.size() > 0 && builder.nextToBuildIndex != -1 && builder.nextToBuildIndex < buildingGoals.size()) {
 			int SCVsTotal = workers.getBaseWorkers(buildingGoals.get(builder.nextToBuildIndex).baseAssignment);
 			int supplyNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSupply;
 			int SCVsNeeded = buildingGoals.get(builder.nextToBuildIndex).requiredSCVs;
@@ -113,7 +113,8 @@ public class CoreBaby extends RRAITemplate
 			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal && buildingGoals.get(builder.nextToBuildIndex).status == BuildStatus.HOLD)
 				buildingGoals.get(builder.nextToBuildIndex).status = BuildStatus.ATTEMPT_BUILD;
 			
-			if (supplyUsed + 5 > supplyTotal && buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot) 
+			if (supplyUsed + 5 > supplyTotal && buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot &&
+					!builder.areWeBuilding(UnitTypes.Terran_Supply_Depot)) 
 					buildingGoals.add(builder.nextToBuildIndex, new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
 		}
 		else

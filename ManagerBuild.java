@@ -559,7 +559,7 @@ public class ManagerBuild extends RRAITemplate
 	 * 
 	 */
 	
-	private int underConstructionM() 
+	public int underConstructionM() 
 	{
 		int cost = 0;
 		
@@ -575,7 +575,7 @@ public class ManagerBuild extends RRAITemplate
 		
 		return cost;
 	}
-	private int underConstructionG() 
+	public int underConstructionG() 
 	{
 		int cost = 0;
 
@@ -1024,6 +1024,18 @@ public class ManagerBuild extends RRAITemplate
 */
 			}
 		}
+	}
+
+	public boolean areWeBuilding(UnitTypes ut)
+	{
+		for (Unit u : bwapi.getMyUnits())
+		{
+			if (!bwapi.getUnitType(u.getTypeID()).isBuilding())
+				continue;
+			if (u.isConstructing() && u.getTypeID() == ut.ordinal())
+				return true;
+		}
+		return false;
 	}
 }
 

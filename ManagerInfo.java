@@ -149,6 +149,7 @@ public class ManagerInfo extends RRAITemplate
 	
 	public void unitDestoryed(int unitID)
 	{		
+		//CANT DO THIS NICK!!!!
 		Unit unit = bwapi.getUnit(unitID);
 		System.out.println("destroyed unitID: "+unitID);
 

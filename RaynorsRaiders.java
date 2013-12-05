@@ -169,6 +169,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		if (frameCount % 15 == 0)
 		{
 			managerBuild.trainUnits();
+			System.out.println("Out of train");
 		}
 		
 		if(frameCount % 1 == 0)
@@ -193,7 +194,8 @@ public class RaynorsRaiders implements BWAPIEventListener
 				+ managerBuild.homePositionY + ")", true);
 		bwapi.drawText(0, 10, "DebugScreen= " + debugScreen, true);
 		bwapi.drawText(0, 20, "SyncCount= " + syncCount, true);
-		//bwapi.drawText(400, 20, "Mins are : " + "           Gas is: " + , true);
+		bwapi.drawText(400, 20, "Mins are : " + (bwapi.getSelf().getMinerals() - managerBuild.underConstructionM()) + 
+				"           Gas is: " + (bwapi.getSelf().getGas() - managerBuild.underConstructionG()), true);
 		
 		if (debugScreen == 0)
 			drawDebug0();

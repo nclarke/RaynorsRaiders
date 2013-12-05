@@ -128,7 +128,7 @@ public class ManagerWorkers extends RRAITemplate
 		if (curWorker != null)
 		{
 			temp = curWorker.curOrder;
-			curWorker.curOrder = curWorker.lastOrder;
+			curWorker.curOrder = workerOrders.MINE;
 			curWorker.lastOrder = temp;
 			bwapi.stop(unitID);
 		}
