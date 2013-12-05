@@ -21,6 +21,8 @@ public class CoreBaby extends RRAITemplate
 	int hostileX,hostileY, countdown, campaign ;
 	CoreSupportGenome genomeSetting;
 	LinkedList<UnitTypes> genBasicUnitList;
+	
+	int flip = 0;
 
 	public CoreBaby() 
 	{
@@ -71,9 +73,8 @@ public class CoreBaby extends RRAITemplate
 			
 			if (genomeSetting.defensiveness > (int) (Math.random() * 100) && campaign > 0) {
 				genDefendMilitaryGroup();
-				if (buildingGoals.size() - builder.completedBuildingsIndex < 3)
-					//genDefensiveBasic();
-					;
+				genDefensiveBasic();
+				
 			}
 			else {
 				if (campaign > 0) {
@@ -85,10 +86,7 @@ public class CoreBaby extends RRAITemplate
 				else{
 					genFullMilitaryAssault();
 				}
-				if (buildingGoals.size() - builder.completedBuildingsIndex < 3) {
-					//genOffensiveBasic();
-					System.out.println("Ready to build more!");
-				}
+				genOffensiveBasic();
 			}
 			countdown = genomeSetting.bloodFrequency;
 		}
@@ -146,14 +144,35 @@ public class CoreBaby extends RRAITemplate
 	}
 	
 	public void genDefensiveBasic() {
-		buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Bunker, BuildStatus.HOLD));
-		//buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Missile_Turret, BuildStatus.HOLD));
+		flip++;
+		if (flip == 0) {
+			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Marine.ordinal());
+			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Vulture.ordinal());
+		}
+		if (flip == 10) {
+			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Medic.ordinal());
+			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal());
+		}
+		if (flip == 20)
+			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Firebat.ordinal());
+		if (flip > 2)
+			flip = 0;
 	}
 	
 	public void genOffensiveBasic() {
-		buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(1, 1, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
+		flip++;
+		if (flip == 0) {
+			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Marine.ordinal());
+			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Vulture.ordinal());
+		}
+		if (flip == 1) {
+			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Medic.ordinal());
+			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal());
+		}
+		if (flip == 2)
+			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Firebat.ordinal());
+		if (flip > 2)
+			flip = 0;
 	}
 	
 	
