@@ -376,6 +376,7 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public int addBaseToBaseWorkers() 
 	{
+		System.out.println("MW: ----------------------------------------Added base to base workers");
 		baseWorkers.add(new LinkedList<Worker>());
 		return baseWorkers.size();
 	}
@@ -401,7 +402,10 @@ public class ManagerWorkers extends RRAITemplate
 	
 	public int getBaseWorkers(int baseNum)
 	{
-		return baseWorkers.get(baseNum).size();
+		if (baseNum < baseWorkers.size())
+			return baseWorkers.get(baseNum).size();
+		else
+			return 0;
 	}
 	
 	/*

@@ -403,7 +403,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		if (createdUnitType == UnitTypes.Terran_Command_Center.ordinal())
 		{
 			//System.out.println("Created CC");
-			managerBuild.newBaseLocation(createdUnit);
+			//managerBuild.newBaseLocation(createdUnit);
 		}
 		
 		managerMilitary.addCreatedMilitaryUnits(createdUnit, createdUnitType);

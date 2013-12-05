@@ -39,6 +39,7 @@ public class CoreBaby extends RRAITemplate
 	public void setup() 
 	{
 		initBuildStyle_siegeExpand();
+		//initFastExpand();
 		genBasicUnitList.add(UnitTypes.Terran_Marine);
 		genBasicUnitList.add(UnitTypes.Terran_Vulture);
 		genBasicUnitList.add(UnitTypes.Terran_Medic);
@@ -197,6 +198,12 @@ public class CoreBaby extends RRAITemplate
 		military.unitOperation(genBasicUnitList, 20, entrance.getFirstSideX(), entrance.getFirstSideY());
 	}
 
+	/*
+	 * requiredSupply, requiredSCV, baseAssignment, blueprint
+	 * 
+	 */
+
+	
 	
 	public void initBuildStyle_siegeExpand() 
 	{
@@ -209,6 +216,11 @@ public class CoreBaby extends RRAITemplate
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Academy, BuildStatus.HOLD));
+	}
+	
+	public void initFastExpand()
+	{
+		buildingGoals.add(new BuildingRR(0, 10, 0, UnitTypes.Terran_Command_Center, BuildStatus.HOLD));
 	}
 	
 	

@@ -88,7 +88,8 @@ public class ManagerBuild extends RRAITemplate
 		ACCEPTTED, ATTEMPT_BUILD, HOLD
 	}
 
-	public static class BuildingRR {
+	public static class BuildingRR
+	{
 		int requiredSupply;
 		int requiredSCVs;
 		int baseAssignment;
@@ -509,20 +510,17 @@ public class ManagerBuild extends RRAITemplate
 	}
 	
 	/*
-	 * Gets called whenever a new base is created. Called from RR.unitCreated
+	 * Gets called whenever a new base is created. Called from build in MB when building a cc
 	 */
 	
-	public void newBaseLocation(Unit newCC)
+	public void newBaseLocation(BaseLocation bl)
 	{
-		for (BaseLocation bl : bwapi.getMap().getBaseLocations())
-		{
-			if (bl.getX() == newCC.getX() && bl.getY() == newCC.getY())
-			{
-				ourBases.add(bl);
-				workers.addBaseToBaseWorkers();
-				//System.out.println("ManagerBuild: Added new base succesfully");
-			}
-		}		
+		System.out.println("---------------------------------IN MB: adding new base");
+		int temp;
+		temp = workers.addBaseToBaseWorkers();
+		System.out.println("Added base " + temp);
+		ourBases.add(bl);
+		System.out.println("-------------------------ManagerBuild: Added new base succesfully");		
 	}
 	
 	/*
@@ -536,20 +534,23 @@ public class ManagerBuild extends RRAITemplate
 
 	public BaseLocation getBaseFromUnit(Unit curCC)
 	{
+		BaseLocation nearestBl = null;
+		double distance;
+		double nearestDist = 99999999999999.9;
 		//System.out.println("ManagerBuild: In base from unit");
 		//System.out.println("Unit is at: " + curCC.getX() + ", " + curCC.getY());
 		for (BaseLocation bl : ourBases)
 		{
 			//System.out.println("Loop one");
 			//System.out.println("bl is at: " + bl.getX() + ", " + bl.getY());
-			if (curCC.getX() == bl.getX() && curCC.getY() == bl.getY())
+			distance = Math.pow(curCC.getX() - bl.getX(),2) + Math.pow(curCC.getY() - bl.getY(), 2);
+			if (distance < nearestDist)
 			{
-				//System.out.println("MangerBuild: Got base from Unit");
-				return bl;
+				nearestDist = distance;
+				nearestBl = bl;
 			}
 		}
-		//System.out.println("WARNING--------------------- getBaseFromUnit eturning null");
-		return null;
+		return nearestBl;
 		
 	}
 	
@@ -717,8 +718,8 @@ public class ManagerBuild extends RRAITemplate
 							{
 								xtile = nearestBase.getX();
 								ytile = nearestBase.getY();
-								
-								ourBases.add(nearestBase);
+								newBaseLocation(nearestBase);
+								//ourBases.add(nearestBase);
 							}
 							else
 							{
