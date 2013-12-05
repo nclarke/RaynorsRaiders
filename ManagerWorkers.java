@@ -46,7 +46,7 @@ public class ManagerWorkers extends RRAITemplate
 			curWorkerUnit = bwapi.getUnit(w.unitID);
 			if (curWorkerUnit.isUnderAttack())
 			{
-				//workerUnderAttack(curWorkerUnit);
+				workerUnderAttack(curWorkerUnit);
 			}
 		}
 		int baseNdx = 0;
