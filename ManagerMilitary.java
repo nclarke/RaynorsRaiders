@@ -203,8 +203,22 @@ public class ManagerMilitary extends RRAITemplate
 	
     public void debug()
     {
-    	int spacing = 10;
-		
+    	int screenNdxX = 0;
+    	int screenNdxY = 50;
+    	bwapi.drawText(0, 40, "Teams are", true);
+    	for (MilitaryTeam mt : militaryTeams)
+    	{
+    		bwapi.drawText(screenNdxX, screenNdxY, "Team is ", true);
+    		screenNdxY += 10;
+    		for (Unit u : mt.militaryTeam)
+    		{
+    			bwapi.drawText(screenNdxX, screenNdxY, bwapi.getUnitType(u.getTypeID()).getName(), true);
+    			screenNdxY += 10;
+    		}
+    		screenNdxX += 100;
+    		screenNdxY = 50;
+    	}
+		/*
 		bwapi.drawText(new Point(5,0), "Our home position: " + String.valueOf(homePositionX) + ", " + String.valueOf(homePositionY), true);
 		for (BaseLocation b : bwapi.getMap().getBaseLocations()) {
 			if (b.isStartLocation()) {
@@ -213,6 +227,7 @@ public class ManagerMilitary extends RRAITemplate
 			}
 			spacing =+ 10;
 		}
+		*/
     }
     
     public void testVult() 
@@ -979,7 +994,7 @@ public class ManagerMilitary extends RRAITemplate
 					{
 						bwapi.useTech(tmp.getID(), TechTypes.Stim_Packs.ordinal());
 					}
-					
+					/*
 					for(int groupUnits = 0; groupUnits < militaryTeams.get(index).getMilitaryTeam().size(); groupUnits++)
 					{
 						int targetID = militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getTargetUnitID();
@@ -990,6 +1005,7 @@ public class ManagerMilitary extends RRAITemplate
 							bwapi.attack(tmp.getID(), targetID);
 						}
 					}
+					*/
 				}
 				
 				if(tmp.getTypeID() == UnitTypes.Terran_Medic.ordinal())

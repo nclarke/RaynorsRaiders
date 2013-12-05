@@ -68,7 +68,7 @@ public class ManagerWorkers extends RRAITemplate
 					if (gw.curOrder == ManagerWorkers.workerOrders.GAS)
 						curNumGasWorkers++;
 				}
-				System.out.println("Gas workers are " + curNumGasWorkers);
+				//System.out.println("Gas workers are " + curNumGasWorkers);
 				if (gas & (curNumGasWorkers < 3))
 				{
 					System.out.println("MW: assiging workers to gas");

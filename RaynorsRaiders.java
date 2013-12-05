@@ -19,6 +19,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 {
 
 	boolean debgFlag = false;
+	int debugScreen = 0;
 	boolean healthFlag = false;
 	boolean militaryDebugFlag = false;
 	int syncCount = 0;
@@ -167,7 +168,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 		if (frameCount % 15 == 0)
 		{
-			//managerBuild.trainUnits();
+			managerBuild.trainUnits();
 		}
 		
 		if(frameCount % 1 == 0)
@@ -190,8 +191,26 @@ public class RaynorsRaiders implements BWAPIEventListener
 		////System.out.println("Start debug");
 		bwapi.drawText(0, 0, "Home base location is ( " + managerBuild.homePositionX + ", "
 				+ managerBuild.homePositionY + ")", true);
-		bwapi.drawText(0, 20, "SyncCount=" + syncCount, true);
+		bwapi.drawText(0, 10, "DebugScreen= " + debugScreen, true);
+		bwapi.drawText(0, 20, "SyncCount= " + syncCount, true);
+		//bwapi.drawText(400, 20, "Mins are : " + "           Gas is: " + , true);
+		
+		if (debugScreen == 0)
+			drawDebug0();
+		else if (debugScreen == 1)
+			drawDebug1();
+		else if (debugScreen == 2)
+			drawDebug2();
 
+		
+		////System.out.println("End debug");
+	}
+	/*
+	 * Building debug
+	 */
+
+	public void drawDebug0()
+	{
 		int undx = 0;
 		int screenNdx = 40;
 		bwapi.drawText(300, screenNdx, "Start unit list is ", true);
@@ -302,15 +321,24 @@ public class RaynorsRaiders implements BWAPIEventListener
 		//}
 		//System.out.println("Here");
 		
-		
+	}
+	
+	/*
+	 * Military debug
+	 */
+	
+	public void drawDebug1()
+	{
 		if(militaryDebugFlag)
 		{
 			//managerMilitary.debug();
 		}
-		
-		////System.out.println("End debug");
+		managerMilitary.debug();
 	}
-	
+	public void drawDebug2()
+	{
+		
+	}
 	
 	public void gameEnded() 
 	{
@@ -324,6 +352,14 @@ public class RaynorsRaiders implements BWAPIEventListener
 	{
 		if (keyCode == 66 ) //if equals b toggle debgFlag
 			debgFlag = !debgFlag;
+		if (keyCode == 67 ) //if equals b toggle debgFlag
+		{
+			if (debugScreen == 2) //if last screen want to send back to first
+				debugScreen = 0;
+			else
+				debugScreen++;
+		}
+			
 		else if (keyCode == 72) // press h to toggle health
 			healthFlag = !healthFlag;
 		else if (keyCode == 77) // press m to toggle military debugs

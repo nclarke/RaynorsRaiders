@@ -172,15 +172,16 @@ public class ManagerBuild extends RRAITemplate
 	
 	public void trainUnits()
 	{	
+		System.out.println("Traning Units");
 		for (Unit u : productionBuildings)
 		{
 			if (u.getTrainingQueueSize() == 0)
 			{
 				if (u.getTypeID() == UnitTypes.Terran_Barracks.ordinal() && barracksUnit != null)
 				{
-					if(bwapi.getSelf().getMinerals() - underConstructionM() >= barracksUnit.getMineralPrice())
+					if(bwapi.getSelf().getMinerals() >= barracksUnit.getMineralPrice())
 					{
-						if(bwapi.getSelf().getGas() - underConstructionG() >= barracksUnit.getGasPrice())
+						if(bwapi.getSelf().getGas() >= barracksUnit.getGasPrice())
 						{
 							bwapi.train(u.getID(), barracksUnit.getID());
 						}
@@ -340,6 +341,7 @@ public class ManagerBuild extends RRAITemplate
 		
 //System.out.println("roster: " + roster.toString());
 		// unit training
+		/*
 		switch(unitsMode) 
 		{
 		case FIRST_POSSIBLE:
@@ -400,6 +402,7 @@ public class ManagerBuild extends RRAITemplate
 			break;
 			
 		}
+		*/
 				
 	}
 	
@@ -496,10 +499,11 @@ public class ManagerBuild extends RRAITemplate
 	 * 
 	 */
 	
-	
 	private int underConstructionM() 
 	{
 		int cost = 0;
+		if (cost == 0)
+			return 0;
 		
 		for(Unit unit : bwapi.getMyUnits()) 
 		{
@@ -513,11 +517,11 @@ public class ManagerBuild extends RRAITemplate
 		
 		return cost;
 	}
-	
 	private int underConstructionG() 
 	{
 		int cost = 0;
-		
+		if (cost == 0)
+			return 0;
 		for(Unit unit : bwapi.getMyUnits()) 
 		{
 			if(unit.isConstructing()) 
