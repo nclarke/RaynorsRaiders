@@ -204,10 +204,9 @@ public class MiltScouter
 	
 	   // Returns the id of a unit of a given type, that is closest to a pixel position (x,y), or -1 if we
     // don't have a unit of this type
-    public Unit getNearestUnit(int unitTypeID, int x, int y) 
+    public int getNearestUnit(int unitTypeID, int x, int y) 
     {
     	int nearestID = -1;
-    	Unit nearestUnit = null;
 	    double nearestDist = 9999999;
 	    for (Unit unit : mInfo.bwapi.getMyUnits()) 
 	    {
@@ -216,11 +215,10 @@ public class MiltScouter
 	    	if (nearestID == -1 || dist < nearestDist) 
 	    	{
 	    		nearestID = unit.getID();
-	    		nearestUnit = unit;
 	    		nearestDist = dist;
 	    	}
 	    }
-	    return nearestUnit;
+	    return nearestID;
     }
     
 	/*

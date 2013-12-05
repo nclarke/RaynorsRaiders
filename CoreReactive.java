@@ -35,7 +35,7 @@ public class CoreReactive extends RRAITemplate
 	public void checkUp() 
 	{
 		if (baby.genomeSetting.defensiveness > (int) (Math.random() * 100)) {
-			Unit targetUnit = info.scouter.getNearestUnit(UnitTypes.Protoss_Zealot.ordinal(), builder.homePositionX, builder.homePositionY);
+			Unit targetUnit = bwapi.getUnit(info.scouter.getNearestUnit(UnitTypes.Protoss_Zealot.ordinal(), builder.homePositionX, builder.homePositionY));
 			military.unitOperation(20, targetUnit.getX(), targetUnit.getY());
 		}
 	}

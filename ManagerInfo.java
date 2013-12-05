@@ -95,6 +95,15 @@ public class ManagerInfo extends RRAITemplate
 
 	public void checkUp() 
 	{
+		if(bwapi.getFrameCount()%2500 == 0)
+		{
+			for(Unit u : this.enemyUnits)
+			{
+				System.out.println("enemy unit is: "+u.toString());
+			}
+			this.enemyUnits.clear();
+			
+		}
 		this.isScouting = false;
 		if(this.scouter.scout != null)
 			this.isScouting = true;
@@ -183,7 +192,6 @@ public class ManagerInfo extends RRAITemplate
 	
 	public void unitDestoryed(int unitID)
 	{		
-		//CANT DO THIS NICK!!!!
 		Unit unit = bwapi.getUnit(unitID);
 		System.out.println("destroyed unitID: "+unitID);
 
