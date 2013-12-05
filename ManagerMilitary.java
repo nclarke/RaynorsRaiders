@@ -175,7 +175,7 @@ public class ManagerMilitary extends RRAITemplate
 	public void checkUp() {
 		
 		//for testing purposes - sends units to attack and tries to handle attack logistics for different units
-		System.out.println("START OF MM CHECKUP");
+		//System.out.println("START OF MM CHECKUP");
 		//attackLocationsTest();
 		
 		rallyTeamToAttack();
@@ -184,7 +184,7 @@ public class ManagerMilitary extends RRAITemplate
 		maintainAttackLocations();
 		//handleTeamStatus();
 		removeEmptyMilitaryTeam();
-		System.out.println("END OF MM CHECKUP");
+		//System.out.println("END OF MM CHECKUP");
 	}
 	
 	/*
@@ -573,9 +573,9 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			if(militaryTeams.get(index).getMilitaryTeam().size() == 0)
 			{
-				System.out.println("MM: OLD MILITARYTEAMS SIZE: " + militaryTeams.size() );
+				//System.out.println("MM: OLD MILITARYTEAMS SIZE: " + militaryTeams.size() );
 				militaryTeams.remove(index);
-				System.out.println("MM: NEW MILITARYTEAMS SIZE: " +  militaryTeams.size() );
+				//System.out.println("MM: NEW MILITARYTEAMS SIZE: " +  militaryTeams.size() );
 			}
 		}
 	}
@@ -922,7 +922,22 @@ public class ManagerMilitary extends RRAITemplate
 			{
 				for(int index2 = 0; index2 < militaryTeams.get(index).getMilitaryTeam().size(); index2++)
 				{
-					bwapi.attack(militaryTeams.get(index).getMilitaryTeam().get(index2).getID(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
+					Unit milUnit = militaryTeams.get(index).getMilitaryTeam().get(index2);
+					
+					if(milUnit.isIdle())
+					{
+						ChokePoint entrance = null;
+						Region baseStart = react.gen_findClosestRegion(militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
+							if (baseStart != null && !react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY).getChokePoints().isEmpty())
+							{
+								entrance = (react.gen_findClosestRegion(militaryTeams.get(index).getX(), militaryTeams.get(index).getY())).getChokePoints().get(0);
+							}
+						militaryTeams.get(index).setLocation(entrance.getSecondSideX(), entrance.getSecondSideY());
+					}
+					else
+					{
+						bwapi.attack(milUnit.getID(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
+					}
 				}
 			}
 		}
@@ -1165,29 +1180,16 @@ public class ManagerMilitary extends RRAITemplate
 				}
 				
 				if(poolUnit.getTypeID() == UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal())
-				{
-					int xtile, ytile;
-					Region r = react.gen_findClosestRegion(homePositionX, homePositionY);
-					ChokePoint cp = null;
-
-					if (r != null) 
-					{
-						if (r.getChokePoints().isEmpty())
+				{	
+					ChokePoint entrance = null;
+					Region baseStart = react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY);
+						if (baseStart != null && !react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY).getChokePoints().isEmpty())
 						{
-							//System.out.println("No chokepoint?");
+							entrance = (react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY)).getChokePoints().get(0);
 						}
-						else 
-						{
-							cp = r.getChokePoints().get(0);
-						}
-					}
+					bwapi.move(poolUnit.getID(), entrance.getFirstSideX(), entrance.getFirstSideY());
 					
-					xtile = cp.getFirstSideX();
-					ytile = cp.getFirstSideY();
-					
-					bwapi.move(poolUnit.getID(), xtile, ytile);
-					
-					if(poolUnit.isStartingAttack())
+					if(poolUnit.isStartingAttack() && !poolUnit.isSieged())
 					{
 						bwapi.siege(poolUnit.getID());
 					}
