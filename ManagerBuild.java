@@ -61,13 +61,11 @@ public class ManagerBuild extends RRAITemplate
 		upgradesStack = new LinkedList<UpgradeTypes>();
 		TechTypes tt;
 		UpgradeTypes upt;
-		upt = UpgradeTypes.Terran_Infantry_Weapons;
-		upgradesStack.add(upt);
-		upgradesStack.add(upt);
 		upt = UpgradeTypes.U_238_Shells;
 		upgradesStack.add(upt);
-		tt = TechTypes.Stim_Packs;
-		researchStack.add(tt);
+		upt = UpgradeTypes.Terran_Infantry_Weapons;
+		upgradesStack.add(upt);
+		//upgradesStack.add(upt);
 		tt = TechTypes.Tank_Siege_Mode;
 		researchStack.add(tt);
 		tt = TechTypes.Nuclear_Strike;

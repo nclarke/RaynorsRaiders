@@ -29,7 +29,7 @@ public class CoreBaby extends RRAITemplate
 		hostileX = 0;
 		hostileY = 0;
 		countdown = 200;
-		genomeSettin g = new CoreSupportGenome();
+		genomeSetting = new CoreSupportGenome();
 		genBasicUnitList = new LinkedList<UnitTypes>();
 		campaign = genomeSetting.bloodFrequency * 10;
 	}
@@ -153,27 +153,30 @@ public class CoreBaby extends RRAITemplate
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Medic.ordinal());
 			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal());
 		}
-		if (flip == 20)
+		if (flip == 13)
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Firebat.ordinal());
+		if (flip == 14)
+				builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Ghost.ordinal());
 		flip++;
-		if (flip > 2)
+		if (flip > 15)
 			flip = 0;
 	}
 	
 	public void genOffensiveBasic() {
-
 		if (flip == 0) {
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Marine.ordinal());
 			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Vulture.ordinal());
 		}
-		if (flip == 1) {
+		if (flip == 10) {
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Medic.ordinal());
 			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal());
 		}
-		if (flip == 2)
+		if (flip == 13)
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Firebat.ordinal());
+		if (flip == 14)
+				builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Ghost.ordinal());
 		flip++;
-		if (flip > 2)
+		if (flip > 15)
 			flip = 0;
 	}
 	
@@ -222,9 +225,10 @@ public class CoreBaby extends RRAITemplate
 	{
 		//buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
 		//buildingGoals.add(new BuildingRR(10, 9, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(0, 1, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
+		
 		//buildingGoals.add(new BuildingRR(0, 1, 0, UnitTypes.Terran_Bunker, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(0, 2, 0, UnitTypes.Terran_Refinery, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 1, 0, UnitTypes.Terran_Refinery, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 2, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 12, 0, UnitTypes.Terran_Academy, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));

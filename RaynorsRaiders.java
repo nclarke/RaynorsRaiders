@@ -180,10 +180,12 @@ public class RaynorsRaiders implements BWAPIEventListener
 		}
 		
 		syncCount = 2;
+		/*
 		if (frameCount == 200)
 		{
 			managerMilitary.scanLocation(500, 1000);
 		}
+		*/
 		//managerMilitary.testSiege();
 		//managerMilitary.testStutter();
 		syncCount = 3;
