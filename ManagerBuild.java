@@ -59,6 +59,17 @@ public class ManagerBuild extends RRAITemplate
 		
 		researchStack = new LinkedList<TechTypes>();
 		upgradesStack = new LinkedList<UpgradeTypes>();
+		TechTypes tt;
+		UpgradeTypes upt;
+		upt = UpgradeTypes.Terran_Infantry_Weapons;
+		upgradesStack.add(upt);
+		upgradesStack.add(upt);
+		upt = UpgradeTypes.U_238_Shells;
+		upgradesStack.add(upt);
+		tt = TechTypes.Stim_Packs;
+		researchStack.add(tt);
+		tt = TechTypes.Tank_Siege_Mode;
+		researchStack.add(tt);
 		
 		buildingsStack = new ArrayList<BuildingRR>();
 		completedBuildingsIndex = -1;
@@ -344,62 +355,6 @@ public class ManagerBuild extends RRAITemplate
 		}
 
 		constructionStatus();
-		
-//System.out.println("roster: " + roster.toString());
-		// unit training
-		/*
-		switch(unitsMode) 
-		{
-		case FIRST_POSSIBLE:
-			int i = 0;
-			boolean canTrain = false;
-			UnitTypes c = null;
-			UnitType soldier = null;
-			
-			// Go through list until we find a trainable unit
-			while(!canTrain && i < roster.size())
-			{
-				c = roster.get(i);
-				soldier = bwapi.getUnitType(c.ordinal());
-
-				for(int j = 0; j < completedBuildingsIndex+1; j++)
-				{
-					BuildingRR bldg = buildingsStack.get(j);
-					
-					if(bldg.blueprint.ordinal() == soldier.getWhatBuildID())
-					{
-						canTrain = true;
-						break;
-					}
-				}
-				
-				if(!canTrain) 
-				{
-					i++;
-				}
-				else 
-				{
-					train(c, i);
-				}
-			}
-				
-			break;
-		case BLOCKING_STACK:
-			c = null;
-			
-			c = roster.peek();
-			
-            train(c, 0);
-			break;
-		case HOLD_ALL:
-			//System.out.println("halting construction...");
-			break;
-		default:
-			break;
-			
-		}
-
-		*/
 				
 
 

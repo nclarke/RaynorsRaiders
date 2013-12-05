@@ -226,6 +226,7 @@ public class CoreBaby extends RRAITemplate
 		//buildingGoals.add(new BuildingRR(0, 1, 0, UnitTypes.Terran_Bunker, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 2, 0, UnitTypes.Terran_Refinery, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 12, 0, UnitTypes.Terran_Academy, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
@@ -233,7 +234,6 @@ public class CoreBaby extends RRAITemplate
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Missile_Turret, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Missile_Turret, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Command_Center, BuildStatus.HOLD));
-		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Academy, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Missile_Turret, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 17, 0, UnitTypes.Terran_Comsat_Station, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 18, 0, UnitTypes.Terran_Starport, BuildStatus.HOLD));
