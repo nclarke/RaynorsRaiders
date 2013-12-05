@@ -29,9 +29,9 @@ public class CoreBaby extends RRAITemplate
 		hostileX = 0;
 		hostileY = 0;
 		countdown = 200;
-		genomeSetting = new CoreSupportGenome();
+		genomeSettin g = new CoreSupportGenome();
 		genBasicUnitList = new LinkedList<UnitTypes>();
-		campaign = genomeSetting.bloodFrequency * 100;
+		campaign = genomeSetting.bloodFrequency * 10;
 	}
 	
 	public void AILinkData() {

@@ -36,7 +36,7 @@ public class ManagerBuild extends RRAITemplate
 	LinkedList<Unit> productionBuildings;
 	LinkedList<BaseLocation> ourBases;
 	DescisionTree techTree;
-	UnitType barracksUnit, factoryUnit, starportUnit;
+	UnitType barracksUnit, factoryUnit, starportUnit, nukeUnit;
 	
 	UnitTypes tempType;
 	Unit tempUnit;
@@ -69,6 +69,8 @@ public class ManagerBuild extends RRAITemplate
 		tt = TechTypes.Stim_Packs;
 		researchStack.add(tt);
 		tt = TechTypes.Tank_Siege_Mode;
+		researchStack.add(tt);
+		tt = TechTypes.Nuclear_Strike;
 		researchStack.add(tt);
 		
 		buildingsStack = new ArrayList<BuildingRR>();
@@ -166,6 +168,7 @@ public class ManagerBuild extends RRAITemplate
 		barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Marine.ordinal());
 		factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal());
 		starportUnit = bwapi.getUnitType(UnitTypes.Terran_Wraith.ordinal());
+		nukeUnit = bwapi.getUnitType(UnitTypes.Terran_Nuclear_Missile.ordinal());
 
 	}
 	
@@ -236,6 +239,20 @@ public class ManagerBuild extends RRAITemplate
 					}
 					else 
 						react.econ_sendBuildAlert(BuildAlert.NO_MINERALS);			
+				}
+				if (u.getTypeID() == UnitTypes.Terran_Nuclear_Silo.ordinal() && nukeUnit != null)
+				{
+					if(bwapi.getSelf().getMinerals() - underConstructionM() >= nukeUnit.getMineralPrice())
+					{
+						if(bwapi.getSelf().getGas() - underConstructionG() >= nukeUnit.getGasPrice())
+						{
+							bwapi.train(u.getID(), nukeUnit.getID());
+						}
+						else
+							react.econ_sendBuildAlert(BuildAlert.NO_GAS);
+					}
+					else 
+						react.econ_sendBuildAlert(BuildAlert.NO_MINERALS);
 				}
 			}
 		}
