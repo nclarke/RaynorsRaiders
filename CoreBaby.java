@@ -86,7 +86,10 @@ public class CoreBaby extends RRAITemplate
 				if (campaign > 0) {
 					genSpreadMilitaryGroup();
 				}
-				else {
+				else if (campaign == 1){
+					military.orderAllMilitaryTeamsToAtk(hostileX,hostileY);
+				}
+				else{
 					genFullMilitaryAssault();
 				}
 				if (buildingGoals.size() - builder.completedBuildingsIndex < 3) {
@@ -109,9 +112,6 @@ public class CoreBaby extends RRAITemplate
 			
 			if (supplyNeeded <= supplyTotal && SCVsNeeded <= SCVsTotal && buildingGoals.get(builder.nextToBuildIndex).status == BuildStatus.HOLD)
 				buildingGoals.get(builder.nextToBuildIndex).status = BuildStatus.ATTEMPT_BUILD;
-			
-			//if (SCVsNeeded > SCVsTotal) 
-			//	workers.trainWorker();
 			
 			if (supplyUsed + 5 > supplyTotal && buildingGoals.get(builder.nextToBuildIndex).blueprint != UnitTypes.Terran_Supply_Depot) 
 					buildingGoals.add(builder.nextToBuildIndex, new BuildingRR(0, 0, 0, UnitTypes.Terran_Supply_Depot, BuildStatus.ATTEMPT_BUILD));
@@ -183,8 +183,6 @@ public class CoreBaby extends RRAITemplate
 	
 	public void genFullMilitaryAssault() {
 		military.unitOperation(genBasicUnitList, 20, hostileX,hostileY);
-		military.orderAllMilitaryTeamsToAtk(hostileX,hostileY);
-		//military.orderUnitPoolToAtk(info.hostileX, info.hostileY);
 		military.scanLocation(hostileX,hostileY);
 		
 	}
