@@ -175,7 +175,7 @@ public class ManagerMilitary extends RRAITemplate
 	public void checkUp() {
 		
 		//for testing purposes - sends units to attack and tries to handle attack logistics for different units
-		System.out.println("START OF MM CHECKUP");
+		//System.out.println("START OF MM CHECKUP");
 		//attackLocationsTest();
 		
 		rallyTeamToAttack();
@@ -184,7 +184,7 @@ public class ManagerMilitary extends RRAITemplate
 		maintainAttackLocations();
 		//handleTeamStatus();
 		removeEmptyMilitaryTeam();
-		System.out.println("END OF MM CHECKUP");
+		//System.out.println("END OF MM CHECKUP");
 	}
 	
 	/*
@@ -573,9 +573,9 @@ public class ManagerMilitary extends RRAITemplate
 		{
 			if(militaryTeams.get(index).getMilitaryTeam().size() == 0)
 			{
-				System.out.println("MM: OLD MILITARYTEAMS SIZE: " + militaryTeams.size() );
+				//System.out.println("MM: OLD MILITARYTEAMS SIZE: " + militaryTeams.size() );
 				militaryTeams.remove(index);
-				System.out.println("MM: NEW MILITARYTEAMS SIZE: " +  militaryTeams.size() );
+				//System.out.println("MM: NEW MILITARYTEAMS SIZE: " +  militaryTeams.size() );
 			}
 		}
 	}
