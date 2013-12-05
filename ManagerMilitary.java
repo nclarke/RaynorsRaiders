@@ -1000,14 +1000,12 @@ public class ManagerMilitary extends RRAITemplate
 					{
 						bwapi.useTech(tmp.getID(), TechTypes.Stim_Packs.ordinal());
 					}
-<<<<<<< HEAD
 					/*
 					for(int groupUnits = 0; groupUnits < militaryTeams.get(index).getMilitaryTeam().size(); groupUnits++)
 =======
 					
 					//commented out: causing crashes 
 					/*for(int groupUnits = 0; groupUnits < militaryTeams.get(index).getMilitaryTeam().size(); groupUnits++)
->>>>>>> dff1eb9a4dcbfad37db55068fe273444dbf0877b
 					{
 						int targetID = militaryTeams.get(index).getMilitaryTeam().get(groupUnits).getTargetUnitID();
 						Unit targetUnit = bwapi.getUnit(targetID);
@@ -1016,12 +1014,10 @@ public class ManagerMilitary extends RRAITemplate
 						{
 							bwapi.attack(tmp.getID(), targetID);
 						}
-<<<<<<< HEAD
 					}
-					*/
-=======
+					
 					}*/
->>>>>>> dff1eb9a4dcbfad37db55068fe273444dbf0877b
+
 				}
 				
 				if(tmp.getTypeID() == UnitTypes.Terran_Medic.ordinal())
