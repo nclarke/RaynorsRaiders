@@ -149,16 +149,16 @@ public class CoreBaby extends RRAITemplate
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Marine.ordinal());
 			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Vulture.ordinal());
 		}
-		if (flip >= 10) {
+		if (flip >= 100) {
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Medic.ordinal());
 			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal());
 		}
-		if (flip >= 13)
+		if (flip >= 120)
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Firebat.ordinal());
-		if (flip >= 14)
+		if (flip >= 140)
 				builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Ghost.ordinal());
 		flip++;
-		if (flip > 15)
+		if (flip > 160)
 			flip = 0;
 	}
 	
@@ -167,16 +167,16 @@ public class CoreBaby extends RRAITemplate
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Marine.ordinal());
 			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Vulture.ordinal());
 		}
-		if (flip >= 10) {
+		if (flip >= 100) {
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Medic.ordinal());
 			builder.factoryUnit = bwapi.getUnitType(UnitTypes.Terran_Siege_Tank_Tank_Mode.ordinal());
 		}
-		if (flip >= 13)
+		if (flip >= 120)
 			builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Firebat.ordinal());
-		if (flip >= 14)
+		if (flip >= 140)
 				builder.barracksUnit = bwapi.getUnitType(UnitTypes.Terran_Ghost.ordinal());
 		flip++;
-		if (flip > 15)
+		if (flip > 160)
 			flip = 0;
 	}
 	
@@ -202,6 +202,8 @@ public class CoreBaby extends RRAITemplate
 	public void genFullMilitaryAssault() {
 		military.unitOperation(genBasicUnitList, 20, hostileX,hostileY);
 		military.scanLocation(hostileX,hostileY);
+		military.orderAllMilitaryTeamsToAtk(hostileX,hostileY);
+		military.orderUnitPoolToAtk(hostileX,hostileY);
 		
 	}
 	
