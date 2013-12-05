@@ -928,15 +928,19 @@ public class ManagerMilitary extends RRAITemplate
 					{
 						ChokePoint entrance = null;
 						Region baseStart = react.gen_findClosestRegion(militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
-							if (baseStart != null && !react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY).getChokePoints().isEmpty())
-							{
-								entrance = (react.gen_findClosestRegion(militaryTeams.get(index).getX(), militaryTeams.get(index).getY())).getChokePoints().get(0);
-							}
-						militaryTeams.get(index).setLocation(entrance.getSecondSideX(), entrance.getSecondSideY());
+						if (baseStart != null && !react.gen_findClosestRegion(builder.homePositionX, builder.homePositionY).getChokePoints().isEmpty())
+						{
+							entrance = (react.gen_findClosestRegion(militaryTeams.get(index).getX(), militaryTeams.get(index).getY())).getChokePoints().get(0);
+						}
+							
+						if(rallyReadyCheck(militaryTeams.get(index).getMilitaryTeam(), milUnit.getX(), milUnit.getY()))
+							militaryTeams.get(index).setLocation(entrance.getSecondSideX(), entrance.getSecondSideY());
+						else if(rallyReadyCheck(militaryTeams.get(index).getMilitaryTeam(), entrance.getSecondSideX(), entrance.getSecondSideX()))
+							militaryTeams.get(index).setLocation(entrance.getFirstSideX(), entrance.getFirstSideY());
 					}
 					else
 					{
-						bwapi.patrol(milUnit.getID(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
+						bwapi.attack(milUnit.getID(), militaryTeams.get(index).getX(), militaryTeams.get(index).getY());
 					}
 				}
 			}
