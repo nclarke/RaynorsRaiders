@@ -51,10 +51,14 @@ public class MiltScouter
 			base.hasSeen = false;
 			base.tile = mInfo.new Tile(b.getX(), b.getY());
 			bases.add(base);
+			System.out.println("initializing the home base");
+			System.out.println("this b ("+b.getX()+","+b.getY()+")");
+			System.out.println("from milt ("+mInfo.military.homePositionX+","+mInfo.military.homePositionY+")");
 			if(b.isStartLocation() && b.getX() == mInfo.military.homePositionX
 			 && b.getY() == mInfo.military.homePositionY)
 			{
 				this.homeBase = base;
+				System.out.println("Our base is at ("+base.baseLoc.getX()+","+base.baseLoc.getY()+")");
 			}
 		}
 	}
@@ -133,8 +137,10 @@ public class MiltScouter
 			{
 				currIndex = 0;
 				System.out.println("no more scouting locations");
-				mInfo.workers.checkInWorker(scout.getID());
-				this.scout = null;
+				System.out.println("time to Dwell!");
+				this.mInfo.timeToDwell = true;
+//				mInfo.workers.checkInWorker(scout.getID());
+//				this.scout = null;
 			}
 			else
 			{

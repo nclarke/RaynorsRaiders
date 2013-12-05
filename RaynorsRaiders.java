@@ -110,7 +110,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		managerBuild.setup();
 		managerWorkers.setup();
 		managerInfo.setup();
-		//System.out.println("Game setup complete");
+		System.out.println("Game setup complete");
 		
 	}
 	
@@ -129,6 +129,7 @@ public class RaynorsRaiders implements BWAPIEventListener
 		{		
 			managerBuild.captureBaseLocation();
 			managerMilitary.startUp();
+			managerInfo.startUp();
 			coreBaby.startUp();
 			if( managerBuild.baseSetup() != 1)
 			{

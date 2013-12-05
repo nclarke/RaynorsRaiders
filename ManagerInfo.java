@@ -5,6 +5,7 @@ import java.util.*;
 
 import javabot.JNIBWAPI;
 import javabot.model.BaseLocation;
+import javabot.model.Player;
 import javabot.model.Unit;
 import javabot.types.TechType;
 import javabot.types.TechType.TechTypes;
@@ -23,12 +24,16 @@ public class ManagerInfo extends RRAITemplate
 	List<Unit> neutralUnits;
 	List<Unit> enemyUnits;/*refresh after sometime*/
 	int selfID;
+	int enemyID;
 	int hostileX;
 	int hostileY;
 	boolean isScouting;
+	boolean timeToDwell;
 	List<Base> enemyBases;/*make better*/
-	Unit closestUnit; /*the closest enemy unit to our base*/
-	Tile closestTile; /*tile of the closest enemy unit to our base*/
+	javabot.model.ChokePoint enemyChoke;
+	Tile chokeTile;
+//	Unit closestUnit; /*the closest enemy unit to our base*/
+//	Tile closestTile; /*tile of the closest enemy unit to our base*/
 	
 	
 	public class Tile {
@@ -63,27 +68,47 @@ public class ManagerInfo extends RRAITemplate
 		neutralUnits = new ArrayList<Unit>();
 		enemyUnits = new ArrayList<Unit>();
 		enemyBases = new LinkedList<Base>();
-		closestTile = new Tile(9999, 9999);
-		closestUnit = null;
+		timeToDwell = false;
+		enemyChoke = null;
+//		closestTile = new Tile(9999, 9999);
+//		closestUnit = null;
 	}
 	
 	
-	public void setup() {
+	public void setup()
+	{
 		selfID = bwapi.getSelf().getID();
-		this.scouter.startUp();
-
+		for(Player p : bwapi.getEnemies())
+		{
+			enemyID = p.getID();
+//			System.out.println("ID of: "+p.getID());
+		}
 	}
-	
+
+	public void startUp()
+	{
+		System.out.println("starting up scouter...");
+		this.scouter.startUp();
+		System.out.println("... done starting scouter");
+		
+	}
 
 	public void checkUp() 
 	{
 		this.isScouting = false;
 		if(this.scouter.scout != null)
 			this.isScouting = true;
-		
-//		System.out.println("Total supply used: "+bwapi.getSelf().getSupplyUsed());
-//		System.out.println("Total supply overall: "+bwapi.getSelf().getSupplyTotal());
-		if (this.isScouting || bwapi.getSelf().getSupplyUsed() == 10)
+
+		System.out.println("scout is: "+scouter.scout+", and isScouting: "+isScouting);
+		System.out.println("Total supply used: "+bwapi.getSelf().getSupplyUsed());
+		System.out.println("Total supply overall: "+bwapi.getSelf().getSupplyTotal());
+		if(timeToDwell)
+		{
+			System.out.println("scout: Time to dwell at");
+			System.out.println("	here ("+scouter.scout.getX()+","+scouter.scout.getY()+")");
+			dwell();
+		}
+		else if (this.isScouting || (bwapi.getSelf().getSupplyUsed()/2) == 8 || (bwapi.getSelf().getSupplyUsed()/2) == 40)
 		{
 			this.scouter.scout();
 			for(Base base : scouter.bases)
@@ -91,6 +116,7 @@ public class ManagerInfo extends RRAITemplate
 				if(base.hasEnemy && !enemyBases.contains(base))
 				{
 					enemyBases.add(base);
+					System.out.println("\nADDED AN ENEMY BASE LOCATION!\n");
 				}				
 			}
 		}
@@ -100,46 +126,54 @@ public class ManagerInfo extends RRAITemplate
 	public void unitSeen(int unitID)
 	{		
 		Unit unit = bwapi.getUnit(unitID);
-		if(bwapi.getUnit(unitID).getPlayerID() == 0) //neutral Unit
+		System.out.println("	seen of type ID: "+unit.getTypeID());
+		if(unit.getPlayerID() == enemyID) //enemy Unit
+		{
+			if(!this.enemyUnits.contains(unit))
+			{
+				enemyUnits.add(unit);
+				System.out.println("New Enemy unit discovered of type: "+bwapi.getUnitType(unitID));
+				System.out.println("looking for type of Nexus: "+UnitTypes.Protoss_Nexus.ordinal());
+				if(bwapi.getUnit(unitID).getTypeID() == UnitTypes.Protoss_Nexus.ordinal())
+				{
+					Base tempBase  = new Base();
+					for(Base tbase : scouter.bases)
+					{
+						if(tbase.baseLoc.getX() == unit.getX() && tbase.baseLoc.getY() == unit.getY())
+						{
+							tbase.hasEnemy = true;
+							tbase.hasSeen = true;
+							enemyBases.remove(tbase);
+							System.out.println("\nADDED AN ENEMY BASE LOCATION!\n");
+							enemyBases.add(tbase);
+						}
+					}
+					for(Base tbase : scouter.bases)
+					{
+						System.out.println("baseLoc: "+tbase.baseLoc);
+						System.out.println("hasEnemy: "+tbase.hasEnemy);
+						System.out.println("hasSeen: "+tbase.hasSeen);
+					}
+					for(Unit u : this.enemyUnits)
+					{
+						System.out.println("tostring: "+u.toString());
+						System.out.println("typeID: "+u.getTypeID());
+						System.out.println("ID: "+u.getID());
+						System.out.println("");
+					}
+
+				}
+				System.out.println("finish enemy ID");
+			}
+
+		}
+		else if(bwapi.getUnit(unitID).getPlayerID() != enemyID && bwapi.getUnit(unitID).getPlayerID() != selfID) //neutral Unit
 		{
 			if(!this.neutralUnits.contains(unit))
 			{
 				neutralUnits.add(unit);
 				System.out.println("New Neautral unit discovered of type: "+bwapi.getUnitType(unitID));
 			}
-		}
-		else if(bwapi.getUnit(unitID).getPlayerID() != selfID) //enemy Unit
-		{
-			if(!this.enemyUnits.contains(unit))
-			{
-				enemyUnits.add(unit);
-				System.out.println("New Enemy unit discovered of type: "+bwapi.getUnitType(unitID));
-				if (Math.abs(unit.getTileX() - military.homePositionX) < Math.abs( closestTile.getX() - military.homePositionX) && 
-				 Math.abs(unit.getTileY() - military.homePositionY) < Math.abs(closestTile.getY() - military.homePositionY))
-				{
-					System.out.println("found new closestunit at ("+unit.getTileX()+","+unit.getTileY()+")");
-					closestTile = new Tile(unit.getTileX(), unit.getTileY());
-					closestUnit = unit;
-				}
-			}
-
-			double nearest = 999999;
-			Base temp = scouter.homeBase;
-			for(Base b : scouter.bases)
-			{
-				if(b != null)
-				{
-					double dist = Math.sqrt(Math.pow(unit.getX() - b.tile.getX()*32, 2) + Math.pow(unit.getY() - b.tile.getY()*32, 2));
-					
-					if(dist < nearest)
-					{
-						temp = b;
-						nearest = dist;
-					}
-				}
-			}
-			temp.hasEnemy = true;
-		
 		}
 		else
 		{
@@ -176,12 +210,12 @@ public class ManagerInfo extends RRAITemplate
 				this.enemyUnits.remove(u);
 			}
 //			System.out.println("middle (closest: "+closestUnit+", "+closestUnit.getID());
-			if(closestUnit.getID() == unitID)
+/*			if(closestUnit.getID() == unitID)
 			{
 				closestTile = new Tile(9999, 9999);
 				closestUnit = null;
 			}
-		}
+*/		}
 		for(Unit u : this.neutralUnits)
 		{
 			if(u.getID() == unitID)
@@ -191,6 +225,89 @@ public class ManagerInfo extends RRAITemplate
 		System.out.println("ending now");
 	}
 
+	private void dwell()
+	{
+		int enemyRegion;
+		int chokeRegion;
+		System.out.println("dwelling, right? "+scouter.scout.isMoving());
+		if (enemyChoke == null)
+		{
+			System.out.println("right! ");
+			for(Base b : this.enemyBases)
+			{
+				enemyRegion = b.baseLoc.getRegionID();
+				System.out.println("ID("+enemyRegion+") checking base ("+b.baseLoc.getX()+"," +b.baseLoc.getY()+")");
+				for(javabot.model.ChokePoint cp : bwapi.getMap().getChokePoints())
+				{
+					chokeRegion = cp.getFirstRegionID();
+					System.out.println("region ("+chokeRegion+") is same? "+(chokeRegion == enemyRegion));
+					System.out.println("choke region first("+cp.getFirstSideX()+"," +cp.getFirstSideY()+")");
+					System.out.println("choke region second("+cp.getSecondSideX()+"," +cp.getSecondSideY()+")");
+					System.out.println("choke region center("+cp.getCenterX()+"," +cp.getCenterY()+")");
+					if(chokeRegion == enemyRegion)
+					{
+						System.out.println("they are equal");
+						enemyChoke = cp;
+						boolean greaterX = scouter.homeBase.baseLoc.getX() < cp.getCenterX();
+						boolean greaterY = scouter.homeBase.baseLoc.getY() < cp.getCenterY();
+						System.out.println("greaters: ("+greaterX+","+greaterY+")");
+						if(greaterX && greaterY)
+						{
+							bwapi.move(scouter.scout.getID(), cp.getSecondSideX(), cp.getSecondSideY());
+							this.chokeTile = new Tile(cp.getSecondSideX(), cp.getSecondSideY());
+						}
+						else
+						{
+							bwapi.move(scouter.scout.getID(), cp.getFirstSideX(), cp.getFirstSideY());
+							this.chokeTile = new Tile(cp.getFirstSideX(), cp.getFirstSideY());
+						}
+						System.out.println("moving to center("+cp.getCenterX()+"," +cp.getCenterY()+")");
+						System.out.println("moving to ("+scouter.scout.getTargetX()+"," +scouter.scout.getTargetY()+")");
+					}
+				}
+			}
+			System.out.println("now done dwelling ");
+		}
+		else
+		{
+			System.out.println("now acclimate");
+			if(Math.abs(this.chokeTile.x - scouter.scout.getX()) > 100 || Math.abs(this.chokeTile.y - scouter.scout.getY()) > 100)
+			{
+				System.out.println("moving to ("+this.chokeTile.x+"," +this.chokeTile.y+")");
+				bwapi.move(scouter.scout.getID(), this.chokeTile.x, this.chokeTile.y);
+			}
+			else
+				acclimate();
+			System.out.println("now done acclimating");
+		}
+	}
+	
+	private void acclimate()
+	{
+		int count = 1;
+		boolean greaterX = scouter.homeBase.baseLoc.getX() < scouter.scout.getX();
+		boolean greaterY = scouter.homeBase.baseLoc.getY() < scouter.scout.getY();
+		System.out.println("scout loc: ("+scouter.scout.getX()+","+scouter.scout.getY()+")");
+		System.out.println("greaters: ("+greaterX+","+greaterY+")");
+		System.out.println("count: " +count);
+		System.out.println("is scout moving? "+scouter.scout.isMoving());
+		while (count > 0 && !scouter.scout.isMoving())
+		{
+			if (greaterX && greaterY)
+				bwapi.move(scouter.scout.getID(), scouter.scout.getX() - 1, scouter.scout.getY() - 1);
+			else if (greaterX && !greaterY)
+				bwapi.move(scouter.scout.getID(), scouter.scout.getX() - 1, scouter.scout.getY() + 1);
+			else if (!greaterX && greaterY)
+				bwapi.move(scouter.scout.getID(), scouter.scout.getX() + 1, scouter.scout.getY() - 1);
+			else if (!greaterX && !greaterY)
+				bwapi.move(scouter.scout.getID(), scouter.scout.getX() + 1, scouter.scout.getY() + 1);
+
+			System.out.println("scout loc: ("+scouter.scout.getX()+","+scouter.scout.getY()+")");
+			count = military.getEnemiesWithinUnitSightRange(scouter.scout);
+			System.out.println("count: " +count);
+		}
+	}
+	
 	
 	public void debug() {
 	}
