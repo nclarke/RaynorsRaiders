@@ -39,7 +39,7 @@ public class CoreReactive extends RRAITemplate
 	/* This is to be run frequently, and is the quick-decider for things such as resources */
 	public void checkUp() 
 	{
-		if (agressiveCountdown-- <= 0) {
+		if (agressiveCountdown-- >= 0) {
 			if(defcon-- <= 0) {
 				if (baby.genomeSetting.defensiveness > (int) (Math.random() * 100)) {
 					Unit targetUnit = bwapi.getUnit(info.scouter.getNearestUnit(UnitTypes.Protoss_Zealot.ordinal(), builder.homePositionX, builder.homePositionY));

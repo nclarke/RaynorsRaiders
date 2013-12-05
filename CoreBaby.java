@@ -60,14 +60,7 @@ public class CoreBaby extends RRAITemplate
 	
 	public void checkUp() 
 	{
-		
-		
-		/* Add units */
-		//if (builder.roster.size() < 20)
-			//genUnitsBasic();
 
-		
-		
 		/* Military Orders */
 		if (campaign > 0)
 			campaign--;
@@ -206,9 +199,14 @@ public class CoreBaby extends RRAITemplate
 		//buildingGoals.add(new BuildingRR(0, 1, 0, UnitTypes.Terran_Bunker, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 2, 0, UnitTypes.Terran_Refinery, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 12, 0, UnitTypes.Terran_Barracks, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Factory, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Machine_Shop, BuildStatus.HOLD));
 		buildingGoals.add(new BuildingRR(0, 16, 0, UnitTypes.Terran_Academy, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 17, 0, UnitTypes.Terran_Comsat_Station, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 18, 0, UnitTypes.Terran_Starport, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 18, 0, UnitTypes.Terran_Science_Facility, BuildStatus.HOLD));
+		buildingGoals.add(new BuildingRR(0, 18, 0, UnitTypes.Terran_Covert_Ops, BuildStatus.HOLD));
 	}
 	
 	
